@@ -3,13 +3,12 @@ import pandas as pd
 from copy import deepcopy
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes, mark_inset
-
+from .utils import ModelNotFoundError
 #q=1-d_r["p[4]"][i]
 #theta_E=np.sqrt((1+q**2)/(2*q))*d_r["p[1]"][i]#theta_E_gravlens
-class ModelNotFoundError(Exception):
-    def __init__(self, model, available_models):
-        message = f"The model '{model}' is not in the lensmodel keys list: {available_models}"
-        super().__init__(message)
+
+
+
 
 
 class Result_Handler(

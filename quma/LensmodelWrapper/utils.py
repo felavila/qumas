@@ -324,5 +324,8 @@ def write_pickle(data,file_path):
         #print(filename.replace("hdf5","pickle"))
         pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-
+class ModelNotFoundError(Exception):
+    def __init__(self, model, available_models):
+        message = f"The model '{model}' is not in the lensmodel keys list: {available_models}"
+        super().__init__(message)
 

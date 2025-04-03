@@ -20,19 +20,6 @@ def montecarlo_errors(x_data,x_error,N=10000):
     return median_estimate,median_uncertainty
 
 
-def clean_name(L):
-    "remove leters from the name, caracteres, hopefully we can obtain compare those with previous results"
-    if type(L) != str:
-        l=[]
-        for ii in L:
-            for i in [chr(i) for i in range(ord('A'),ord('Z')+1)]:
-                    ii=ii.replace(i,"").replace("†","").replace("−","-").replace("*","")
-            l.append(ii)
-        L=l
-    else:
-        for i in [chr(i) for i in range(ord('A'),ord('Z')+1)]:
-            L=L.replace(i,"").replace("†","").replace("−","-").replace("*","")
-    return L
 def lday_to_cm(lday_value):
     # Speed of light in cm/s
     speed_of_light_cm_per_s = 2.998e10
@@ -82,6 +69,7 @@ def r_x_to_r_y(rx,x,y=2500,log10=False):
         return to_return(unumpy.log10(unumpy.uarray(*rx)*(y/x)**(4/3)))
     else:
         return to_return(unumpy.uarray(*rx)*(y/x)**(4/3))
+
 def to_return(f):
     if isinstance(f,AffineScalarFunc):
         f= np.array([f.nominal_value,f.s])

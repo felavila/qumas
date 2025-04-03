@@ -6,7 +6,7 @@ import stat
 import subprocess
 from .utils import columns_to_float
 import pandas as pd
-from time_scales_estimation_code.mass_models import mass_models
+from .mass_models import mass_models
 module_dir = os.path.dirname(os.path.abspath(__file__))
 
 filter_info =  pd.read_csv(f"{module_dir}/tables/filter_unique.csv")

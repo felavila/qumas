@@ -1,4 +1,3 @@
-
 def mass_models(mass_distribution,n_galaxies, p1, lens_centered, path):
     if mass_distribution == "SIS":
             # Initialize l as an empty string
