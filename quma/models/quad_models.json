@@ -1,0 +1,30 @@
+
+{
+"SIS":{"step_3":"alpha p1 0 0 0.00 0.0 0 0.0 0 0 1 \n1 1 1 0 0 0 0 0 0 0 \noptimize path/final_step\n",
+"figure_step":"set plotmode    = 2\nkapgam 3 path/kappa_gamma.dat\nplotcrit path/critical_caustic.dat\nplotgrid path/grid.dat\ncalcRein 10 path/RE.dat\nquit"},
+
+"SIE":{"step_1":"alpha p1 0 0 0.03 10.0 0 0.0 0 0 1 \n1 0 0 1 1 0 0 0 0 0 \nvaryone 1 5 -90.0 90.0 19 path/step_1\n",
+"step_2":"\nsetlens path/step_1.start\nchangevary 1 \n1 0 0 1 1 0 0 0 0 0 \noptimize path/step_2\n",
+"step_3":"\nset chimode= 1\nsetlens path/step_2.start\nchangevary 1\n1 1 1 1 1 0 0 0 0 0\noptimize path/final_step\n",
+"figure_step":"set plotmode    = 2\nkapgam 3 path/kappa_gamma.dat\nplotcrit path/critical_caustic.dat\nplotgrid path/grid.dat\ncalcRein 10 path/RE.dat\nquit"},
+    
+    "POW":{"step_1":"alpha p1 0 0 0.03 10.0 0 0.0 0 0 1 \n1 0 0 1 1 0 0 0 0 0 \nvaryone 1 5 -90.0 90.0 19 path/step_1\n",
+    "step_2":"\nsetlens path/step_1.start\nchangevary 1 \n1 0 0 1 1 0 0 0 0 0 \noptimize path/step_2\n",
+    "step_3":"\nset chimode= 1\nsetlens path/step_2.start\nchangevary 1\n1 1 1 1 1 0 0 0 0 1\noptimize path/final_step\n",
+    "figure_step":"set plotmode    = 2\nkapgam 3 path/kappa_gamma.dat\nplotcrit path/critical_caustic.dat\nplotgrid path/grid.dat\ncalcRein 10 path/RE.dat\nquit"},
+    
+"SIS+shear":{"step_1":"alpha p1 0 0 0.00 0.0 0 0.0 0 0 1 \n1 0 0 0 0 1 1 0 0 0 \nvaryone 1 7 -90.0 90.0 19 path/step_1\n",
+"step_2":"\nsetlens path/step_1.start\nchangevary 1 \n1 0 0 0 0 1 1 0 0 0 \noptimize path/step_2\n",
+"step_3":"\nset chimode= 1\nsetlens path/step_2.start\nchangevary 1\n1 1 1 0 0 1 1 0 0 0\noptimize path/final_step\n",
+"figure_step":"set plotmode    = 2\nkapgam 3 path/kappa_gamma.dat\nplotcrit path/critical_caustic.dat\nplotgrid path/grid.dat\ncalcRein 10 path/RE.dat\nquit"},
+
+"SIE+shear":{"step_1":"alpha p1 0 0 0.03 10.0 0 0.0 0 0 1 \n1 0 0 1 1 0 0 0 0 0 \nvarytwo 1 5 -90.0 90.0 19 1 7 -90.0 90.0 19 path/step_1\n",
+"step_2":"\nsetlens path/step_1.start\nchangevary 1 \n1 1 1 1 1 0 0 0 0 0 \noptimize path/step_2\n",
+"step_3":"\nset chimode= 1\nsetlens path/step_2.start\nchangevary 1\n1 1 1 1 1 1 1 0 0 0\noptimize path/final_step\n",
+"figure_step":"set plotmode    = 2\nkapgam 3 path/kappa_gamma.dat\nplotcrit path/critical_caustic.dat\nplotgrid path/grid.dat\ncalcRein 10 path/RE.dat\nquit"},
+
+    "POW+shear":{"step_1":"alpha p1 0 0 0.03 10.0 0 0.0 0 0 1 \n1 0 0 1 1 0 0 0 0 0 \nvarytwo 1 5 -90.0 90.0 19 1 7 -90.0 90.0 19 path/step_1\n",
+    "step_2":"\nsetlens path/step_1.start\nchangevary 1 \n1 1 1 1 1 0 0 0 0 0 \noptimize path/step_2\n",
+    "step_3":"\nset chimode= 1\nsetlens path/step_2.start\nchangevary 1\n1 1 1 1 1 1 1 0 0 1\noptimize path/final_step\n",
+    "figure_step":"set plotmode    = 2\nkapgam 3 path/kappa_gamma.dat\nplotcrit path/critical_caustic.dat\nplotgrid path/grid.dat\ncalcRein 10 path/RE.dat\nquit"}
+    }

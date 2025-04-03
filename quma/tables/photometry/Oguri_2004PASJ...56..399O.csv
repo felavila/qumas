@@ -1,0 +1,4 @@
+name,z_s,z_l,ra,dec,component,IS,RA,dRA,DEC,dDEC,band_i,error_i,photometric_system,Telescope,instrument,Bibcode,notes
+SDSSJ1335+0118,1.57,0.44,203.89496,1.30153,A,ima,0.0,0.001,0.0,0.001,17.63,0.01,,Subaru,Suprime,2004PASJ...56..399O,
+SDSSJ1335+0118,1.57,0.44,203.89496,1.30153,B,ima,-1.038,0.002,-1.165,0.002,18.7,0.01,,Subaru,Suprime,2004PASJ...56..399O,
+SDSSJ1335+0118,1.57,0.44,203.89496,1.30153,G,lens,-0.769,0.011,-0.757,0.011,20.05,0.01,,Subaru,Suprime,2004PASJ...56..399O,

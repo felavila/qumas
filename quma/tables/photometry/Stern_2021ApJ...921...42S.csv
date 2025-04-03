@@ -1,0 +1,10 @@
+name,z_s,z_l,ra,dec,component,IS,RA,dRA,DEC,dDEC,band_G,error_G,photometric_system,Telescope,instrument,Bibcode,notes
+GraLJ165105.3-041725,1.451,0.591,252.7724,-4.2903,A,ima,0.0,0.002,0.0,0.002,19.6,0.02,vega,Gaia,Gaia,2021ApJ...921...42S,in the original paper G and B are changed
+GraLJ165105.3-041725,1.451,0.591,252.7724,-4.2903,B,ima,-3.2119,0.002,-5.7522,0.002,19.49,0.02,vega,Gaia,Gaia,2021ApJ...921...42S,in the original paper G and B are changed
+GraLJ165105.3-041725,1.451,0.591,252.7724,-4.2903,C,ima,-7.8631,0.002,-6.3014,0.002,18.99,0.02,vega,Gaia,Gaia,2021ApJ...921...42S,in the original paper G and B are changed
+GraLJ165105.3-041725,1.451,0.591,252.7724,-4.2903,D,ima,-6.3679,0.002,-1.6598,0.002,20.04,0.02,vega,Gaia,Gaia,2021ApJ...921...42S,in the original paper G and B are changed
+GraLJ165105.3-041725,1.451,0.591,252.7724,-4.2903,G,lens,-4.5961,0.01,-3.1504,0.01,,,vega,Gaia,Gaia,2021ApJ...921...42S,in the original paper G and B are changed
+GraLJ065904.1+162909,3.083,0.766,104.7670833,16.48583333,A,ima,0.0,0.002,0.0000,0.002,18.59,0.02,vega,Gaia,Gaia,2021ApJ...921...42S,
+GraLJ065904.1+162909,3.083,0.766,104.7670833,16.48583333,B,ima,-4.7491,0.002,-2.2357,0.002,20.05,0.02,vega,Gaia,Gaia,2021ApJ...921...42S,
+GraLJ065904.1+162909,3.083,0.766,104.7670833,16.48583333,C,ima,-0.0849,0.002,−1.9017,0.002, 19.94,0.02,vega,Gaia,Gaia,2021ApJ...921...42S,
+GraLJ065904.1+162909,3.083,0.766,104.7670833,16.48583333,D,ima,1.1879,0.003,0.9889,0.01, 20.00,0.02,vega,Gaia,Gaia,2021ApJ...921...42S,

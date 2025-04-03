@@ -1,0 +1,4 @@
+name,z_s,z_l,ra,dec,component,IS,RA,dRA,DEC,dDEC,band_I,error_I,photometric_system,Telescope,instrument,Bibcode,notes
+SDSSJ1021+4913,1.72,0.451,155.29588,49.22508,A,ima,0.0,0.0001,0.0,0.0001,19.02,0.06,,UH88,8kmosaic,2006AJ....131...41P,
+SDSSJ1021+4913,1.72,0.451,155.29588,49.22508,B,ima,-0.83,0.029,0.776,0.029,20.01,0.1,,UH88,8kmosaic,2006AJ....131...41P,
+SDSSJ1021+4913,1.72,0.451,155.29588,49.22508,G,lens,-0.27,0.003,0.514,0.014,21.72,0.5,,UH88,8kmosaic,2006AJ....131...41P,

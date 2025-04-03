@@ -1,0 +1,4 @@
+name,z_s,z_l,ra,dec,component,IS,RA,dRA,DEC,dDEC,band_R,error_R,photometric_system,Telescope,instrument,Bibcode,notes
+ULASJ2343-0050,0.787,,355.79975,-0.84286,A,ima,0.0,0.001,0.0,0.001,20.6,0.01,,Keck,KeckI,2008MNRAS.387..741J,
+ULASJ2343-0050,0.787,,355.79975,-0.84286,B,ima,1.39,0.001,0.59,0.001,20.78,0.01,,Keck,KeckI,2008MNRAS.387..741J,
+ULASJ2343-0050,0.787,,355.79975,-0.84286,G,lens,0.4,0.001,0.2,0.001,19.94,0.01,,Keck,KeckI,2008MNRAS.387..741J,

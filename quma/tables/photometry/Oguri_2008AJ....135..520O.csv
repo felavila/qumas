@@ -1,0 +1,4 @@
+name,z_s,z_l,ra,dec,component,IS,RA,dRA,DEC,dDEC,band_I,error_I,photometric_system,Telescope,instrument,Bibcode,notes
+SDSSJ1524+4409,1.21,0.32,231.19008,44.16375,A,ima,0.0,0.008,0.0,0.008,19.54,0.04,vega,UH88,Tek2k,2008AJ....135..520O,
+SDSSJ1524+4409,1.21,0.32,231.19008,44.16375,B,ima,-1.485,0.012,0.761,0.012,20.17,0.03,vega,UH88,Tek2k,2008AJ....135..520O,
+SDSSJ1524+4409,1.21,0.32,231.19008,44.16375,G,lens,-0.576,0.012,0.142,0.012,18.33,0.01,vega,UH88,Tek2k,2008AJ....135..520O,

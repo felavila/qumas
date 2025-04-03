@@ -1,0 +1,4 @@
+name,z_l,z_s,ra,dec,component,IS,RA,dRA,DEC,dDEC,band_i,error_i,photometric_system,Telescope,instrument,Bibcode,notes
+DESJ0407-5006,,1.515,61.7928,-50.10042,A,ima,-0.863,0.002,1.437,0.002,18.01,0.03,,Magellan,IMACS,2018MNRAS.480.5017A,
+DESJ0407-5006,,1.515,61.7928,-50.10042,B,ima,0.0,0.004,0.0,0.004,19.26,0.03,,Magellan,IMACS,2018MNRAS.480.5017A,
+DESJ0407-5006,,1.515,61.7928,-50.10042,G,lens,-0.331,0.06,0.424,0.006,19.97,0.06,,Magellan,IMACS,2018MNRAS.480.5017A,

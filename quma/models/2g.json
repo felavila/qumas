@@ -1,0 +1,27 @@
+if model=="SIE-2G" and CM==True:
+    ra,dec=dif["RA"].values-dif["RA"].values[0],dif["DEC"].values-dif["DEC"].values[0]
+    #values=R_chi[R_model["model"]=="SIE+shear"]
+    L1=[]
+    for i in range(len(ra)):
+        if i==0:
+            L1.append("alpha "+str(alfa_0)+" "+str(ra[i])+" "+str(dec[i]) +" 0.1 10.0 0 0.0 0 0 1")
+        else:
+            L1.append("alpha "+str(alfa_0)+" "+str(ra[i])+" "+str(dec[i]) +" 0.1 10.0 0 0.0 0 0 1")
+    for i in range(len(ra)):
+        L1.append("1 0 0 1 1 0 0 0 0 0")
+    L1.append("varytwo 1 5 -90.0 90.0 19 2 5 -90.0 90.0 19 "+pad+"/first")   
+    L2=["#secondpart","setlens "+pad+"/first.start","changevary 1","1 1 1 0 0 0 0 0 0 0 #second","1 1 1 0 0 0 0 0 0 0","optimize "+pad+"/second"]
+    L3=["#thirdpart","setlens "+pad+"/second.start","changevary 1"," 1 1 1 1 1 0 0 0 0 0 # third","1 1 1 1 1 0 0 0 0 0","optimize "+pad+"/third"]
+    L = itertools.chain(L1,L2,L3)
+if model=="SIE-2G" and CM==True and R_chi!=None and len(imagenes)>1000:
+    ra,dec=dif["RA"].values-dif["RA"].values[0],dif["DEC"].values-dif["DEC"].values[0]
+    values=R_chi[R_model["model"]=="SIE+shear"]
+    L1=[]
+    for i in range(len(ra)):
+        L1.append("alpha "+str(alfa_0/2)+" "+str(ra[i])+" "+str(dec[i]) +" 0.1 10.0 0 0.0 0 0 1")
+    for i in range(len(ra)):
+        L1.append("1 0 0 1 1 0 0 0 0 0")
+    L1.append("varytwo 1 5 -90.0 90.0 19 2 5 -90.0 90.0 19 "+pad+"/first")   
+    L2=["#secondpart","setlens "+pad+"/first.start","changevary 1","1 1 1 0 0 0 0 0 0 0 #second","1 1 1 0 0 0 0 0 0 0","optimize "+pad+"/second"]
+    L3=["#thirdpart","setlens "+pad+"/second.start","changevary 1"," 1 1 1 1 1 0 0 0 0 0 # third","1 1 1 1 1 0 0 0 0 0","optimize "+pad+"/third"]
+    L = itertools.chain(L1,L2,L3)
