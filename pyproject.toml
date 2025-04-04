@@ -63,9 +63,6 @@ include = [
     "CHANGELOG.rst",
 ]
 
-dependencies = ["astropy >=6.0","scipy >=1.11.4"
-, "pandas>=2.2.0" ,"matplotlib>=3.8.2","parallelbar>=2.4","pytest>=7.0", "numpy==1.26","lmfit","parallelbar","h5py"]
-
 exclude = [
     "docs/*",
     "requirements/*",
@@ -112,6 +109,15 @@ exclude = [
 ### Dependency Constraints, aka Requirements ###
 [tool.poetry.dependencies]
 python = ">=3.10, <3.13"
+astropy = ">=6.0"
+scipy = ">=1.11.4"
+pandas = ">=2.2.0"
+matplotlib = ">=3.8.2"
+parallelbar = ">=2.4"
+numpy = "==1.26"
+lmfit = "*"
+h5py = "*"
+
 
 # Test: packages imported in test code and packages required for the "test runner"
 pytest = { version = "^8.0.0", optional = true }
