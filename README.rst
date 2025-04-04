@@ -2,11 +2,10 @@
 QuMA: Quasar Microlens Analysis
 =======
 
-| |build| |coverage| |docs| |maintainability| |codacy| |tech-debt|
-| |release_version| |wheel| |supported_versions| |commits_since_specific_tag_on_master| |commits_since_latest_github_release|
-| |pypi_stats| |ossf| |ruff| |black| |gh-lic|
+.. .| |build| |coverage| |docs| |maintainability| |codacy| |tech-debt|
+.. .| |release_version| |wheel| |supported_versions| |commits_since_specific_tag_on_master| |commits_since_latest_github_release|
+.. .| |pypi_stats| |ossf| |ruff| |black| |gh-lic||
 
-|
 QuMA (Quasar Microlens Analysis) is a Python 3 package that provides a comprehensive suite of tools for analyzing microlensing phenomena in quasars. It is designed to facilitate the study of time scales, assess the impact of microlensing on AGN spectra, and analyze magnification maps in gravitational lensing systems.
 
 Features
@@ -32,10 +31,11 @@ References
 
 QuMA includes a submodule that uses the Lensmodel package for semi-automatic modeling of lensed quasars. This submodule uses code originally developed by Charles R. Keeton. If you use this submodule in your research, please cite:
 
-**Keeton, C. R. (2011). _Lensmodel: A tool for gravitational lensing._**  
-*Astrophysics Source Code Library, ascl:1102.003.*  
-Available at: [ADS Abstract](https://ui.adsabs.harvard.edu/abs/2011ascl.soft02003K/abstract)  
-The code can be found at: [Lensmodel Code](https://www.physics.rutgers.edu/~keeton/gravlens/2012WS/)
+**Keeton, C. R. (2011). *Lensmodel: A tool for gravitational lensing.*  
+Astrophysics Source Code Library, ascl:1102.003.**  
+Available at: `ADS Abstract <https://ui.adsabs.harvard.edu/abs/2011ascl.soft02003K/abstract>`_  
+The code can be found at: `Lensmodel Code <https://www.physics.rutgers.edu/~keeton/gravlens/2012WS/>`_
+
 
 License
 =======
