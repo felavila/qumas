@@ -2,10 +2,11 @@
 QuMA: Quasar Microlens Analysis
 =======
 
-| |build| |release_version| |wheel| |supported_versions|
-| |docs| |coverage| |maintainability| |tech-debt|
-| |ruff| |gh-lic| |commits_since_specific_tag_on_main| |commits_since_latest_github_release|
+| |build| |coverage| |docs| |maintainability| |codacy| |tech-debt|
+| |release_version| |wheel| |supported_versions| |commits_since_specific_tag_on_master| |commits_since_latest_github_release|
+| |pypi_stats| |ossf| |ruff| |black| |gh-lic|
 
+|
 QuMA (Quasar Microlens Analysis) is a Python 3 package that provides a comprehensive suite of tools for analyzing microlensing phenomena in quasars. It is designed to facilitate the study of time scales, assess the impact of microlensing on AGN spectra, and analyze magnification maps in gravitational lensing systems.
 
 Features
