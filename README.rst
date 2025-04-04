@@ -1,3 +1,4 @@
+=======
 QuMA: Quasar Microlens Analysis
 =======
 
@@ -20,9 +21,10 @@ Installation
 
 Install QuMA locally using the following command:
 
-```bash
-pip install -e .
-```
+.. code-block:: shell
+    
+    pip install -e .
+
 
 References
 =======
