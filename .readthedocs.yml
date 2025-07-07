@@ -6,6 +6,12 @@ build:
   tools:
     python: "3.12"
   jobs:
+    pre_build:
+      # force-regenerate all API .rst files under docs/api/
+      - sphinx-apidoc --force --module-first --separate \
+          -o docs/api ../quma
+      - python ./scripts/visualize-ga-workflow.py > docs/cicd_mermaid.md
+      - python ./scripts/visualize-dockerfile.py > docs/dockerfile_mermaid.md
     pre_install:
       - python --version
       # 1️⃣ Install both Poetry and the export plugin via pip:

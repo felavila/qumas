@@ -4,25 +4,26 @@ Welcome to QuMA’s documentation!
 **QuMA** (Quasar Microlens Analysis) is a Python package for ?
 
 .. note::
-   This docs are a work in progress.
+   This documentation is a work in progress.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Tutorial:
+   :caption: Tutorial
 
    contents/10_introduction
    contents/20_why_this_package
    contents/30_usage
 
+
 API Reference
 =============
 
 .. toctree::
-   :maxdepth: 1
-   :caption: Modules:
-   :glob:
+   :maxdepth: 2
+   :caption: API Reference
 
-   contents/quma*
+   api/index
+
 
 Indices and tables
 ==================

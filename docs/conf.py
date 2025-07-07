@@ -1,24 +1,18 @@
 # Configuration file for the Sphinx documentation builder.
 #
-# This file configures the readthedocs.org server that Continuously
-# builds the documentation pages of the quma
-# project.
+# This file configures the Read the Docs server that continuously
+# builds the documentation pages of the quma project.
 
-# Docstrings in the source code should be written in
-# the 'Google' format.
-
-# This file only contains a selection of the most common options. For a full
-# list see the documentation:
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
-
+import os
+import sys
+import sphinx_rtd_theme
 
 # -- Path setup --------------------------------------------------------------
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here
-import os
-import sys
+# documentation root, use os.path.abspath to make it absolute.
+sys.path.insert(0, os.path.abspath('..'))
 
 
 def get_templated_vars():
@@ -39,91 +33,103 @@ def get_templated_vars():
 
 variables = get_templated_vars()
 
-# Add package to PYTHONPATH
-sys.path.insert(0, os.path.abspath('..'))
-
 
 # -- Project information -----------------------------------------------------
 
 project = variables.project_slug
-copyright = '{year}, {name}'.format(
-    year=variables.year,
-    name=variables.author_name,
-)
 author = variables.author_name
-
-# The full version, including alpha/beta/rc tags
+copyright = f"{variables.year}, {variables.author_name}"
 release = variables.version
+
 
 # -- General configuration ---------------------------------------------------
 
-# Add any Sphinx extension module names here, as strings. They can be
-# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
-# ones.
+# The suffix(es) of source filenames.
+source_suffix = {
+    '.rst': 'restructuredtext',
+}
+
+# The master toctree document.
+master_doc = 'index'
+
+# Sphinx extensions
 extensions = [
-    'sphinx.ext.doctest',
-    'sphinx.ext.autodoc',
-    'sphinx.ext.autosummary',
+    'sphinx.ext.autodoc',      # Pull in Python docstrings
+    'sphinx.ext.autosummary',  # Generate summary tables + stub pages
+    'sphinx.ext.napoleon',     # Google / NumPy style docstrings
+    'sphinx.ext.viewcode',     # “View source” links
     'sphinx.ext.coverage',
-    'sphinx.ext.doctest',
-    'sphinx.ext.extlinks',  # External Links Configuration: Dynamic Urls
+    'sphinx.ext.extlinks',     # External Links helper
     'sphinx.ext.ifconfig',
-    'sphinx.ext.napoleon',  # Allow parsing of docstrings using Google format
     'sphinx.ext.todo',
-    'sphinx.ext.viewcode',
+    'sphinx.ext.doctest',
     'sphinxcontrib.spelling',
 ]
-extensions += [
-    "sphinx.ext.autodoc",
-    "sphinx.ext.autosummary",
-]
-autosummary_generate = True
-autodoc_mock_imports = ["pandas","lmfit","astropy","uncertainties"]  # if you want to skip installing those
-# Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
 
-# List of patterns, relative to source directory, that match files and
-# directories to ignore when looking for source files.
-# This pattern also affects html_static_path and html_extra_path.
+# Automatically generate autosummary stub pages
+autosummary_generate = True
+
+# Autodoc configuration
+autodoc_default_options = {
+    'members': True,
+    'undoc-members': False,
+    'show-inheritance': True,
+}
+autodoc_member_order = 'bysource'
+autodoc_typehints = 'description'
+
+# Napoleon settings
+napoleon_google_docstring = True
+napoleon_numpy_docstring = False
+
+# Mock imports for modules not needed during docs build
+autodoc_mock_imports = [
+    'pandas',
+    'lmfit',
+    'astropy',
+    'uncertainties',
+]
+
+# Paths for templates and excluded patterns
+templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 
 # -- Options for HTML output -------------------------------------------------
 
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
+# Use the Read the Docs theme
+html_theme = 'sphinx_rtd_theme'
+html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+html_theme_options = {
+    'logo_only': False,
+    'display_version': True,
+    'prev_next_buttons_location': 'bottom',
+    'style_external_links': False,
+    'collapse_navigation': False,
+    'sticky_navigation': True,
+    'navigation_depth': 4,
+}
 
-# on_rtd is whether we are on readthedocs.org
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
-
-if not on_rtd:  # only set the theme if we're building docs locally
-    html_theme = 'sphinx_rtd_theme'
-
-# Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
-# html_static_path = ['_static']
+# Add any paths that contain custom static files (such as style sheets)
+html_static_path = ['_static']
+# html_logo = '_static/logo.png'  # Uncomment if you add a logo
 
 
-### External Links Configuration ###
-# provided by the sphinx.ext.extlinks extension
+# -- External Links Configuration -------------------------------------------
 
-# With the current settings (see the mapping below), you can for example use the
-# directive :issue:`5`, to dynamically render a link with text 'issue 5'.
-# The link shall be 'clickable' and shall redirect to your issues page on github
-# and specifically point to issue number 5
-# https://github.com/{username}/{repository}/issues/5
-
-# Mapping of link identifiers/keys to:
-# 2-length tuples with 1st item the url and 2nd the prefix (the "text string")
-# You can add etries here, according to your use case(s).
+# Enables :issue:`123` links to GitHub issues
 extlinks = {
     'issue': (
         'https://github.com/{username}/{repository}/issues/'.format(
             username=variables.github_username,
             repository=variables.repo_name,
-        )
-        + '%s',
+        ) + '%s',
         'issue ',
     ),
 }
+
+
+# -- Todo and spelling options -----------------------------------------------
+
+todo_include_todos = True
+spelling_warning = True
