@@ -64,7 +64,21 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.doctest',
     'sphinxcontrib.spelling',
-#    "sphinx_rtd_theme"
+    "autoapi.extension"
+    "sphinx_rtd_theme"
+]
+
+autoapi_type = 'python'
+autoapi_dirs = ['../quma']
+# Where in your docs tree to put the generated API pages:
+autoapi_root = 'api'
+
+# Which members to include:
+autoapi_options = [
+    'members',
+    'undoc-members',
+    'show-inheritance',
+    'show-module-summary',
 ]
 
 # Automatically generate autosummary stub pages

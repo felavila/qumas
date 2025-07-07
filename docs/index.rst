@@ -19,8 +19,7 @@ API Reference
 =============
 
 .. toctree::
-   :maxdepth: 2
-   :caption: API Reference
+   :maxdepth: 4
 
    api/index
 
