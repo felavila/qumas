@@ -24,6 +24,9 @@ def convert_none_to_nan(item):
     else:
         return item
 
+
+
+
 class WindowAnalysis:
     def __init__(self,results,zs=0.0,rest_frame=True,save_name = None,obj_name=None,path_previous_results=None):
         """_summary_
@@ -72,12 +75,123 @@ class WindowAnalysis:
                 self.spectra_dict[band]["error"].append(value.get("error",np.ones_like(flux)))
                 self.spectra_dict[band]["obj"].append(obj)
     
-    
     def __call__(self,**kwargs):
+        lines = self.pre_define_windows["line_name"].values
+        for line_name in lines:
+            #print(line_name)
+            row = self.pre_define_windows[self.pre_define_windows["line_name"]==line_name]
+            center_window = np.mean(row["core_range"].values[0])
+            window = [center_window-500,center_window+500]
+            lr_init = row["right_range"].values[0]
+            lc_init = row["left_range"].values[0]
+            core_init = row["core_range"].values[0]
+            #print(center_window,lr_init,lr_init,lc_init,core_init)
+            if self._previous_results is not None and line_name in self._previous_results.line_name.values:
+                row = self._previous_results[self._previous_results.line_name == line_name].iloc[0].to_dict() #assuming all the rows share the same values
+                row.update({["X","Y","objs"][n]: value for n,value in enumerate(np.array(self.spectra_dict[row.band]["wavelength"]), np.array(self.spectra_dict[row.band]["flux"]),self.spectra_dict[row.band]["obj"])})
+                self.interactive_plot(**row)
+            for band in self.spectra_dict.keys():
+                X,Y,objs = np.array(self.spectra_dict[band]["wavelength"]), np.array(self.spectra_dict[band]["flux"]),self.spectra_dict[band]["obj"]
+                if center_window < np.min(X) or center_window > np.max(X):
+                    continue
+                else:
+                    #print( center_window,np.min(X),np.max(X))
+                    self.interactive_plot(X,Y,objs,center_window,window,lr_init,lc_init,core_init,band,line_name)
+    
+    def interactive_plot(self,X,Y,objs,center_window,window,lr_init,lc_init,core_init,band,line_name):
+        #X,Y,objs = np.array(self.spectra_dict[band]["wavelength"]), np.array(self.spectra_dict[band]["flux"]),self.spectra_dict[band]["obj"]
+        #if center_window < np.min(X[0]) or center_window > np.max(X[0]):
+         #   return "cant do nothing"
+        #else:
+            w_mask = (X[0]>=min(window)) & (X[0]<=max(window)) #soft coming sooon 
+            Y_local = Y[:,w_mask]
+            q2 = np.percentile(Y_local, 89)
+            q3 = np.percentile(Y_local, 95) 
+            q4 = np.percentile(Y_local, 99.97) 
+            max_local = np.max(Y_local)
+            min_local = np.min(Y_local)
+            aspect_ratio = 1.5
+            fig = plt.figure(figsize=(20, 15 / 1.5))
+            grid = plt.GridSpec(2, 2, width_ratios=[2, 2], height_ratios=[3, 1], hspace=0.4)
+            Lp = plt.subplot(grid[0, 0])
+            Rp = plt.subplot(grid[0, 1])
+            bbox_Lp = Lp.get_position()
+            bbox_Rp = Rp.get_position()
+            gap_left = bbox_Lp.x0/4 + bbox_Lp.width
+            #the val init aqui luego 
+            #line -> todo el resto adentro ? lo q seria un doble looop?
+            #if self._previous_results.get(f"{}_{}"):
+                #Wrange_lc_Lp,Wrange_rc_Lp,Wrange_core,Wrange_Lp,Wrange_Rp,Frange_Lp,Frange_Rp
+            
+            #window = [center_window - 500, center_window + 500]
+            _d = 0.15
+            Wslider_lc = plt.axes([gap_left, bbox_Lp.y0 -_d,  bbox_Lp.width, 0.03])
+            Wslider_core = plt.axes([gap_left, bbox_Lp.y0 -_d - 0.05,  bbox_Lp.width, 0.03])
+            Wslider_rc = plt.axes([gap_left, bbox_Lp.y0 - _d -0.10,  bbox_Lp.width, 0.03])
+            
+            Wslider_Lp = plt.axes([bbox_Lp.x0, bbox_Lp.y1*1.01, bbox_Lp.width, 0.03]) 
+            Wslider_Rp = plt.axes([bbox_Rp.x0, bbox_Rp.y1*1.01, bbox_Rp.width, 0.03]) 
+            
+            Fslider_Lp = plt.axes([bbox_Lp.x0 + bbox_Lp.width, bbox_Lp.y0, 0.03, bbox_Lp.height])
+            Fslider_Rp = plt.axes([bbox_Rp.x0 + bbox_Rp.width , bbox_Rp.y0, 0.03, bbox_Rp.height]) 
+            #Wslider_core_Rp = plt.axes([bbox_Rp.x0, bbox_Rp.y0-0.1, bbox_Rp.width, 0.03]) 
+            Wrange_lc_Lp = RangeSlider(Wslider_lc, "left \ncontinium",np.min(X),center_window , valinit=lc_init,color="purple",alpha=0.5) 
+            Wrange_rc_Lp = RangeSlider(Wslider_rc, "right \ncontinium",center_window,np.max(X),valinit=lr_init,color="green",alpha=0.2) 
+            Wrange_core = RangeSlider(Wslider_core ,"line core",center_window-100,center_window+100,valinit=core_init,color="r",alpha=0.2)
+            
+            Wrange_Lp = RangeSlider(Wslider_Lp,None,np.min(X),np.max(X),valinit=window)
+            Wrange_Rp = RangeSlider(Wslider_Rp,None,np.min(X),np.max(X),valinit=window)
+            Frange_Lp = RangeSlider(Fslider_Lp, None, 0, max_local , valinit=[0,q4], orientation='vertical')
+            Frange_Rp = RangeSlider(Fslider_Rp,None , -max_local*0.5, max_local , valinit=[-max_local*0.01,max_local*0.5], orientation='vertical')
+            
+            Wrange_Lp.valtext.set_visible(False)
+            Wrange_Rp.valtext.set_visible(False)
+            Frange_Lp.valtext.set_visible(False)
+            Frange_Rp.valtext.set_visible(False)
+            Wrange_lc_Lp.valtext.set_visible(False)
+            Wrange_rc_Lp.valtext.set_visible(False)
+            Wrange_core.valtext.set_visible(False)
+            
+            # Use the helper method for the initial plot
+            self._window_plot(Lp, Rp, X, Y, objs, center_window, line_name, band, 
+                            Wrange_lc_Lp, Wrange_rc_Lp, Wrange_core, 
+                            Wrange_Lp, Frange_Lp, Wrange_Rp, Frange_Rp)
+            
+            # Connect sliders to update the plot using the same helper method in the callback
+            slider_update = lambda val: self._window_plot(Lp, Rp, X, Y, objs, center_window, line_name, band, Wrange_lc_Lp, Wrange_rc_Lp, Wrange_core, Wrange_Lp, Frange_Lp, Wrange_Rp, Frange_Rp)
+            
+            Wrange_Lp.on_changed(slider_update)
+            Frange_Lp.on_changed(slider_update)
+            Wrange_Rp.on_changed(slider_update)
+            Frange_Rp.on_changed(slider_update)
+            Wrange_lc_Lp.on_changed(slider_update)
+            Wrange_rc_Lp.on_changed(slider_update)
+            Wrange_core.on_changed(slider_update)
+            
+            save_button = plt.axes([0.4, 0.02, 0.2, 0.04])
+            button_save = Button(save_button, 'Save', color='lightgoldenrodyellow', hovercolor='0.975')
+            
+            button_save.on_clicked(lambda event: self._on_save_button_clicked(event,Lp, Rp, X, Y, objs, center_window, line_name, band, Wrange_lc_Lp, Wrange_rc_Lp, Wrange_core, Wrange_Lp, Frange_Lp, Wrange_Rp, Frange_Rp))
+            #if name_file in os.listdir(os.getcwd()):
+            #   if any((panda_read[["name"]].values == [line_name]).all(axis=1)):
+            #      ax_save_button = plt.axes([0.6, 0.02, 0.2, 0.04])
+            #     button_remove = Button(ax_save_button, 'remove line', color='lightgoldenrodyellow', hovercolor='0.975')
+            #    button_remove.on_clicked(on_remove_line_clicked)
+            # Update the plot when slider values change
+            #ax_save_button = plt.axes([0.01, 0.95, 0.2, 0.04])
+            #button_close = Button(ax_save_button, 'Close', color='lightgoldenrodyellow', hovercolor='0.975')
+            #button_close.on_clicked(on_close_all)
+            plt.show()
+            
+            
+            return X, Y, window, Lp.get_position()
+        
+    def windows_analysis(self,band="nir",):
         """_summary_
             overall i will build all around the idea of that the two bands share the same number of pixels because is more easier but
             maybe is more consistent have the idea of this is not always the case.
         """
+        
         row = self.pre_define_windows.iloc[8]
         line = row['line_name']
         center_window = np.mean(row["core_range"])
@@ -85,8 +199,9 @@ class WindowAnalysis:
         lr_init = row["right_range"]
         lc_init = row["left_range"]
         core_init = row["core_range"]
-        band = "nir"
+        #band = "nir"
         X,Y,objs = np.array(self.spectra_dict[band]["wavelength"]), np.array(self.spectra_dict[band]["flux"]),self.spectra_dict[band]["obj"]
+        
         if center_window < np.min(X[0]) or center_window > np.max(X[0]):
             return "cant do nothing"
         else:
@@ -199,13 +314,13 @@ class WindowAnalysis:
                 'Frange_Lp_min': min(Frange_Lp.val),
                 'Frange_Rp_max': max(Frange_Rp.val),
                 'Frange_Rp_min': min(Frange_Rp.val)}
-        if self._previous_results:
+        #if self._previous_results:
             #print(imagen)
             #print(self._previous_results[imagen])
-            prev=self._previous_results.get(f"{imagen}_{band}")
+         #   prev=self._previous_results.get(f"{imagen}_{band}")
             #print(prev.keys())
             #print([[prev[key],current[key]] for key in current.keys()])
-            same = all([prev.get(key) == result_.get(key) for key in result_.keys()])
+          #  same = all([prev.get(key) == result_.get(key) for key in result_.keys()])
             
             #print(same)
         return result_
@@ -214,7 +329,8 @@ class WindowAnalysis:
     def _read_previous_results(self, path):
         if isinstance(path, str) and os.path.isfile(path):
             with open(path, 'rb') as f:
-                loaded_list = pickle.load(f)
+                loaded_list = pd.DataFrame(list(pickle.load(f).values()))
+                #print(loaded_list)
             return loaded_list
         else:
             return None

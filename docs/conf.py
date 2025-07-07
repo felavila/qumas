@@ -40,7 +40,7 @@ def get_templated_vars():
 variables = get_templated_vars()
 
 # Add package to PYTHONPATH
-sys.path.insert(0, os.path.abspath(os.path.join('..', 'src', variables.package_name)))
+sys.path.insert(0, os.path.abspath('..'))
 
 
 # -- Project information -----------------------------------------------------
@@ -73,7 +73,12 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinxcontrib.spelling',
 ]
-
+extensions += [
+    "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
+]
+autosummary_generate = True
+autodoc_mock_imports = ["pandas","lmfit","astropy","uncertainties"]  # if you want to skip installing those
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 

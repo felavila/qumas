@@ -1,7 +1,7 @@
 import glob
 import numpy as np
 import pandas as pd
-from .utils import pandas_to_model
+from .LensmodelWrapper.utils import pandas_to_model
 import os 
 
 module_dir = os.path.dirname(os.path.abspath(__file__))
@@ -10,7 +10,7 @@ module_dir = os.path.dirname(os.path.abspath(__file__))
 #filter_info =  pd.read_csv(f"{module_dir}/tables/filter_unique.csv")
 
 class LensedQsoCensus:
-    def __init__(self, path="tables/photometry"):
+    def __init__(self, path="Tables/photometry"):
         self.path_lens_tables = glob.glob(f"{module_dir}/{path}/*")
         #print(self.path_lens_tables)
         self.lens_census = self._do_full_lens_census()

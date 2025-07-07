@@ -1,11 +1,20 @@
-quma package
-=====================================================================
-
-
-Module contents
----------------
+﻿quma
+====
 
 .. automodule:: quma
-   :members:
-   :undoc-members:
-   :show-inheritance:
+
+   
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   LensmodelWrapper
+   MicrolensingAnalysis
+   MicrolensingMaps
+   MicrolensingTimescale
+   Tables
+   Tools
+   census
+   cli

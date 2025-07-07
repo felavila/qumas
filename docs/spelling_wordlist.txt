@@ -9,7 +9,7 @@ Submodules
 Subpackages
 
 # python modules/object names
-quma
+tudspek
 utils
 metaclass
 args

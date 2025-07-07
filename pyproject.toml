@@ -10,8 +10,8 @@ build-backend = "poetry.core.masonry.api"
 ## Also renders on pypi as 'subtitle'
 [tool.poetry]
 name = "quma"
-version = "0.0.1"
-description = "QuMA: Quasar Microlens Analysis"
+version = "0.1.0"
+description = "SHEAP: Spectral Handling and Estimation of AGN Parameters"
 authors = ["Felipe Avila-Vera <felipe.avilav@postgrado.uv.cl>"]
 maintainers = ["Felipe Avila-Vera <felipe.avilav@postgrado.uv.cl>"]
 license = "AGPL-3.0-only"
@@ -35,11 +35,7 @@ classifiers = [
     "Operating System :: POSIX :: Linux",
     "Operating System :: MacOS",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.6",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.12",
     "Topic :: Software Development",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: System :: Software Distribution",
@@ -47,15 +43,15 @@ classifiers = [
 ]
 
 packages = [
-    { include = "quma"},
+    { include = "quma" },
 ]
 
 include = [
     { path = "tests", format = "sdist" },
     { path = "docs/**/*.rst", format = "sdist" },
     { path = "docs/conf.py", format = "sdist" },
-    { path = "src/**/*.typed", format = "sdist" },
-    { path = "src/stubs/*.pyi", format = "sdist" },
+    { path = "quma/**/*.typed", format = "sdist" },
+    { path = "quma/stubs/*.pyi", format = "sdist" },
     "pyproject.toml",
     "LICENSE",
     "README.rst",
@@ -108,7 +104,7 @@ exclude = [
 
 ### Dependency Constraints, aka Requirements ###
 [tool.poetry.dependencies]
-python = ">=3.10, <3.13"
+python = ">=3.12, <3.14"
 astropy = ">=6.0"
 scipy = ">=1.11.4"
 pandas = ">=2.2.0"
@@ -117,7 +113,6 @@ parallelbar = ">=2.4"
 numpy = "==1.26"
 lmfit = "*"
 h5py = "*"
-
 
 # Test: packages imported in test code and packages required for the "test runner"
 pytest = { version = "^8.0.0", optional = true }
@@ -131,19 +126,28 @@ pytest-run-subprocess = { version = "^0.10.0", optional = true }
 mypy = { version = "^1.8.0", optional = true }
 
 # Docs: dev and build dependencies
-sphinx = { version = "~4", optional = true }
-sphinx-autodoc-typehints = { version = ">= 1.10", optional = true }
-sphinx-rtd-theme = { version = "== 0.5.0", optional = true }
-sphinxcontrib-spelling = { version = "~= 7.3.3", optional = true }
+sphinx = { version = ">=5.0,<8.3", optional = true }
+sphinx-autodoc-typehints = { version = ">=1.10", optional = true }
+sphinx-rtd-theme = { version = ">=1.2.0,<2.0", optional = true }
+sphinxcontrib-spelling = { version = "~=7.3.3", optional = true }
 sphinx-autobuild = { version = "^2021.3.14", optional = true }
-sphinx-inline-tabs = { version = "^2023.4.21", optional = true, python = ">=3.8,<3.13" }
-sphinxcontrib-mermaid = { version = "^0.9.2", optional = true, python = ">=3.7,<3.13" }
+sphinx-inline-tabs = { version = "^2023.4.21", optional = true, python = ">=3.12,<3.13" }
+sphinxcontrib-mermaid = { version = "^0.9.2", optional = true, python = ">=3.12,<3.13" }
 
 # requests [security,tests] >= 2.8.1, == 2.8.* ; python_version < "2.7"
 # poetry add 'griffe >=1.0.0 ; python_version >= "3.9"' --optional
 
 
 ### EXTRAS ###
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0"
+pytest-cov = "^4.0"
+pytest-xdist = "^3.0"
+coverage = "^7.0"
+exceptiongroup = "^1.1" 
+sphinx = ">=5.0"
+click = { version = ">=8.1.0,<9.0", optional = true }
+types-pyyaml = "^6.0.12.20250516"
 [tool.poetry.extras]
 test = [
     "pytest",
@@ -152,7 +156,8 @@ test = [
     "pytest-xdist",
     "pytest-click",
     "pytest-run-subprocess",
-]
+    "coverage"
+    ,"exceptiongroup"]
 typing = [
     "mypy",
     "types-requests",
@@ -166,6 +171,8 @@ docs = [
     "sphinxcontrib-spelling",
     "sphinx-inline-tabs",
     "sphinxcontrib-mermaid",
+    "furo",
+    "sphinx-autobuild"
 ]
 docslive = [
     "sphinx",
@@ -184,6 +191,10 @@ quma = 'quma.cli:main'
 export = "poetry_plugin_export.plugins:ExportApplicationPlugin"
 
 # TOOLS
+
+[tool.poetry.group.typing.dependencies]
+types-pyyaml = "^6.0.12.20250402"
+
 [tool.pytest.ini_options]
 minversion = "6.2"
 addopts = "--strict-markers"
@@ -214,6 +225,17 @@ tests = []
 skips = [
     "B101",
 ]
+
+[tool.mypy]
+ignore_missing_imports = true      # quick blanket, or …
+check_untyped_defs = true
+disallow_untyped_defs = true
+warn_unused_ignores = true
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = ["optax.*", "jax.*", "astropy.*", "sfdmap2"]
+ignore_missing_imports = true
 
 [tool.software-release]
 version_variable = "quma/__init__.py:__version__"

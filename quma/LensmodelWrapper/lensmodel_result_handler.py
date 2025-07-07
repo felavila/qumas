@@ -39,12 +39,14 @@ class Result_Handler(
         self.current_best_n_model = self.current_best.model_name                   
         #self.panda_stats,self.pandas_full = self.make_pandas_result()
         #self.pandas_full_model_result = 
+    
     def get_model_from_pandas(self,model:str=None):
         """model str"""
         model = model or self.current_best_n_model
         if model not in self.models:
             raise ModelNotFoundError(model, self.models)
         return self.pandas_from_results[self.pandas_from_results.model_name==model]
+    
     def get_necessary_to_mcmc(self,model:str=None):
         """model str"""
         model = model or self.current_best_n_model
@@ -53,12 +55,14 @@ class Result_Handler(
         dic_model = self.get_model(model=model)
         stats=self.pandas_model_stats[self.pandas_model_stats.model_name==model]
         return dic_model,stats.iloc[0]
+    
     def get_model(self,model:str=None):
         """model str"""
         model = model or self.current_best_n_model
         if model not in self.models:
             raise ModelNotFoundError(model, self.models)
         return self.lensmodel_system[model]
+    
     def get_lens_params(self,model:str=None):
         model = model or self.current_best_n_model
         if model not in self.models:

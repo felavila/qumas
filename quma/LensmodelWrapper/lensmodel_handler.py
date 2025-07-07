@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import numpy as np
 from scipy.spatial import distance
 import json
@@ -7,9 +8,15 @@ import subprocess
 from .utils import columns_to_float
 import pandas as pd
 from .mass_models import mass_models
-module_dir = os.path.dirname(os.path.abspath(__file__))
 
-filter_info =  pd.read_csv(f"{module_dir}/tables/filter_unique.csv")
+# Get the path to the current file
+module_dir = Path(__file__).resolve().parent
+
+# Navigate to the root of the quma package (i.e., one level up from LensmodelWrapper)
+quma_root = module_dir.parent
+
+# Define the path to the CSV file (e.g., in the data/ subdirectory)
+csv_path = quma_root / "Tables" / "filter_unique.csv"
 class lensmodel_handler:
     """modeling_path: where will go the results of our modeling
     system:and pandas data frame from our census with all information to model our system

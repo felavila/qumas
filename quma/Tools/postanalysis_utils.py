@@ -16,7 +16,7 @@ def montecarlo_errors(x_data,x_error,N=10000):
     median_estimate = np.median(medians)
     median_uncertainty = np.std(medians)
 
-    print(f"Median = {median_estimate} ± {median_uncertainty}")
+    print(fr"Median = {median_estimate:.3f} $\pm$ {median_uncertainty:.3f}")
     return median_estimate,median_uncertainty
 
 

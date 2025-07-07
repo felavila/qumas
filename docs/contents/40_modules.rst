@@ -1,7 +1,8 @@
-quma
-===================================================
+QuMA Modules
+============
 
-.. toctree::
-   :maxdepth: 4
+.. autosummary::
+   :toctree: .
+   :recursive:
 
    quma
