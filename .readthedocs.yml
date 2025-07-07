@@ -44,10 +44,5 @@ formats:
 # to build your documentation
 # See https://docs.readthedocs.io/en/stable/guides/reproducible-builds.html
 python:
-  install:
-    # install your package itself
-    - method: pip
-      path: .
-    # install the extra deps for building docs
-    - method: pip
-      requirements: docs/requirements.txt
+   install:
+   - requirements: req-docs.txt
