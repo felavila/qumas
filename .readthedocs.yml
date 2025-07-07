@@ -6,26 +6,12 @@ build:
   tools:
     python: "3.12"
   jobs:
-    # these run in order before RTD’s “install” step
     pre_install:
       - python --version
-      - python -m pip install poetry
-      - python -m poetry self add poetry-plugin-export
-      - python -m poetry export \
-          --format=requirements.txt \
-          --output=req-docs.txt \
-          --extras docs
-    # this replaces RTD’s default “install” step for your code+deps
-    post_install:
-      - pip install -r req-docs.txt
-      - pip install -e .
-      - pip install pyyaml
-    # run your custom scripts before the Sphinx build
-    pre_build:
-      - python ./scripts/visualize-ga-workflow.py \
-          > ./docs/cicd_mermaid.md
-      - python ./scripts/visualize-dockerfile.py \
-          > ./docs/dockerfile_mermaid.md
+      # 1️⃣ Install both Poetry and the export plugin via pip:
+      - python -m pip install poetry poetry-plugin-export
+      # 2️⃣ Run export with normal, space-separated flags (no backslashes):
+      - python -m poetry export -f requirements.txt -o req-docs.txt -E docs
 
 python:
   install:
