@@ -64,7 +64,7 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.doctest',
     'sphinxcontrib.spelling',
-    "sphinx_rtd_theme"
+#    "sphinx_rtd_theme"
 ]
 
 # Automatically generate autosummary stub pages
