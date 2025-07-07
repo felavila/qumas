@@ -1,4 +1,5 @@
 # .readthedocs.yml
+
 version: 2
 
 build:
@@ -6,26 +7,34 @@ build:
   tools:
     python: "3.12"
   jobs:
+    pre_install:
+      # Ensure we have the right Poetry + export plugin
+      - python --version
+      - python -m pip install poetry poetry-plugin-export
+      # Export the `docs` extra into a requirements file
+      - python -m poetry export -f requirements.txt -o req-docs.txt -E docs
+
+    post_install:
+      # Upgrade tooling
+      - python -m pip install --upgrade --no-cache-dir pip setuptools
+      - python -m pip install --upgrade --no-cache-dir sphinx
+      # Install your package itself
+      - python -m pip install --upgrade --upgrade-strategy only-if-needed --no-cache-dir .
+      # Install the docs‐only dependencies
+      - python -m pip install --exists-action=w --no-cache-dir -r req-docs.txt
+
     pre_build:
-      # Generate one .rst per module under docs/api
-      - sphinx-apidoc --force --module-first --separate \
-          -o docs/api \
-          quma
+      # Auto-generate one .rst per module under docs/api
+      - sphinx-apidoc --force --module-first --separate -o docs/api quma
+      # Your custom mermaid-generation scripts
       - python ./scripts/visualize-ga-workflow.py > docs/cicd_mermaid.md
       - python ./scripts/visualize-dockerfile.py > docs/dockerfile_mermaid.md
-    pre_install:
-      - python --version
-      # 1️⃣ Install both Poetry and the export plugin via pip:
-      - python -m pip install poetry poetry-plugin-export
-      # 2️⃣ Run export with normal, space-separated flags (no backslashes):
-      - python -m poetry export -f requirements.txt -o req-docs.txt -E docs
 
 python:
   install:
-    # install your package itself
+    # Install the package and any requirements not coming from Poetry
     - method: pip
       path: .
-    # (Optional) additional pure‐pip requirements
     - requirements: req-docs.txt
 
 sphinx:
