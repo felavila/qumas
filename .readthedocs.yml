@@ -20,13 +20,14 @@ build:
       - python -m pip install --exists-action=w --no-cache-dir -r req-docs.txt
 
     pre_build:
-      # Using a YAML block so backslashes work correctly:
-      - |
-        sphinx-apidoc --force --module-first --separate \
-          -o docs/api \
-          quma
-      - python ./scripts/visualize-ga-workflow.py > docs/cicd_mermaid.md
-      - python ./scripts/visualize-dockerfile.py > docs/dockerfile_mermaid.md
+      # Auto-generate one .rst per module under docs/api
+      - sphinx-apidoc --force --module-first --separate -o docs/api quma
+
+      # Generate CI workflow diagram, but don’t fail if the YAML isn’t present
+      - python ./scripts/visualize-ga-workflow.py > docs/cicd_mermaid.md 2>/dev/null || echo "Skipping GA workflow visualization (no workflow file found)"
+
+      # Generate Dockerfile diagram (same guard)
+      - python ./scripts/visualize-dockerfile.py > docs/dockerfile_mermaid.md 2>/dev/null || echo "Skipping Dockerfile visualization"
 
 python:
   install:
