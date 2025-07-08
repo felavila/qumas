@@ -18,7 +18,9 @@ build:
       - python -m pip install --exists-action=w --no-cache-dir -r req-docs.txt
 
     pre_build:
-      - sphinx-apidoc --force --module-first --separate -o docs/api quma
+      -  sphinx-apidoc --force --module-first --separate \
+          -o docs/source/api \
+          quma
       - python ./scripts/visualize-ga-workflow.py > docs/cicd_mermaid.md 2>/dev/null || echo "Skipping GA workflow visualization"
       - python ./scripts/visualize-dockerfile.py > docs/dockerfile_mermaid.md 2>/dev/null || echo "Skipping Dockerfile visualization"
 
