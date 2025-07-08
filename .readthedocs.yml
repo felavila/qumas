@@ -1,16 +1,39 @@
 version: 2
+
 build:
   os: ubuntu-22.04
   tools:
     python: "3.12"
+
+  jobs:
+    pre_install:
+      - python --version
+      - python -m pip install poetry poetry-plugin-export
+      - python -m poetry export -f requirements.txt -o req-docs.txt -E docs
+
+    post_install:
+      - python -m pip install --upgrade --no-cache-dir pip setuptools
+      - python -m pip install --upgrade --no-cache-dir sphinx
+      - python -m pip install --upgrade --upgrade-strategy only-if-needed --no-cache-dir .
+      - python -m pip install --exists-action=w --no-cache-dir -r req-docs.txt
+
+    pre_build:
+      - sphinx-apidoc --force --module-first --separate -o docs/api quma
+      - python ./scripts/visualize-ga-workflow.py > docs/cicd_mermaid.md 2>/dev/null || echo "Skipping GA workflow visualization"
+      - python ./scripts/visualize-dockerfile.py > docs/dockerfile_mermaid.md 2>/dev/null || echo "Skipping Dockerfile visualization"
+
 python:
   install:
     - method: pip
       path: .
-    - requirements: docs/requirements-docs.txt  # if you have one
+    - requirements: req-docs.txt
+
 sphinx:
-  configuration: docs/source/conf.py
+  builder: html
+  configuration: docs/conf.py
+  fail_on_warning: false
+
 formats:
-  - html
+  - htmlzip
   - pdf
   - epub
