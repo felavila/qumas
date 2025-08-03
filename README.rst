@@ -25,6 +25,11 @@ Install QuMA locally using the following command:
     
     pip install -e .
 
+Documentation
+=============
+
+The full documentation is available at:  
+https://quma41.readthedocs.io/en/latest/
 
 References
 ============
