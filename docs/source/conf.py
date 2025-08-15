@@ -21,7 +21,6 @@ release   = '0.1.0'
 autodoc_inherit_docstrings = True
 
 extensions = [
-    'myst_nb',
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'sphinx.ext.viewcode',
@@ -41,6 +40,11 @@ try:
 except Exception:
     print("nbsphinx not available; skipping notebook rendering")
     
+try:
+    import myst_nb
+    extensions.append("myst_nb")
+except Exception:
+    print("myst_nb not available; skipping notebook rendering")
 # Treat notebooks and markdown via myst-nb
 # source_suffix = {
 #     '.rst':    'restructuredtext',
