@@ -6,7 +6,6 @@ import shutil
 import re
 import nbsphinx  # noqa: F401
 import myst_nb
-#import nbsphinx
 import sphinx_rtd_theme
 
 
@@ -98,7 +97,7 @@ html_theme      = 'sphinx_rtd_theme'
 
 html_static_path = ['_static']
 html_css_files = [
-  'custom.css',
+'custom.css',
 ]
 pygments_style = "sphinx"
 add_module_names = False
@@ -181,31 +180,32 @@ with open("getting_started.rst", "wt") as f:
     
 ######
 
-# if not os.path.exists("tutorials"):
-#     os.makedirs("tutorials")
+if not os.path.exists("examples"):
+    os.makedirs("examples")
 
-# for src_file in glob.glob("../examples/*.ipynb"):
-#     dst_file = os.path.join("tutorials", src_file.split("/")[-1])
-#     shutil.copy(src_file, "tutorials/")
+for src_file in glob.glob("../examples/*.ipynb"):
+    dst_file = os.path.join("examples", src_file.split("/")[-1])
+    shutil.copy(src_file, "examples/")
 
-# # add index file to `tutorials` path, `:orphan:` is used to
-# # tell sphinx that this rst file needs not to be appeared in toctree
-# with open("../../examples/index.rst", "rt") as f1:
-#     with open("tutorials/index.rst", "wt") as f2:
-#         #f2.write(":orphan:\n\n")
-#         f2.write(f1.read())
+# add index file to `examples` path, `:orphan:` is used to
+# tell sphinx that this rst file needs not to be appeared in toctree
+with open("../../examples/index.rst", "rt") as f1:
+    with open("examples/index.rst", "wt") as f2:
+        #f2.write(":orphan:\n\n")
+        f2.write(f1.read())
 
 
-# # -- Convert scripts to notebooks #####
-# sphinx_gallery_conf = {
-#     "examples_dirs": ["../../examples"],
-#     "gallery_dirs": ["examples"],
-#     # only execute files beginning with plot_
-#     "filename_pattern": "/plot_",
-#    # "ignore_pattern": "(minipyro|__init__)",
-#     # not display Total running time of the script because we do not execute it
-#     "min_reported_time": 1,
-# }
+# -- Convert scripts to notebooks #####
+sphinx_gallery_conf = {
+    "examples_dirs": ["../../examples"],
+    "gallery_dirs": ["examples"],
+    # only execute files beginning with plot_
+    "filename_pattern": "/plot_",
+   # "ignore_pattern": "(minipyro|__init__)",
+    # not display Total running time of the script because we do not execute it
+    "min_reported_time": 1,
+}
+########
 
 html_logo = "_static/quma_logo_v1.png"
 

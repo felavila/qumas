@@ -12,10 +12,17 @@ quma documentation
 
 .. toctree::
    :maxdepth: 2
+   :caption: Examples
+
+   examples/index
+
+.. toctree::
+   :maxdepth: 2
    :caption: API Reference
 
    api/quma
    tables
+
 Indices and tables
 ==================
 
