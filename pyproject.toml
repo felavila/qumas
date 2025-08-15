@@ -183,7 +183,7 @@ docslive = [
     "sphinxcontrib-spelling",
     "sphinx-inline-tabs",
     "sphinxcontrib-mermaid",
-    "sphinx-autobuild",
+    "sphinx-autobuild","nbsphinx","myst-parser"
 ]
 
 [tool.poetry.scripts]
