@@ -2693,4 +2693,4 @@ typing = ["mypy", "pytest", "pytest-click"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.9,<3.13"
-content-hash = "a49546f3dfe97f8179b6cbfb1aa2aa834dcacaeba376539fbae28b3f06babfd1"
+content-hash = "04145d8823992bf65c55fa746d6f246007ef88de4b0f1749782c4d199075ac51"
