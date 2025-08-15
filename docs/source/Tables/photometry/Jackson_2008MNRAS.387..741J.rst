@@ -1,7 +1,7 @@
 Jackson 2008Mnras.387..741J
 ===========================
 
-**Source:** :download:`Jackson_2008MNRAS.387..741J.csv <../../../../quma/Tables/photometry/Jackson_2008MNRAS.387..741J.csv>`
+**Source:** :download:`Jackson_2008MNRAS.387..741J.csv <../../../../qumas/Tables/photometry/Jackson_2008MNRAS.387..741J.csv>`
 
 - **Rows:** 3
 - **Columns:** 18

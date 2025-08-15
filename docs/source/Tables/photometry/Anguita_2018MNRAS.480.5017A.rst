@@ -1,7 +1,7 @@
 Anguita 2018Mnras.480.5017A
 ===========================
 
-**Source:** :download:`Anguita_2018MNRAS.480.5017A.csv <../../../../quma/Tables/photometry/Anguita_2018MNRAS.480.5017A.csv>`
+**Source:** :download:`Anguita_2018MNRAS.480.5017A.csv <../../../../qumas/Tables/photometry/Anguita_2018MNRAS.480.5017A.csv>`
 
 - **Rows:** 3
 - **Columns:** 18

@@ -1,7 +1,7 @@
-quma.Tools.utils module
+qumas.Tools.utils module
 =======================
 
-.. automodule:: quma.Tools.utils
+.. automodule:: qumas.Tools.utils
    :members:
    :show-inheritance:
    :undoc-members:

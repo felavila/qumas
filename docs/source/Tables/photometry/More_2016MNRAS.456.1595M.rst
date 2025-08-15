@@ -1,7 +1,7 @@
 More 2016Mnras.456.1595M
 ========================
 
-**Source:** :download:`More_2016MNRAS.456.1595M.csv <../../../../quma/Tables/photometry/More_2016MNRAS.456.1595M.csv>`
+**Source:** :download:`More_2016MNRAS.456.1595M.csv <../../../../qumas/Tables/photometry/More_2016MNRAS.456.1595M.csv>`
 
 - **Rows:** 36
 - **Columns:** 22

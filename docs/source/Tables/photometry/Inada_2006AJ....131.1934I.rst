@@ -1,7 +1,7 @@
 Inada 2006Aj....131.1934I
 =========================
 
-**Source:** :download:`Inada_2006AJ....131.1934I.csv <../../../../quma/Tables/photometry/Inada_2006AJ....131.1934I.csv>`
+**Source:** :download:`Inada_2006AJ....131.1934I.csv <../../../../qumas/Tables/photometry/Inada_2006AJ....131.1934I.csv>`
 
 - **Rows:** 3
 - **Columns:** 24

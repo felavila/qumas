@@ -1,7 +1,7 @@
 Others With Out Photometry
 ==========================
 
-**Source:** :download:`others_with_out_photometry.csv <../../../../quma/Tables/photometry/others_with_out_photometry.csv>`
+**Source:** :download:`others_with_out_photometry.csv <../../../../qumas/Tables/photometry/others_with_out_photometry.csv>`
 
 - **Rows:** 114
 - **Columns:** 7

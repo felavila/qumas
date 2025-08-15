@@ -1,7 +1,7 @@
 Castles Non Castles
 ===================
 
-**Source:** :download:`castles_non_castles.csv <../../../../quma/Tables/photometry/castles_non_castles.csv>`
+**Source:** :download:`castles_non_castles.csv <../../../../qumas/Tables/photometry/castles_non_castles.csv>`
 
 - **Rows:** 156
 - **Columns:** 74

@@ -1,7 +1,7 @@
 Chantry 2010A&A...522A..95C
 ===========================
 
-**Source:** :download:`Chantry_2010A&A...522A..95C.csv <../../../../quma/Tables/photometry/Chantry_2010A&A...522A..95C.csv>`
+**Source:** :download:`Chantry_2010A&A...522A..95C.csv <../../../../qumas/Tables/photometry/Chantry_2010A&A...522A..95C.csv>`
 
 - **Rows:** 27
 - **Columns:** 18

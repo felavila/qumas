@@ -1,7 +1,7 @@
 Kayo 2010Aj....139.1614K
 ========================
 
-**Source:** :download:`Kayo_2010AJ....139.1614K.csv <../../../../quma/Tables/photometry/Kayo_2010AJ....139.1614K.csv>`
+**Source:** :download:`Kayo_2010AJ....139.1614K.csv <../../../../qumas/Tables/photometry/Kayo_2010AJ....139.1614K.csv>`
 
 - **Rows:** 7
 - **Columns:** 18

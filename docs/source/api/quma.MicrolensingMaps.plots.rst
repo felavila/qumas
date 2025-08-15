@@ -1,7 +1,7 @@
-quma.MicrolensingMaps.plots module
+qumas.MicrolensingMaps.plots module
 ==================================
 
-.. automodule:: quma.MicrolensingMaps.plots
+.. automodule:: qumas.MicrolensingMaps.plots
    :members:
    :show-inheritance:
    :undoc-members:

@@ -1,7 +1,7 @@
 Inada 2007Aj....133..206I
 =========================
 
-**Source:** :download:`Inada_2007AJ....133..206I.csv <../../../../quma/Tables/photometry/Inada_2007AJ....133..206I.csv>`
+**Source:** :download:`Inada_2007AJ....133..206I.csv <../../../../qumas/Tables/photometry/Inada_2007AJ....133..206I.csv>`
 
 - **Rows:** 3
 - **Columns:** 22

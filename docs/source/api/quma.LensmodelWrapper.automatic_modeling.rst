@@ -1,7 +1,7 @@
-quma.LensmodelWrapper.automatic\_modeling module
+qumas.LensmodelWrapper.automatic\_modeling module
 ================================================
 
-.. automodule:: quma.LensmodelWrapper.automatic_modeling
+.. automodule:: qumas.LensmodelWrapper.automatic_modeling
    :members:
    :show-inheritance:
    :undoc-members:

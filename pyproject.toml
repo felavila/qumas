@@ -9,7 +9,7 @@ build-backend = "poetry.core.masonry.api"
 # Information required for building (sdist/wheel)
 ## Also renders on pypi as 'subtitle'
 [tool.poetry]
-name = "quma"
+name = "qumas"
 version = "0.1.0"
 description = "SHEAP: Spectral Handling and Estimation of AGN Parameters"
 authors = ["Felipe Avila-Vera <felipe.avilav@postgrado.uv.cl>"]
@@ -17,9 +17,9 @@ maintainers = ["Felipe Avila-Vera <felipe.avilav@postgrado.uv.cl>"]
 license = "AGPL-3.0-only"
 readme = "README.rst"
 
-homepage = "https://github.com/favila/quma"
-repository = "https://github.com/favila/quma"
-documentation = "https://quma.readthedocs.io/"
+homepage = "https://github.com/favila/qumas"
+repository = "https://github.com/favila/qumas"
+documentation = "https://qumas.readthedocs.io/"
 
 keywords = [
     "python package",
@@ -43,15 +43,15 @@ classifiers = [
 ]
 
 packages = [
-    { include = "quma" },
+    { include = "qumas" },
 ]
 
 include = [
     { path = "tests", format = "sdist" },
     { path = "docs/**/*.rst", format = "sdist" },
     { path = "docs/conf.py", format = "sdist" },
-    { path = "quma/**/*.typed", format = "sdist" },
-    { path = "quma/stubs/*.pyi", format = "sdist" },
+    { path = "qumas/**/*.typed", format = "sdist" },
+    { path = "qumas/stubs/*.pyi", format = "sdist" },
     "pyproject.toml",
     "LICENSE",
     "README.rst",
@@ -77,12 +77,12 @@ exclude = [
 
 # PyPi url links, that appear in 'Project Links' section
 [tool.poetry.urls]
-"Bug Tracker" = "https://github.com/quma/issues"
-"CI: Github Actions" = "https://github.com/favila/quma/actions"
-"Documentation" = "https://quma.readthedocs.io/"
-"Source Code" = "https://github.com/favila/quma"
-"Changelog" = "https://github.com/favila/quma/blob/master/CHANGELOG.rst"
-"Code of Conduct" = "https://github.com/favila/quma/blob/master/CONTRIBUTING.rst"
+"Bug Tracker" = "https://github.com/qumas/issues"
+"CI: Github Actions" = "https://github.com/favila/qumas/actions"
+"Documentation" = "https://qumas.readthedocs.io/"
+"Source Code" = "https://github.com/favila/qumas"
+"Changelog" = "https://github.com/favila/qumas/blob/master/CHANGELOG.rst"
+"Code of Conduct" = "https://github.com/favila/qumas/blob/master/CONTRIBUTING.rst"
 
 
 # Caret requirements allow SemVer compatible updates to a specified version. An update is allowed if the new version number does not modify the left-most non-zero digit in the major, minor, patch grouping. For instance, if we previously ran poetry add requests@^2.13.0 and wanted to update the library and ran poetry update requests, poetry would update us to version 2.14.0 if it was available, but would not update us to 3.0.0. If instead we had specified the version string as ^0.1.13, poetry would update to 0.1.14 but not 0.2.0. 0.0.x is not considered compatible with any other version.
@@ -192,7 +192,7 @@ docslive = [
 ]
 
 [tool.poetry.scripts]
-quma = 'quma.cli:main'
+qumas = 'qumas.cli:main'
 
 [tool.poetry.plugins."poetry.application.plugin"]
 export = "poetry_plugin_export.plugins:ExportApplicationPlugin"
@@ -245,4 +245,4 @@ module = ["astropy.*"]
 ignore_missing_imports = true
 
 [tool.software-release]
-version_variable = "quma/__init__.py:__version__"
+version_variable = "qumas/__init__.py:__version__"

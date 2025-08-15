@@ -1,7 +1,7 @@
 Shajib 2019Mnras.483.5649S
 ==========================
 
-**Source:** :download:`Shajib_2019MNRAS.483.5649S.csv <../../../../quma/Tables/photometry/Shajib_2019MNRAS.483.5649S.csv>`
+**Source:** :download:`Shajib_2019MNRAS.483.5649S.csv <../../../../qumas/Tables/photometry/Shajib_2019MNRAS.483.5649S.csv>`
 
 - **Rows:** 65
 - **Columns:** 22

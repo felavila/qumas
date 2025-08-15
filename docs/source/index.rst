@@ -1,6 +1,6 @@
-:github_url: https://github.com/felavila/quma
+:github_url: https://github.com/felavila/qumas
 
-quma documentation
+qumas documentation
 =====================
 
 
@@ -20,7 +20,7 @@ quma documentation
    :maxdepth: 2
    :caption: API Reference
 
-   api/quma
+   api/qumas
    tables
 
 Indices and tables

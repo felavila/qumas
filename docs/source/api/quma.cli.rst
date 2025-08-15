@@ -1,7 +1,7 @@
-quma.cli module
+qumas.cli module
 ===============
 
-.. automodule:: quma.cli
+.. automodule:: qumas.cli
    :members:
    :show-inheritance:
    :undoc-members:

@@ -1,7 +1,7 @@
-quma.MicrolensingMaps package
+qumas.MicrolensingMaps package
 =============================
 
-.. automodule:: quma.MicrolensingMaps
+.. automodule:: qumas.MicrolensingMaps
    :members:
    :show-inheritance:
    :undoc-members:
@@ -12,6 +12,6 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
-   quma.MicrolensingMaps.maps_utils
-   quma.MicrolensingMaps.micro_maps_func
-   quma.MicrolensingMaps.plots
+   qumas.MicrolensingMaps.maps_utils
+   qumas.MicrolensingMaps.micro_maps_func
+   qumas.MicrolensingMaps.plots

@@ -1,7 +1,7 @@
 Oguri 2008Aj....135..520O
 =========================
 
-**Source:** :download:`Oguri_2008AJ....135..520O.csv <../../../../quma/Tables/photometry/Oguri_2008AJ....135..520O.csv>`
+**Source:** :download:`Oguri_2008AJ....135..520O.csv <../../../../qumas/Tables/photometry/Oguri_2008AJ....135..520O.csv>`
 
 - **Rows:** 3
 - **Columns:** 18

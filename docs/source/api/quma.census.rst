@@ -1,7 +1,7 @@
-quma.census module
+qumas.census module
 ==================
 
-.. automodule:: quma.census
+.. automodule:: qumas.census
    :members:
    :show-inheritance:
    :undoc-members:

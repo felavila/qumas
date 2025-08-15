@@ -1,7 +1,7 @@
 Schechter 2017Aj....153..219S
 =============================
 
-**Source:** :download:`Schechter_2017AJ....153..219S.csv <../../../../quma/Tables/photometry/Schechter_2017AJ....153..219S.csv>`
+**Source:** :download:`Schechter_2017AJ....153..219S.csv <../../../../qumas/Tables/photometry/Schechter_2017AJ....153..219S.csv>`
 
 - **Rows:** 7
 - **Columns:** 20

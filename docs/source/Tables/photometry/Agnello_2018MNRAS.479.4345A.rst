@@ -1,7 +1,7 @@
 Agnello 2018Mnras.479.4345A
 ===========================
 
-**Source:** :download:`Agnello_2018MNRAS.479.4345A.csv <../../../../quma/Tables/photometry/Agnello_2018MNRAS.479.4345A.csv>`
+**Source:** :download:`Agnello_2018MNRAS.479.4345A.csv <../../../../qumas/Tables/photometry/Agnello_2018MNRAS.479.4345A.csv>`
 
 - **Rows:** 3
 - **Columns:** 18

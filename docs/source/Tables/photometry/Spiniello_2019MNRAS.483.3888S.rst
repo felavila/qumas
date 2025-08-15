@@ -1,7 +1,7 @@
 Spiniello 2019Mnras.483.3888S
 =============================
 
-**Source:** :download:`Spiniello_2019MNRAS.483.3888S.csv <../../../../quma/Tables/photometry/Spiniello_2019MNRAS.483.3888S.csv>`
+**Source:** :download:`Spiniello_2019MNRAS.483.3888S.csv <../../../../qumas/Tables/photometry/Spiniello_2019MNRAS.483.3888S.csv>`
 
 - **Rows:** 15
 - **Columns:** 24

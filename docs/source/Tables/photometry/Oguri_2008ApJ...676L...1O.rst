@@ -1,7 +1,7 @@
 Oguri 2008Apj...676L...1O
 =========================
 
-**Source:** :download:`Oguri_2008ApJ...676L...1O.csv <../../../../quma/Tables/photometry/Oguri_2008ApJ...676L...1O.csv>`
+**Source:** :download:`Oguri_2008ApJ...676L...1O.csv <../../../../qumas/Tables/photometry/Oguri_2008ApJ...676L...1O.csv>`
 
 - **Rows:** 6
 - **Columns:** 18

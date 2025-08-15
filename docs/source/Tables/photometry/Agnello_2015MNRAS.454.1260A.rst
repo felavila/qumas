@@ -1,7 +1,7 @@
 Agnello 2015Mnras.454.1260A
 ===========================
 
-**Source:** :download:`Agnello_2015MNRAS.454.1260A.csv <../../../../quma/Tables/photometry/Agnello_2015MNRAS.454.1260A.csv>`
+**Source:** :download:`Agnello_2015MNRAS.454.1260A.csv <../../../../qumas/Tables/photometry/Agnello_2015MNRAS.454.1260A.csv>`
 
 - **Rows:** 6
 - **Columns:** 18

@@ -1,7 +1,7 @@
 Shajib 2021Mnras.503.1557S
 ==========================
 
-**Source:** :download:`Shajib_2021MNRAS.503.1557S.csv <../../../../quma/Tables/photometry/Shajib_2021MNRAS.503.1557S.csv>`
+**Source:** :download:`Shajib_2021MNRAS.503.1557S.csv <../../../../qumas/Tables/photometry/Shajib_2021MNRAS.503.1557S.csv>`
 
 - **Rows:** 60
 - **Columns:** 18

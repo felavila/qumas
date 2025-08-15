@@ -1,7 +1,7 @@
 Oguri 2004Pasj...56..399O
 =========================
 
-**Source:** :download:`Oguri_2004PASJ...56..399O.csv <../../../../quma/Tables/photometry/Oguri_2004PASJ...56..399O.csv>`
+**Source:** :download:`Oguri_2004PASJ...56..399O.csv <../../../../qumas/Tables/photometry/Oguri_2004PASJ...56..399O.csv>`
 
 - **Rows:** 3
 - **Columns:** 18

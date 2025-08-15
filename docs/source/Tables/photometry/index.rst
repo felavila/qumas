@@ -1,7 +1,7 @@
 Photometry
 ==========
 
-.. include:: ../../../../quma/Tables/photometry/README.md
+.. include:: ../../../../qumas/Tables/photometry/README.md
    :parser: myst_parser.sphinx_
 
 .. toctree::

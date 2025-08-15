@@ -1,7 +1,7 @@
-quma.MicrolensingAnalysis package
+qumas.MicrolensingAnalysis package
 =================================
 
-.. automodule:: quma.MicrolensingAnalysis
+.. automodule:: qumas.MicrolensingAnalysis
    :members:
    :show-inheritance:
    :undoc-members:
@@ -12,10 +12,10 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
-   quma.MicrolensingAnalysis.Update
-   quma.MicrolensingAnalysis.WindowAnalysis
-   quma.MicrolensingAnalysis.functions
-   quma.MicrolensingAnalysis.microlensing_mag_plot
-   quma.MicrolensingAnalysis.ratio_cont_core
-   quma.MicrolensingAnalysis.utils
-   quma.MicrolensingAnalysis.windows
+   qumas.MicrolensingAnalysis.Update
+   qumas.MicrolensingAnalysis.WindowAnalysis
+   qumas.MicrolensingAnalysis.functions
+   qumas.MicrolensingAnalysis.microlensing_mag_plot
+   qumas.MicrolensingAnalysis.ratio_cont_core
+   qumas.MicrolensingAnalysis.utils
+   qumas.MicrolensingAnalysis.windows

@@ -1,7 +1,7 @@
 Spiniello 2019Mnras.485.5086S
 =============================
 
-**Source:** :download:`Spiniello_2019MNRAS.485.5086S.csv <../../../../quma/Tables/photometry/Spiniello_2019MNRAS.485.5086S.csv>`
+**Source:** :download:`Spiniello_2019MNRAS.485.5086S.csv <../../../../qumas/Tables/photometry/Spiniello_2019MNRAS.485.5086S.csv>`
 
 - **Rows:** 10
 - **Columns:** 24

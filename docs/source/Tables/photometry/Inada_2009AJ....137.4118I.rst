@@ -1,7 +1,7 @@
 Inada 2009Aj....137.4118I
 =========================
 
-**Source:** :download:`Inada_2009AJ....137.4118I.csv <../../../../quma/Tables/photometry/Inada_2009AJ....137.4118I.csv>`
+**Source:** :download:`Inada_2009AJ....137.4118I.csv <../../../../qumas/Tables/photometry/Inada_2009AJ....137.4118I.csv>`
 
 - **Rows:** 6
 - **Columns:** 24

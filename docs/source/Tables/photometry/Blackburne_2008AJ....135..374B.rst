@@ -1,7 +1,7 @@
 Blackburne 2008Aj....135..374B
 ==============================
 
-**Source:** :download:`Blackburne_2008AJ....135..374B.csv <../../../../quma/Tables/photometry/Blackburne_2008AJ....135..374B.csv>`
+**Source:** :download:`Blackburne_2008AJ....135..374B.csv <../../../../qumas/Tables/photometry/Blackburne_2008AJ....135..374B.csv>`
 
 - **Rows:** 5
 - **Columns:** 18

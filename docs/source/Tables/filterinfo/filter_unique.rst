@@ -1,7 +1,7 @@
 Filter Unique
 =============
 
-**Source:** :download:`filter_unique.csv <../../../../quma/Tables/filterinfo/filter_unique.csv>`
+**Source:** :download:`filter_unique.csv <../../../../qumas/Tables/filterinfo/filter_unique.csv>`
 
 - **Rows:** 33
 - **Columns:** 7

@@ -1,7 +1,7 @@
 Anguita 2009A&A...507...35A
 ===========================
 
-**Source:** :download:`Anguita_2009A&A...507...35A.csv <../../../../quma/Tables/photometry/Anguita_2009A&A...507...35A.csv>`
+**Source:** :download:`Anguita_2009A&A...507...35A.csv <../../../../qumas/Tables/photometry/Anguita_2009A&A...507...35A.csv>`
 
 - **Rows:** 5
 - **Columns:** 18

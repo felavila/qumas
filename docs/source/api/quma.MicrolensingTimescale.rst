@@ -1,7 +1,7 @@
-quma.MicrolensingTimescale package
+qumas.MicrolensingTimescale package
 ==================================
 
-.. automodule:: quma.MicrolensingTimescale
+.. automodule:: qumas.MicrolensingTimescale
    :members:
    :show-inheritance:
    :undoc-members:
@@ -12,5 +12,5 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
-   quma.MicrolensingTimescale.Microtimescales
-   quma.MicrolensingTimescale.v_cmb
+   qumas.MicrolensingTimescale.Microtimescales
+   qumas.MicrolensingTimescale.v_cmb

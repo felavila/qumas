@@ -13,14 +13,14 @@ import pandas as pd
 # -------------------------
 MAX_ROWS_PREVIEW = int(os.getenv("DOCS_MAX_ROWS", "50"))  # set -1 for all rows (careful!)
 MAX_COL_WIDTH = int(os.getenv("DOCS_MAX_COL_WIDTH", "40"))
-TABLE_GLOB = "**/*.csv"  # recurse under quma/Tables
+TABLE_GLOB = "**/*.csv"  # recurse under qumas/Tables
 SECTIONS_EXCLUDE = {"__pycache__", ".ipynb_checkpoints"}
 
 # -------------------------
 # Paths
 # -------------------------
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-SRC_ROOT = PROJECT_ROOT / "quma" / "Tables"
+SRC_ROOT = PROJECT_ROOT / "qumas" / "Tables"
 DOCS_ROOT = PROJECT_ROOT / "docs" / "source" / "Tables"
 DOCS_ROOT.mkdir(parents=True, exist_ok=True)
 
@@ -90,7 +90,7 @@ def rel_from_page(page_dir: Path, target_path: Path) -> str:
 def collect_csvs() -> Dict[str, List[Path]]:
     """
     Return dict: section_name -> list of CSV paths.
-    Section is the immediate subdir under quma/Tables (or 'root' for top-level files).
+    Section is the immediate subdir under qumas/Tables (or 'root' for top-level files).
     """
     files = list(SRC_ROOT.glob(TABLE_GLOB))
     sections: Dict[str, List[Path]] = {}

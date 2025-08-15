@@ -1,7 +1,7 @@
 Lemon 2019Mnras.483.4242L
 =========================
 
-**Source:** :download:`Lemon_2019MNRAS.483.4242L.csv <../../../../quma/Tables/photometry/Lemon_2019MNRAS.483.4242L.csv>`
+**Source:** :download:`Lemon_2019MNRAS.483.4242L.csv <../../../../qumas/Tables/photometry/Lemon_2019MNRAS.483.4242L.csv>`
 
 - **Rows:** 75
 - **Columns:** 26

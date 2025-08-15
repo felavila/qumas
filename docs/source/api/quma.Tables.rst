@@ -1,7 +1,7 @@
-quma.Tables package
+qumas.Tables package
 ===================
 
-.. automodule:: quma.Tables
+.. automodule:: qumas.Tables
    :members:
    :show-inheritance:
    :undoc-members:

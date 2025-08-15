@@ -1,16 +1,16 @@
-.. image:: docs/source/_static/quma_logo_v1.png
-   :alt: quma Logo
+.. image:: docs/source/_static/qumas_logo_v1.png
+   :alt: qumas Logo
    :align: left
    :width: 400
 
-QuMA: Quasar Microlens Analysis
+QuMAS: Quasar Microlens AnalysiS
 =========================================================
 
 .. .| |build| |coverage| |docs| |maintainability| |codacy| |tech-debt|
 .. .| |release_version| |wheel| |supported_versions| |commits_since_specific_tag_on_master| |commits_since_latest_github_release|
 .. .| |pypi_stats| |ossf| |ruff| |black| |gh-lic||
 
-QuMA (Quasar Microlens Analysis) is a Python 3 package that provides a comprehensive suite of tools for analyzing microlensing phenomena in quasars. It is designed to facilitate the study of time scales, assess the impact of microlensing on AGN spectra, and analyze magnification maps in gravitational lensing systems.
+QuMAS (Quasar Microlens AnalysiS) is a Python 3 package that provides a comprehensive suite of tools for analyzing microlensing phenomena in quasars. It is designed to facilitate the study of time scales, assess the impact of microlensing on AGN spectra, and analyze magnification maps in gravitational lensing systems.
 
 Features
 ============
@@ -23,7 +23,7 @@ Features
 Installation
 ============
 
-Install QuMA locally using the following command:
+Install qumas locally using the following command:
 
 .. code-block:: shell
     
@@ -33,12 +33,12 @@ Documentation
 =============
 
 The full documentation is available at:  
-https://quma41.readthedocs.io/en/latest/
+https://qumas.readthedocs.io/en/latest/
 
 References
 ============
 
-QuMA includes a submodule that uses the Lensmodel package for semi-automatic modeling of lensed quasars. This submodule uses code originally developed by Charles R. Keeton. If you use this submodule in your research, please cite:
+qumas includes a submodule that uses the Lensmodel package for semi-automatic modeling of lensed quasars. This submodule uses code originally developed by Charles R. Keeton. If you use this submodule in your research, please cite:
 
 **Keeton, C. R. (2011). *Lensmodel: A tool for gravitational lensing.*  
 Astrophysics Source Code Library, ascl:1102.003.**  

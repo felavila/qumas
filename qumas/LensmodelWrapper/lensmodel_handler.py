@@ -12,11 +12,11 @@ from .mass_models import mass_models
 # Get the path to the current file
 module_dir = Path(__file__).resolve().parent
 
-# Navigate to the root of the quma package (i.e., one level up from LensmodelWrapper)
-quma_root = module_dir.parent
+# Navigate to the root of the qumas package (i.e., one level up from LensmodelWrapper)
+qumas_root = module_dir.parent
 
 # Define the path to the CSV file (e.g., in the data/ subdirectory)
-csv_path = quma_root / "Tables" / "filter_unique.csv"
+csv_path = qumas_root / "Tables" / "filter_unique.csv"
 class lensmodel_handler:
     """modeling_path: where will go the results of our modeling
     system:and pandas data frame from our census with all information to model our system

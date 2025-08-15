@@ -1,7 +1,7 @@
 Ostrovski 2017Mnras.465.4325O
 =============================
 
-**Source:** :download:`Ostrovski_2017MNRAS.465.4325O.csv <../../../../quma/Tables/photometry/Ostrovski_2017MNRAS.465.4325O.csv>`
+**Source:** :download:`Ostrovski_2017MNRAS.465.4325O.csv <../../../../qumas/Tables/photometry/Ostrovski_2017MNRAS.465.4325O.csv>`
 
 - **Rows:** 3
 - **Columns:** 18

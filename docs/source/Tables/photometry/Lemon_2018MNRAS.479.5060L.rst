@@ -1,7 +1,7 @@
 Lemon 2018Mnras.479.5060L
 =========================
 
-**Source:** :download:`Lemon_2018MNRAS.479.5060L.csv <../../../../quma/Tables/photometry/Lemon_2018MNRAS.479.5060L.csv>`
+**Source:** :download:`Lemon_2018MNRAS.479.5060L.csv <../../../../qumas/Tables/photometry/Lemon_2018MNRAS.479.5060L.csv>`
 
 - **Rows:** 76
 - **Columns:** 26

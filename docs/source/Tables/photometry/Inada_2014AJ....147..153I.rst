@@ -1,7 +1,7 @@
 Inada 2014Aj....147..153I
 =========================
 
-**Source:** :download:`Inada_2014AJ....147..153I.csv <../../../../quma/Tables/photometry/Inada_2014AJ....147..153I.csv>`
+**Source:** :download:`Inada_2014AJ....147..153I.csv <../../../../qumas/Tables/photometry/Inada_2014AJ....147..153I.csv>`
 
 - **Rows:** 7
 - **Columns:** 18

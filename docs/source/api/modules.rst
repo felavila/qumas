@@ -1,7 +1,7 @@
-quma
+qumas
 ====
 
 .. toctree::
    :maxdepth: 4
 
-   quma
+   qumas

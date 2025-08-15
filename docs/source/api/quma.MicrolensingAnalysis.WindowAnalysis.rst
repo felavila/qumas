@@ -1,7 +1,7 @@
-quma.MicrolensingAnalysis.WindowAnalysis module
+qumas.MicrolensingAnalysis.WindowAnalysis module
 ===============================================
 
-.. automodule:: quma.MicrolensingAnalysis.WindowAnalysis
+.. automodule:: qumas.MicrolensingAnalysis.WindowAnalysis
    :members:
    :show-inheritance:
    :undoc-members:

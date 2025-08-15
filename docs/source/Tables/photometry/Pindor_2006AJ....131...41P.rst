@@ -1,7 +1,7 @@
 Pindor 2006Aj....131...41P
 ==========================
 
-**Source:** :download:`Pindor_2006AJ....131...41P.csv <../../../../quma/Tables/photometry/Pindor_2006AJ....131...41P.csv>`
+**Source:** :download:`Pindor_2006AJ....131...41P.csv <../../../../qumas/Tables/photometry/Pindor_2006AJ....131...41P.csv>`
 
 - **Rows:** 3
 - **Columns:** 18

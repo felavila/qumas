@@ -1,7 +1,7 @@
 Connor 2022Apj...927...45C
 ==========================
 
-**Source:** :download:`Connor_2022ApJ...927...45C.csv <../../../../quma/Tables/photometry/Connor_2022ApJ...927...45C.csv>`
+**Source:** :download:`Connor_2022ApJ...927...45C.csv <../../../../qumas/Tables/photometry/Connor_2022ApJ...927...45C.csv>`
 
 - **Rows:** 1
 - **Columns:** 7

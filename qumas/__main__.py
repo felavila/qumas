@@ -1,9 +1,9 @@
-"""Run `python -m quma`.
+"""Run `python -m qumas`.
 
-Allow running quma, also by invoking
+Allow running qumas, also by invoking
 the python module:
 
-`python -m quma`
+`python -m qumas`
 
 This is an alternative to directly invoking the cli that uses python as the
 "entrypoint".
@@ -11,7 +11,7 @@ This is an alternative to directly invoking the cli that uses python as the
 
 from __future__ import absolute_import
 
-from quma.cli import main
+from qumas.cli import main
 
 if __name__ == "__main__":  # pragma: no cover
-    main(prog_name="quma")  # pylint: disable=unexpected-keyword-arg
+    main(prog_name="qumas")  # pylint: disable=unexpected-keyword-arg

@@ -1,7 +1,7 @@
 Kostrzewa-Rutkowska 2018Mnras.476..663K
 =======================================
 
-**Source:** :download:`Kostrzewa-Rutkowska_2018MNRAS.476..663K.csv <../../../../quma/Tables/photometry/Kostrzewa-Rutkowska_2018MNRAS.476..663K.csv>`
+**Source:** :download:`Kostrzewa-Rutkowska_2018MNRAS.476..663K.csv <../../../../qumas/Tables/photometry/Kostrzewa-Rutkowska_2018MNRAS.476..663K.csv>`
 
 - **Rows:** 3
 - **Columns:** 18

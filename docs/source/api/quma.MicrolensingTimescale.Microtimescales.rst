@@ -1,7 +1,7 @@
-quma.MicrolensingTimescale.Microtimescales module
+qumas.MicrolensingTimescale.Microtimescales module
 =================================================
 
-.. automodule:: quma.MicrolensingTimescale.Microtimescales
+.. automodule:: qumas.MicrolensingTimescale.Microtimescales
    :members:
    :show-inheritance:
    :undoc-members:

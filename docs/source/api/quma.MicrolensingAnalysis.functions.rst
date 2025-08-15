@@ -1,7 +1,7 @@
-quma.MicrolensingAnalysis.functions module
+qumas.MicrolensingAnalysis.functions module
 ==========================================
 
-.. automodule:: quma.MicrolensingAnalysis.functions
+.. automodule:: qumas.MicrolensingAnalysis.functions
    :members:
    :show-inheritance:
    :undoc-members:

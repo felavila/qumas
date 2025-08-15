@@ -1,7 +1,7 @@
 Rusu 2016Mnras.458....2R
 ========================
 
-**Source:** :download:`Rusu_2016MNRAS.458....2R.csv <../../../../quma/Tables/photometry/Rusu_2016MNRAS.458....2R.csv>`
+**Source:** :download:`Rusu_2016MNRAS.458....2R.csv <../../../../qumas/Tables/photometry/Rusu_2016MNRAS.458....2R.csv>`
 
 - **Rows:** 102
 - **Columns:** 22

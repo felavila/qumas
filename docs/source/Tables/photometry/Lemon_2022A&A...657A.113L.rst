@@ -1,7 +1,7 @@
 Lemon 2022A&A...657A.113L
 =========================
 
-**Source:** :download:`Lemon_2022A&A...657A.113L.csv <../../../../quma/Tables/photometry/Lemon_2022A&A...657A.113L.csv>`
+**Source:** :download:`Lemon_2022A&A...657A.113L.csv <../../../../qumas/Tables/photometry/Lemon_2022A&A...657A.113L.csv>`
 
 - **Rows:** 7
 - **Columns:** 18

@@ -1,7 +1,7 @@
-quma.LensmodelWrapper.mcmc\_lensmodel module
+qumas.LensmodelWrapper.mcmc\_lensmodel module
 ============================================
 
-.. automodule:: quma.LensmodelWrapper.mcmc_lensmodel
+.. automodule:: qumas.LensmodelWrapper.mcmc_lensmodel
    :members:
    :show-inheritance:
    :undoc-members:

@@ -12,7 +12,7 @@ def test_cli(
     get_main_arguments,
     isolated_cli_runner,
 ):
-    from quma.cli import main
+    from qumas.cli import main
 
     main_arguments = get_main_arguments()
     result = isolated_cli_runner.invoke(

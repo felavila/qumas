@@ -18,7 +18,7 @@ build:
       - python -m pip install --exists-action=w --no-cache-dir -r req-docs.txt
 
     pre_build:
-      - sphinx-apidoc --force --module-first --separate -o docs/source/api quma
+      - sphinx-apidoc --force --module-first --separate -o docs/source/api qumas
       - test -f ./scripts/clean_rst.py && python ./scripts/clean_rst.py || echo "Skipping clean_rst.py"
       - test -f ./scripts/generate_tables_docs.py && python ./scripts/generate_tables_docs.py || echo "Skipping generate_tables_docs.py"
       - python ./scripts/visualize-ga-workflow.py > docs/cicd_mermaid.md 2>/dev/null || echo "Skipping GA workflow visualization"

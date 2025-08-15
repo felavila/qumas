@@ -1,7 +1,7 @@
-quma.MicrolensingAnalysis.Update module
+qumas.MicrolensingAnalysis.Update module
 =======================================
 
-.. automodule:: quma.MicrolensingAnalysis.Update
+.. automodule:: qumas.MicrolensingAnalysis.Update
    :members:
    :show-inheritance:
    :undoc-members:

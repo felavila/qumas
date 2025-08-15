@@ -1,7 +1,7 @@
-quma.Tools package
+qumas.Tools package
 ==================
 
-.. automodule:: quma.Tools
+.. automodule:: qumas.Tools
    :members:
    :show-inheritance:
    :undoc-members:
@@ -12,8 +12,8 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
-   quma.Tools.linear_fit
-   quma.Tools.linear_fit_tools
-   quma.Tools.paperthings
-   quma.Tools.postanalysis_utils
-   quma.Tools.utils
+   qumas.Tools.linear_fit
+   qumas.Tools.linear_fit_tools
+   qumas.Tools.paperthings
+   qumas.Tools.postanalysis_utils
+   qumas.Tools.utils

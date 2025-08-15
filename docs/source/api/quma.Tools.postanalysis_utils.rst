@@ -1,7 +1,7 @@
-quma.Tools.postanalysis\_utils module
+qumas.Tools.postanalysis\_utils module
 =====================================
 
-.. automodule:: quma.Tools.postanalysis_utils
+.. automodule:: qumas.Tools.postanalysis_utils
    :members:
    :show-inheritance:
    :undoc-members:

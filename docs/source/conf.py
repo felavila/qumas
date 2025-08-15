@@ -14,7 +14,7 @@ import sphinx_rtd_theme
 
 sys.path.insert(0, os.path.abspath('../..'))
 
-project   = 'quma'
+project   = 'qumas'
 author    = 'F. Avila-Vera'
 release   = '0.1.0'
 
@@ -78,7 +78,7 @@ autodoc_typehints   = 'description'
 napoleon_google_docstring = True
 autodoc_class_content = "both"   # include both class‐ and __init__‐docstrings
 
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store','api/quma.Tables.rst'
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store','api/qumas.Tables.rst'
                     ,'**/Tables/*']
                     # 'api/sheap.SuportData*', 'api/sheap.Core.Core.rst'
                     # ,'**/Core/Core.*'
@@ -153,7 +153,7 @@ while i < len(body_lines):
         and re.match(r"=+", body_lines[i+1].rstrip("\n"))
     ):
         # Replace title + its underline
-        new_title = "QuMA: Quasar Microlens Analysis\n"
+        new_title = "qumas: Quasar Microlens Analysis\n"
         new_uline = "-" * (len(new_title.rstrip("\n"))) + "\n"
         new_body.append(new_title)
         new_body.append(new_uline)
@@ -172,7 +172,7 @@ while i < len(body_lines):
     i += 1
 
 # 4) Prepend the “Getting Started with SHEAP” heading
-hdr = "Getting Started with QuMA\n" + "=" * len("Getting Started with QuMA") + "\n\n"
+hdr = "Getting Started with qumas\n" + "=" * len("Getting Started with qumas") + "\n\n"
 
 with open("getting_started.rst", "wt") as f:
     f.write(hdr)
@@ -207,7 +207,7 @@ sphinx_gallery_conf = {
 }
 ########
 
-html_logo = "_static/quma_logo_v1.png"
+html_logo = "_static/qumas_logo_v1.png"
 
 # # logo
 # html_logo = "_static/img/pyro_logo_wide.png"

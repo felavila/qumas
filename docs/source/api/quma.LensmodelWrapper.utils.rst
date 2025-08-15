@@ -1,7 +1,7 @@
-quma.LensmodelWrapper.utils module
+qumas.LensmodelWrapper.utils module
 ==================================
 
-.. automodule:: quma.LensmodelWrapper.utils
+.. automodule:: qumas.LensmodelWrapper.utils
    :members:
    :show-inheritance:
    :undoc-members:

@@ -1,7 +1,7 @@
-quma.LensmodelWrapper package
+qumas.LensmodelWrapper package
 =============================
 
-.. automodule:: quma.LensmodelWrapper
+.. automodule:: qumas.LensmodelWrapper
    :members:
    :show-inheritance:
    :undoc-members:
@@ -12,8 +12,8 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   quma.LensmodelWrapper.lensmodel
-   quma.LensmodelWrapper.models
+   qumas.LensmodelWrapper.lensmodel
+   qumas.LensmodelWrapper.models
 
 Submodules
 ----------
@@ -21,11 +21,11 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
-   quma.LensmodelWrapper.automatic_modeling
-   quma.LensmodelWrapper.lensmodel_handler
-   quma.LensmodelWrapper.lensmodel_reader
-   quma.LensmodelWrapper.lensmodel_result_handler
-   quma.LensmodelWrapper.lensmodel_wrapper
-   quma.LensmodelWrapper.mass_models
-   quma.LensmodelWrapper.mcmc_lensmodel
-   quma.LensmodelWrapper.utils
+   qumas.LensmodelWrapper.automatic_modeling
+   qumas.LensmodelWrapper.lensmodel_handler
+   qumas.LensmodelWrapper.lensmodel_reader
+   qumas.LensmodelWrapper.lensmodel_result_handler
+   qumas.LensmodelWrapper.lensmodel_wrapper
+   qumas.LensmodelWrapper.mass_models
+   qumas.LensmodelWrapper.mcmc_lensmodel
+   qumas.LensmodelWrapper.utils

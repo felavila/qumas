@@ -1,23 +1,23 @@
-"""Main `quma` CLI."""
+"""Main `qumas` CLI."""
 
 import os
 import sys
 
 import click
 
-from quma import __version__
+from qumas import __version__
 
 this_file_location = os.path.dirname(os.path.realpath(os.path.abspath(__file__)))
 
 
 def version_msg():
-    """quma version, location and Python version.
+    """qumas version, location and Python version.
 
-    Get message about quma version, location
+    Get message about qumas version, location
     and Python version.
     """
     python_version = sys.version[:3]
-    message = u"quma %(version)s from {} (Python {})"
+    message = u"qumas %(version)s from {} (Python {})"
     location = os.path.dirname(this_file_location)
     return message.format(location, python_version)
 

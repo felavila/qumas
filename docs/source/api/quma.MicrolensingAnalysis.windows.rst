@@ -1,7 +1,7 @@
-quma.MicrolensingAnalysis.windows module
+qumas.MicrolensingAnalysis.windows module
 ========================================
 
-.. automodule:: quma.MicrolensingAnalysis.windows
+.. automodule:: qumas.MicrolensingAnalysis.windows
    :members:
    :show-inheritance:
    :undoc-members:

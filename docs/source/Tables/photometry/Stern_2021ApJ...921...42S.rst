@@ -1,7 +1,7 @@
 Stern 2021Apj...921...42S
 =========================
 
-**Source:** :download:`Stern_2021ApJ...921...42S.csv <../../../../quma/Tables/photometry/Stern_2021ApJ...921...42S.csv>`
+**Source:** :download:`Stern_2021ApJ...921...42S.csv <../../../../qumas/Tables/photometry/Stern_2021ApJ...921...42S.csv>`
 
 - **Rows:** 9
 - **Columns:** 18

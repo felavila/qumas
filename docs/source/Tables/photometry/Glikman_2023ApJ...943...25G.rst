@@ -1,7 +1,7 @@
 Glikman 2023Apj...943...25G
 ===========================
 
-**Source:** :download:`Glikman_2023ApJ...943...25G.csv <../../../../quma/Tables/photometry/Glikman_2023ApJ...943...25G.csv>`
+**Source:** :download:`Glikman_2023ApJ...943...25G.csv <../../../../qumas/Tables/photometry/Glikman_2023ApJ...943...25G.csv>`
 
 - **Rows:** 7
 - **Columns:** 20

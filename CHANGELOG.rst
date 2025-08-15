@@ -5,8 +5,8 @@ Changelog
 0.0.1 (2025-04-04)
 ==================
 
-| This is the first public release of the **quma** Python package, developed as part of the **SHEAP** Project.
-| The package is open-source and available at: https://github.com/favila/quma
+| This is the first public release of the **qumas** Python package, developed as part of the **SHEAP** Project.
+| The package is open-source and available at: https://github.com/favila/qumas
 | It was scaffolded using the `Cookiecutter Python Package <https://github.com/boromir674/cookiecutter-python-package/tree/master/src/cookiecutter_python>`_ template.
 
 Initial Features
@@ -20,7 +20,7 @@ Initial Features
 CI/CD & Automation
 ------------------
 
-- Continuous Integration pipeline using **GitHub Actions**: https://github.com/favila/quma/actions
+- Continuous Integration pipeline using **GitHub Actions**: https://github.com/favila/qumas/actions
   - Test matrix covering:
     - Platforms: `ubuntu-latest`, `macos-latest`
     - Python versions: `3.12`, `3.13`

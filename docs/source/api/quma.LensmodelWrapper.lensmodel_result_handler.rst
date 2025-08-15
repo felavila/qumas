@@ -1,7 +1,7 @@
-quma.LensmodelWrapper.lensmodel\_result\_handler module
+qumas.LensmodelWrapper.lensmodel\_result\_handler module
 =======================================================
 
-.. automodule:: quma.LensmodelWrapper.lensmodel_result_handler
+.. automodule:: qumas.LensmodelWrapper.lensmodel_result_handler
    :members:
    :show-inheritance:
    :undoc-members:

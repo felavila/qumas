@@ -1,7 +1,7 @@
-quma.Tools.linear\_fit module
+qumas.Tools.linear\_fit module
 =============================
 
-.. automodule:: quma.Tools.linear_fit
+.. automodule:: qumas.Tools.linear_fit
    :members:
    :show-inheritance:
    :undoc-members:

@@ -1,7 +1,7 @@
-quma package
+qumas package
 ============
 
-.. automodule:: quma
+.. automodule:: qumas
    :members:
    :show-inheritance:
    :undoc-members:
@@ -12,12 +12,12 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   quma.LensmodelWrapper
-   quma.MicrolensingAnalysis
-   quma.MicrolensingMaps
-   quma.MicrolensingTimescale
-   quma.Tables
-   quma.Tools
+   qumas.LensmodelWrapper
+   qumas.MicrolensingAnalysis
+   qumas.MicrolensingMaps
+   qumas.MicrolensingTimescale
+   qumas.Tables
+   qumas.Tools
 
 Submodules
 ----------
@@ -25,5 +25,5 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
-   quma.census
-   quma.cli
+   qumas.census
+   qumas.cli

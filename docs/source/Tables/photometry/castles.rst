@@ -1,7 +1,7 @@
 Castles
 =======
 
-**Source:** :download:`castles.csv <../../../../quma/Tables/photometry/castles.csv>`
+**Source:** :download:`castles.csv <../../../../qumas/Tables/photometry/castles.csv>`
 
 - **Rows:** 322
 - **Columns:** 34

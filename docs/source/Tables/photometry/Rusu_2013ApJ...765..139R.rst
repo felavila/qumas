@@ -1,7 +1,7 @@
 Rusu 2013Apj...765..139R
 ========================
 
-**Source:** :download:`Rusu_2013ApJ...765..139R.csv <../../../../quma/Tables/photometry/Rusu_2013ApJ...765..139R.csv>`
+**Source:** :download:`Rusu_2013ApJ...765..139R.csv <../../../../qumas/Tables/photometry/Rusu_2013ApJ...765..139R.csv>`
 
 - **Rows:** 4
 - **Columns:** 18

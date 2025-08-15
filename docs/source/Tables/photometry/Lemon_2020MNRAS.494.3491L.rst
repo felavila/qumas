@@ -1,7 +1,7 @@
 Lemon 2020Mnras.494.3491L
 =========================
 
-**Source:** :download:`Lemon_2020MNRAS.494.3491L.csv <../../../../quma/Tables/photometry/Lemon_2020MNRAS.494.3491L.csv>`
+**Source:** :download:`Lemon_2020MNRAS.494.3491L.csv <../../../../qumas/Tables/photometry/Lemon_2020MNRAS.494.3491L.csv>`
 
 - **Rows:** 37
 - **Columns:** 26

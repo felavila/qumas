@@ -1,7 +1,7 @@
-quma.Tools.paperthings module
+qumas.Tools.paperthings module
 =============================
 
-.. automodule:: quma.Tools.paperthings
+.. automodule:: qumas.Tools.paperthings
    :members:
    :show-inheritance:
    :undoc-members:

@@ -1,7 +1,7 @@
 Lagattuta 2010Apj...716L.185L
 =============================
 
-**Source:** :download:`Lagattuta_2010ApJ...716L.185L.csv <../../../../quma/Tables/photometry/Lagattuta_2010ApJ...716L.185L.csv>`
+**Source:** :download:`Lagattuta_2010ApJ...716L.185L.csv <../../../../qumas/Tables/photometry/Lagattuta_2010ApJ...716L.185L.csv>`
 
 - **Rows:** 6
 - **Columns:** 18

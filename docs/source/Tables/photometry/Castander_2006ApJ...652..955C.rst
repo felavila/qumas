@@ -1,7 +1,7 @@
 Castander 2006Apj...652..955C
 =============================
 
-**Source:** :download:`Castander_2006ApJ...652..955C.csv <../../../../quma/Tables/photometry/Castander_2006ApJ...652..955C.csv>`
+**Source:** :download:`Castander_2006ApJ...652..955C.csv <../../../../qumas/Tables/photometry/Castander_2006ApJ...652..955C.csv>`
 
 - **Rows:** 3
 - **Columns:** 18

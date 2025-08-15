@@ -1,7 +1,7 @@
 Schmidt 2023Mnras.518.1260S
 ===========================
 
-**Source:** :download:`Schmidt_2023MNRAS.518.1260S.csv <../../../../quma/Tables/photometry/Schmidt_2023MNRAS.518.1260S.csv>`
+**Source:** :download:`Schmidt_2023MNRAS.518.1260S.csv <../../../../qumas/Tables/photometry/Schmidt_2023MNRAS.518.1260S.csv>`
 
 - **Rows:** 152
 - **Columns:** 22

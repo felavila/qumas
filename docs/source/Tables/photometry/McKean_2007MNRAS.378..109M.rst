@@ -1,7 +1,7 @@
 Mckean 2007Mnras.378..109M
 ==========================
 
-**Source:** :download:`McKean_2007MNRAS.378..109M.csv <../../../../quma/Tables/photometry/McKean_2007MNRAS.378..109M.csv>`
+**Source:** :download:`McKean_2007MNRAS.378..109M.csv <../../../../qumas/Tables/photometry/McKean_2007MNRAS.378..109M.csv>`
 
 - **Rows:** 6
 - **Columns:** 18

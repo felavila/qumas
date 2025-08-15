@@ -28,4 +28,4 @@ COPY . .
 RUN pip install --no-cache-dir --user .
 
 
-CMD [ "quma" ]
+CMD [ "qumas" ]

@@ -1,7 +1,7 @@
 Williams 2018Mnras.477L..70W
 ============================
 
-**Source:** :download:`Williams_2018MNRAS.477L..70W.csv <../../../../quma/Tables/photometry/Williams_2018MNRAS.477L..70W.csv>`
+**Source:** :download:`Williams_2018MNRAS.477L..70W.csv <../../../../qumas/Tables/photometry/Williams_2018MNRAS.477L..70W.csv>`
 
 - **Rows:** 1
 - **Columns:** 7

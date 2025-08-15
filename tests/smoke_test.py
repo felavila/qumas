@@ -1,4 +1,4 @@
 def test_import_module():
-    import quma
+    import qumas
 
-    assert quma is not None
+    assert qumas is not None

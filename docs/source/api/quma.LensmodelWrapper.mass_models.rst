@@ -1,7 +1,7 @@
-quma.LensmodelWrapper.mass\_models module
+qumas.LensmodelWrapper.mass\_models module
 =========================================
 
-.. automodule:: quma.LensmodelWrapper.mass_models
+.. automodule:: qumas.LensmodelWrapper.mass_models
    :members:
    :show-inheritance:
    :undoc-members:

@@ -1,7 +1,7 @@
-quma.MicrolensingTimescale.v\_cmb module
+qumas.MicrolensingTimescale.v\_cmb module
 ========================================
 
-.. automodule:: quma.MicrolensingTimescale.v_cmb
+.. automodule:: qumas.MicrolensingTimescale.v_cmb
    :members:
    :show-inheritance:
    :undoc-members:
