@@ -15,7 +15,7 @@ quma documentation
    :caption: API Reference
 
    api/quma
-
+   tables
 Indices and tables
 ==================
 
