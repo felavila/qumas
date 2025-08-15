@@ -172,7 +172,9 @@ docs = [
     "sphinx-inline-tabs",
     "sphinxcontrib-mermaid",
     "furo",
-    "sphinx-autobuild"
+    "sphinx-autobuild","nbsphinx","myst-parser"
+    
+    
 ]
 docslive = [
     "sphinx",
@@ -234,7 +236,7 @@ warn_unused_ignores = true
 ignore_errors = true
 
 [[tool.mypy.overrides]]
-module = ["optax.*", "jax.*", "astropy.*", "sfdmap2"]
+module = ["astropy.*"]
 ignore_missing_imports = true
 
 [tool.software-release]

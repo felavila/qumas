@@ -1,7 +1,7 @@
 .. image:: docs/source/_static/quma_logo_v1.png
    :alt: quma Logo
    :align: left
-   :width: 700
+   :width: 400
 
 QuMA: Quasar Microlens Analysis
 =========================================================

@@ -66,7 +66,7 @@ def clean_rst_file(filepath: str):
 
 def clean_all_rst():
     for file in os.listdir(DOCS_API_PATH):
-        if file.endswith(".rst") and file.startswith("sheap"):
+        if file.endswith(".rst") and file.startswith("quma"):
             print(f"Cleaning {file}")
             clean_rst_file(DOCS_API_PATH / file)
 
