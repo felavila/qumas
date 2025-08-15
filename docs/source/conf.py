@@ -5,7 +5,7 @@ import glob
 import shutil
 import re
 
-import nbsphinx
+#import nbsphinx
 import sphinx_rtd_theme
 
 
@@ -26,7 +26,7 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.viewcode',
     'sphinx.ext.napoleon',
-    "nbsphinx",
+    #"nbsphinx",
     "sphinxcontrib.jquery",
     "sphinx.ext.doctest",
     "sphinx.ext.imgconverter",
@@ -35,7 +35,12 @@ extensions = [
 #    "sphinx_gallery.gen_gallery",
 #    "sphinx_search.extension",
 ]
-
+try:
+    import nbsphinx  # noqa: F401
+    extensions.append("nbsphinx")
+except Exception:
+    print("nbsphinx not available; skipping notebook rendering")
+    
 # Treat notebooks and markdown via myst-nb
 # source_suffix = {
 #     '.rst':    'restructuredtext',
