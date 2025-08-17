@@ -13,6 +13,7 @@ from .v_cmb import calculate_projections
 
 
 class MicrolensingTimescale:
+    #?
     #Not sure about the errors maybe can think about it again in the future 
     #cm_s = u.cm / u.s# cm/s
     # Global constants with default values
