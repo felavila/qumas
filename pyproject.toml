@@ -10,8 +10,8 @@ build-backend = "poetry.core.masonry.api"
 ## Also renders on pypi as 'subtitle'
 [tool.poetry]
 name = "qumas"
-version = "0.1.0"
-description = "SHEAP: Spectral Handling and Estimation of AGN Parameters"
+version = "0.1.1"
+description = "QuMAS: Quasar Microlens AnalysiS"
 authors = ["Felipe Avila-Vera <felipe.avilav@postgrado.uv.cl>"]
 maintainers = ["Felipe Avila-Vera <felipe.avilav@postgrado.uv.cl>"]
 license = "AGPL-3.0-only"
