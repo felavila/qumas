@@ -10,8 +10,8 @@ build-backend = "poetry.core.masonry.api"
 ## Also renders on pypi as 'subtitle'
 [tool.poetry]
 name = "qumas"
-version = "0.1.1"
-description = "QuMAS: Quasar Microlens AnalysiS"
+version = "0.1.2"
+description = "QuMAS: Quasar Microlensing AnalysiS"
 authors = ["Felipe Avila-Vera <felipe.avilav@postgrado.uv.cl>"]
 maintainers = ["Felipe Avila-Vera <felipe.avilav@postgrado.uv.cl>"]
 license = "AGPL-3.0-only"

@@ -1,16 +1,16 @@
-.. image:: docs/source/_static/qumas_logo_v1.png
+.. image:: https://raw.githubusercontent.com/felavila/qumas/v0.1.2/docs/source/_static/qumas_logo_v1.png
    :alt: qumas Logo
    :align: left
    :width: 400
 
-QuMAS: Quasar Microlens AnalysiS
+QuMAS: Quasar Microlensing AnalysiS
 =========================================================
 
 .. .| |build| |coverage| |docs| |maintainability| |codacy| |tech-debt|
 .. .| |release_version| |wheel| |supported_versions| |commits_since_specific_tag_on_master| |commits_since_latest_github_release|
 .. .| |pypi_stats| |ossf| |ruff| |black| |gh-lic||
 
-QuMAS (Quasar Microlens AnalysiS) is a Python 3 package that provides a comprehensive suite of tools for analyzing microlensing phenomena in quasars. It is designed to facilitate the study of time scales, assess the impact of microlensing on AGN spectra, and analyze magnification maps in gravitational lensing systems.
+QuMAS (Quasar Microlensing AnalysiS) is a Python 3 package that provides a comprehensive suite of tools for analyzing microlensing phenomena in quasars. It is designed to facilitate the study of time scales, assess the impact of microlensing on AGN spectra, and analyze magnification maps in gravitational lensing systems.
 
 Features
 ============
@@ -29,11 +29,6 @@ Install qumas locally using the following command:
     
     pip install -e .
 
-Documentation
-=============
-
-The full documentation is available at:  
-https://qumas.readthedocs.io/en/latest/
 
 References
 ============

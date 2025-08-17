@@ -153,7 +153,7 @@ while i < len(body_lines):
         and re.match(r"=+", body_lines[i+1].rstrip("\n"))
     ):
         # Replace title + its underline
-        new_title = "qumas: Quasar Microlens Analysis\n"
+        new_title = "QuMAS: Quasar Microlensing AnalysiS\n"
         new_uline = "-" * (len(new_title.rstrip("\n"))) + "\n"
         new_body.append(new_title)
         new_body.append(new_uline)
