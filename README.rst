@@ -1,4 +1,4 @@
-.. image:: https://raw.githubusercontent.com/felavila/qumas/v0.1.2/docs/source/_static/qumas_logo_v1.png
+.. image:: https://raw.githubusercontent.com/felavila/qumas/main/docs/source/_static/qumas_logo_v1.png
    :alt: qumas Logo
    :align: left
    :width: 400

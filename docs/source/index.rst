@@ -1,9 +1,11 @@
 :github_url: https://github.com/felavila/qumas
 
-qumas documentation
-=====================
+===============================
+Welcome to qumas documentation
+===============================
 
-
+.. include:: getting_started.rst
+   
 .. toctree::
    :maxdepth: 2
    :caption: Getting Started 
