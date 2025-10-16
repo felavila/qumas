@@ -152,6 +152,8 @@ class Result_Handler(
         model = model or self.current_best_n_model
         if model not in self.models:
             raise ModelNotFoundError(model, self.models)
+        print(model)
+        
         model_dic = self.lensmodel_system[model]
         ra_imput = model_dic['final_step']['images']['ra_imput']
         dec_imput = model_dic['final_step']['images']['dec_imput']

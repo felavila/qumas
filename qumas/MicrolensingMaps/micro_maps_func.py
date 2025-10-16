@@ -3,39 +3,41 @@ from scipy.ndimage import gaussian_filter
 from .maps_utils import map2d_to_stats,renormalize_mean
 
 
-dict_maps = {"alpha_0.1":  "/home/felipe/work/microlensing_timescale_qso_lensing/analysis/microlensing_maps/Mapas_magnification",
-             "alpha_0.2":  "/home/felipe/work/microlensing_timescale_qso_lensing/analysis/microlensing_maps/Mapas_02"}
+main_path = "/home/felipe/work/MicrolensingProjects/MicrolensingMagnificationMaps"
+dict_maps = {"alpha_0.1":  f"{main_path}/Mapas_magnification",
+            "alpha_0.2":  f"{main_path}/Mapas_02"}
 
 
 def maps_to_stats(name,component,rs_lday,pix,mappix,num_bins=100,bins_limit=3,rs_times = [0.3,1,2],dict_maps=dict_maps):
-   """_summary_
+    """_summary_
 
-   Args:
-       name (_type_): _description_
-       component (_type_): _description_
-       rs_lday (_type_): _description_
-       pix (_type_): _description_
-       mappix (_type_): _description_
-       num_bins (int, optional): _description_. Defaults to 100.
-       bins_limit (int, optional): _description_. Defaults to 3.
-       factors (list, optional): _description_. Defaults to [0.3,1,2].
-       dict_maps (_type_, optional): _description_. Defaults to dict_maps.
+    Args:
+        name (_type_): _description_
+        component (_type_): _description_
+        rs_lday (_type_): _description_
+        pix (_type_): _description_
+        mappix (_type_): _description_
+        num_bins (int, optional): _description_. Defaults to 100.
+        bins_limit (int, optional): _description_. Defaults to 3.
+        factors (list, optional): _description_. Defaults to [0.3,1,2].
+        dict_maps (_type_, optional): _description_. Defaults to dict_maps.
 
-   Returns:
-       _type_: _description_
-   """
-   mag_maps = {}
-   for key,path in dict_maps.items():
-      map_1d_path = f'{path}/{name}{component}/magmap.dat'
-      map_1d = np.loadtxt(map_1d_path)
-      map_2d = np.reshape(map_1d, (int(mappix), int(mappix)))
-      n_factor_results = {}
-      for rs_time in rs_times:
-         result = map2d_to_stats(map_2d,pix,rs_lday,num_bins=num_bins,bins_limit = bins_limit,rs_times = rs_time)
-         n_factor_results[str(rs_time)] = result
-      mag_maps[key] = n_factor_results
-   return mag_maps
-      
+    Returns:
+        _type_: _description_
+    """
+    mag_maps = {}
+    for key,path in dict_maps.items():
+        map_1d_path = f'{path}/{name}{component}/magmap.dat'
+        map_1d = np.loadtxt(map_1d_path)
+        map_2d = np.reshape(map_1d, (int(mappix), int(mappix)))
+        n_factor_results = {}
+        for rs_time in rs_times:
+            #print(key,rs_time)
+            result = map2d_to_stats(map_2d,pix,rs_lday,num_bins=num_bins,bins_limit = bins_limit,rs_times = rs_time)
+            n_factor_results[str(rs_time)] = result
+        mag_maps[key] = n_factor_results
+    return mag_maps
+
 # def map_to_stat_full(name,component,rs_lday,pix,mappix):
 #    print(f'Doing {name} {component}')
 #    maps_alpha_01 = "/home/felipe/work/microlensing_timescale_qso_lensing/analysis/microlensing_maps/Mapas_magnification"

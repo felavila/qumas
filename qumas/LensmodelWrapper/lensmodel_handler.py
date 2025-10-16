@@ -72,19 +72,20 @@ class lensmodel_handler:
         lens_lens_centered = lens[["RA","DEC"]].values-lens[["RA","DEC"]].values[0]
         error_lens_lens_centered = np.sqrt(lens[["dRA","dDEC"]].values**2+lens[["dRA","dDEC"]].values[0]**2)
         magnitudes = images[band_to_model].values
+        #in coming iterations this should be change.
         band_info = self.system.loc[images[band_to_model].index][["photometric_system","Telescope","instrument"]].values[0]
-        if not isinstance(band_info[0],str):
-            band_info[0] = "Vega"
-        mask = ((filter_info["photometric_system"] == "Vega" if "v"  in band_info[0] else filter_info["photometric_system"] == band_info[0]) & (filter_info["Telescope"] == band_info[1]) &(filter_info["instrument"] == band_info[2]) & 
-                (filter_info["band_to_model"] == band_to_model.replace("band_", "")))
+        # if not isinstance(band_info[0],str):
+        #     band_info[0] = "Vega"
+        # mask = ((filter_info["photometric_system"] == "Vega" if "v"  in band_info[0] else filter_info["photometric_system"] == band_info[0]) & (filter_info["Telescope"] == band_info[1]) &(filter_info["instrument"] == band_info[2]) & 
+        #         (filter_info["band_to_model"] == band_to_model.replace("band_", "")))
         
-        band_matching_rows = filter_info[mask]
-        if len(band_matching_rows) == 0:
-            print('no band_info specific band info for this case')
-            band_info = {i: None for i in filter_info.columns}
-            band_info["band_to_model"] = band_to_model.replace("band_", "")
-        else:
-            band_info = band_matching_rows.iloc[0].to_dict()
+        # band_matching_rows = filter_info[mask]
+        # if len(band_matching_rows) == 0:
+        #     print('no band_info specific band info for this case')
+        #     band_info = {i: None for i in filter_info.columns}
+        #     band_info["band_to_model"] = band_to_model.replace("band_", "")
+        # else:
+        #     band_info = band_matching_rows.iloc[0].to_dict()
         #print(band_matching_rows.iloc[0].to_dict())
         if use_informed_flux:
             flux = magnitudes
@@ -95,6 +96,7 @@ class lensmodel_handler:
             flux_error = images[band_to_model.replace("band",'error')].values
             #return print("Not define yet a formula for the propagation of the error in the flux")
             #flux_error = image[2] #error propagation from flux
+        print(flux)
         astrometry_error = self.n_images*[astrometry_error]
         if use_real_astrometry_error:
             error_images_lens_centered = np.sqrt(images[["dRA","dDEC"]].values**2+lens[["dRA","dDEC"]].values[0]**2)
@@ -152,10 +154,13 @@ class lensmodel_handler:
                 #   flux = ((-1)**(ii))*image[1]/np.max(image[1])
                 f.write(f"{ra:.3f} {dec:.3f} {flux[n]:.3f} {astrometry_error[n]:.3f} {flux_error[n]:.3f} {time_delay:.3f} {time_delay_error:.3f} {image[0]} \n")
             f.close()
+        print(self.system_name)
         data_model = {"name":self.system_name,"component":images["component"].values,"ra":images_lens_centered[:,0],"dec":images_lens_centered[:,1],"astrometry_error":astrometry_error \
                     ,"flux":flux,"flux_error":flux_error,"magnitudes":magnitudes,"band_to_model":band_to_model,"lens_ra":lens_lens_centered[:,0],"lens_dec":lens_lens_centered[:,1] \
-                    ,"center_mass_error":center_mass_error,"zl":self.zl,"zs":self.zs}
-        data_model.update(band_info)
+                    ,"center_mass_error":center_mass_error,"zl":self.zl,"zs":self.zs,'photometric_system':"?", 'Telescope':"?", 'instrument':"?", 
+                        'zpt':"?", 'lambda_cen':"?"}
+        
+        #data_model.update(band_info)
         return data_model
     def model_writter(self,mass_distribution=None,name_run ="model_run",kwards_special={}):
         with open(os.path.join(self.model_setup_path,"model_setup.json"), 'r') as file:

@@ -19,7 +19,8 @@ def set_up_dir(path_for_models,dir_models,system_name):
     return os.path.join(path_for_models,dir_models,system_name)
 # To do change all the save and reading to pickle
 
-def automatic_modeling(system,max_separation=0.01,path_for_models=None,dir_models=None,model_All=False,do_mcmc=False,max_lap=10,relative_flux_error=0.2,use_informed_flux=False,use_real_error_flux=False,do_model_of=None,**kwargs):
+def automatic_modeling(system,max_separation=0.01,path_for_models=None,dir_models=None,model_All=False,do_mcmc=False,max_lap=10,
+                    relative_flux_error=0.2,use_informed_flux=False,use_real_error_flux=False,do_model_of=None,**kwargs):
     #Check for existing results
     #path_model_result_csv = os.path.join(set_up_dir(system_name,path_for_models,dir_models),"final_result",f"models_{system_name}.csv")
     system_name = system.name.values[0]

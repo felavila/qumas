@@ -49,6 +49,7 @@ def map2d_to_stats(map_2d,pix,rs_lday,num_bins=100,bins_limit = 3,rs_times = 1,f
     """
     map_2d_norm = map_2d/np.mean(map_2d)
     mag_map_2d_norm = -2.5*np.log10(map_2d_norm)
+    #print(factor_scale_to_sigma*rs_lday*rs_times/pix)
     mag_map_2d_norm_conv = gaussian_filter(mag_map_2d_norm, [factor_scale_to_sigma*rs_lday*rs_times/pix,factor_scale_to_sigma*rs_lday*rs_times/pix],mode='mirror')
     bins = np.linspace(-bins_limit, bins_limit, num_bins + 1)
     counts, bin_edges = np.histogram(mag_map_2d_norm_conv.ravel(), bins=bins)
@@ -56,10 +57,13 @@ def map2d_to_stats(map_2d,pix,rs_lday,num_bins=100,bins_limit = 3,rs_times = 1,f
     bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
     pmf_for_plots = np.r_[pmf, pmf[-1]]
     pdf = counts / (counts.sum() * np.diff(bin_edges))
-    result = {"map_2d":map_2d,"mag_map_2d_norm":mag_map_2d_norm,"mag_map_2d_norm_conv": mag_map_2d_norm_conv,"rs_lday":rs_lday,"pix":pix,"num_bins":num_bins,"rs_times":rs_times,
-            "bin_edges":bin_edges,"bin_centers":bin_centers,"counts":counts,"pmf":pmf,"pmf_for_plots":pmf_for_plots,"width": np.diff(bin_edges), "dx": np.diff(bin_edges)[0],"pdf":pdf
+    result = {"map_2d":map_2d,"mag_map_2d_norm":mag_map_2d_norm,"mag_map_2d_norm_conv": mag_map_2d_norm_conv,"Rs_lday":rs_lday,
+            "pix":pix,"num_bins":num_bins,"rs_times":rs_times,
+            "bin_edges":bin_edges,"bin_centers":bin_centers,"counts":counts,"pmf":pmf,"pmf_for_plots":pmf_for_plots,"width": np.diff(bin_edges),
+            "dx": np.diff(bin_edges)[0],"pdf":pdf,"rs_sigma[pix]": factor_scale_to_sigma*rs_lday*rs_times/pix,"factor_scale_to_sigma":factor_scale_to_sigma
             }
-    keys = ["mean","mean_abs","mean_positive","mean_negative","prob_mag_less_than_n032","prob_mag_more_than_05","prob_mag_more_than_p032","prob_mag_less_than_none","var","var_pmf_abs"]
+    keys = ["mean","mean_abs","mean_positive","mean_negative","prob_mag_less_than_n032","prob_mag_more_than_05","prob_mag_more_than_p032","prob_mag_less_than_none","var"
+            ,"var_pmf_abs"]
     result.update({keys[i]+"_center":value for i,value in enumerate(pmf_stats(pmf,bin_centers))})
     result.update({keys[i]+"_edges":value for i,value in enumerate(pmf_stats(pmf_for_plots,bin_edges))})
     return result 

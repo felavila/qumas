@@ -14,7 +14,7 @@ class LensedQsoCensus:
         self.path_lens_tables = glob.glob(f"{module_dir}/{path}/*")
         #print(self.path_lens_tables)
         self.lens_census = self._do_full_lens_census()
-        self.lens_census["year"] = [i[0:4] for i in self.lens_census["Bibcode"]]
+        self.lens_census["year"] = [str(i)[0:4] for i in self.lens_census["Bibcode"]]
         self.points = self.lens_census[["ra", "dec"]].values
         self.distances = np.linalg.norm(self.points[:, np.newaxis] - self.points, axis=2)
 
@@ -58,7 +58,11 @@ class LensedQsoCensus:
                 visited |= close_mask
                 count += 1
                 if get_unique_names:
-                    names.append(self.lens_census.name[close_mask].drop_duplicates().values[0])
+                    try:
+                        names.append(self.lens_census.name[close_mask].drop_duplicates().values[0])
+                    except:
+                        
+                        print("?")
                 if get_unique_years:
                     years.append([self.lens_census.name[close_mask].drop_duplicates().values[0],min(self.lens_census.year[close_mask].drop_duplicates().values.astype(int))])
         if get_unique_names:
@@ -82,9 +86,9 @@ class LensedQsoCensus:
         data_to_model["known_names"] = [system.name.drop_duplicates().values]* len(data_to_model)
         data_to_model["can_be_modeled"] = [any([(("band" in col) and ("ima" in data_to_model["IS"].values)) for col in data_to_model.columns])] * len(data_to_model)
         return data_to_model
-    # def pandas_for_model(self):
-    #     pandas_to_be_use_in_model = pd.concat([pandas_to_model(self.hierarchical_selection(system_name)) for system_name in self.unique_systems_count(get_unique_names=True)]
-    #     ).reset_index(drop=True)
-    #     pandas_to_be_use_in_model['total_lens'] = pandas_to_be_use_in_model['total_lens'].fillna(0)
-    #     return pandas_to_be_use_in_model
+    def pandas_for_model(self):
+        pandas_to_be_use_in_model = pd.concat([pandas_to_model(self.hierarchical_selection(system_name)) for system_name in self.unique_systems_count(get_unique_names=True)]
+        ).reset_index(drop=True)
+        pandas_to_be_use_in_model['total_lens'] = pandas_to_be_use_in_model['total_lens'].fillna(0)
+        return pandas_to_be_use_in_model
 
