@@ -29,7 +29,8 @@ class lensmodel_handler:
     
     
     def __init__(self, modeling_path:str,system:pd.DataFrame
-                 ,json_models=f"{module_dir}/models"): 
+                 ,json_models=f"{module_dir}/models",
+                  time_delay = None,time_delay_error= None): 
         self.model_setup_path = json_models
         self.modeling_path = modeling_path
         self.system = system
@@ -48,6 +49,8 @@ class lensmodel_handler:
              self.mass_models = json.load(file_mass)
         #prior Er
         self.p1 = round(np.max(distance.pdist(np.array([self.images["RA"].values,self.images["DEC"].values]).T,metric='euclidean')/2),2)
+        self.time_delay = time_delay
+        self.time_delay_error = time_delay_error
         #if is not create yet create directories for the results and a directory in where will run the code.
         if modeling_path != None:
             self.data_path = os.path.join(self.modeling_path,f"{self.system_name}.dat")
@@ -55,6 +58,7 @@ class lensmodel_handler:
                 os.mkdir(self.modeling_path)
             #if os.path.isdir(os.path.join(self.modeling_path,"final_result"))==False:
              #   os.mkdir(os.path.join(self.modeling_path,"final_result"))
+        
         else:
             self.data_path = None
     def __str__(self):
@@ -65,6 +69,8 @@ class lensmodel_handler:
     #maybe if moment to use **kwargs?
     def data_writter(self,use_real_error_flux=False,use_real_astrometry_error=False,free_center_of_mass=False, \
                     astrometry_error=0.003,center_mass_error=0.003,relative_flux_error=0.2,band_to_model=None,use_informed_flux=False):
+        
+        time_delay,time_delay_error = self.time_delay,self.time_delay_error
         band_to_model = band_to_model if band_to_model in self.available_bands else self.band_to_model
         images, lens = columns_to_float(self.system, band_to_model) if band_to_model else (self.images, self.lens)
         #how can handle system with more image that the ones i want to use in the first model ?
@@ -96,7 +102,7 @@ class lensmodel_handler:
             flux_error = images[band_to_model.replace("band",'error')].values
             #return print("Not define yet a formula for the propagation of the error in the flux")
             #flux_error = image[2] #error propagation from flux
-        print(flux)
+        #print(flux)
         astrometry_error = self.n_images*[astrometry_error]
         if use_real_astrometry_error:
             error_images_lens_centered = np.sqrt(images[["dRA","dDEC"]].values**2+lens[["dRA","dDEC"]].values[0]**2)
@@ -129,7 +135,12 @@ class lensmodel_handler:
             center_mass_error = [center_mass_error]
             if number_of_lens>1:
                 center_mass_error+= [0.5]*(number_of_lens-1)
-        time_delay,time_delay_error = 0,1000
+        if time_delay:
+            print("you add a time delay yei")
+            print("time delay",time_delay,"time delay error", time_delay_error)
+            #time_delay,time_delay_error = 0,1000
+        else:
+            time_delay,time_delay_error = [0]*len(flux),[1000]*len(flux)
         if self.data_path:
             f = open(os.path.join(self.data_path), 'w')
             f.write(f"#The system name is: {self.system_name} \n")
@@ -152,7 +163,7 @@ class lensmodel_handler:
                 #   flux=((1)**(ii))*image[1]
                 #if np.max(image[1])>30:
                 #   flux = ((-1)**(ii))*image[1]/np.max(image[1])
-                f.write(f"{ra:.3f} {dec:.3f} {flux[n]:.3f} {astrometry_error[n]:.3f} {flux_error[n]:.3f} {time_delay:.3f} {time_delay_error:.3f} {image[0]} \n")
+                f.write(f"{ra:.3f} {dec:.3f} {flux[n]:.3f} {astrometry_error[n]:.3f} {flux_error[n]:.3f} {time_delay[n]:.3f} {time_delay_error[n]:.3f} {image[0]} \n")
             f.close()
         print(self.system_name)
         data_model = {"name":self.system_name,"component":images["component"].values,"ra":images_lens_centered[:,0],"dec":images_lens_centered[:,1],"astrometry_error":astrometry_error \

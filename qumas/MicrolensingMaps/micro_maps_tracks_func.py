@@ -184,6 +184,96 @@ def _sample_profile_along_line_pixels(
     x_pix = np.arange(values.size, dtype=int)
     return x_pix, values, rr, cc
 
+
+def _angle_deg_from_pixels(r0: int, c0: int, r1: int, c1: int, *, y_down: bool = True) -> float:
+    """Angle in degrees from (r0,c0) to (r1,c1).
+    y_down=True gives image-style angles; set False for Cartesian."""
+    dx = c1 - c0
+    dy = r1 - r0
+    if not y_down:
+        dy = -dy
+    ang = np.degrees(np.arctan2(dy, dx))   # (-180, 180]
+    return float((ang + 360) % 360)        # [0, 360)
+
+def _angle_deg_from_data(p0: Tuple[float,float], p1: Tuple[float,float]) -> float:
+    """Angle in degrees in data coords (x to the right, y up)."""
+    x0, y0 = p0
+    x1, y1 = p1
+    ang = np.degrees(np.arctan2(y1 - y0, x1 - x0))  # (-180, 180]
+    return float((ang + 360) % 360)                 # [0, 360)
+def bresenham_line(r0: int, c0: int, r1: int, c1: int) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Classic Bresenham line between (r0, c0) and (r1, c1), inclusive.
+    Returns arrays rr, cc of same length.
+    """
+    r0, c0, r1, c1 = int(r0), int(c0), int(r1), int(c1)
+    dr = abs(r1 - r0)
+    dc = abs(c1 - c0)
+    sr = 1 if r1 >= r0 else -1
+    sc = 1 if c1 >= c0 else -1
+
+    rr = []
+    cc = []
+
+    if dc > dr:
+        err = dc // 2
+        r = r0
+        for c in range(c0, c1 + sc, sc):
+            rr.append(r)
+            cc.append(c)
+            err -= dr
+            if err < 0:
+                r += sr
+                err += dc
+    else:
+        err = dr // 2
+        c = c0
+        for r in range(r0, r1 + sr, sr):
+            rr.append(r)
+            cc.append(c)
+            err -= dc
+            if err < 0:
+                c += sc
+                err += dr
+
+    return np.asarray(rr, dtype=int), np.asarray(cc, dtype=int)
+
+
+def _angle_deg_from_pixels(r0: int, c0: int, r1: int, c1: int, *, y_down: bool = True) -> float:
+    """
+    Angle in degrees from (r0,c0) to (r1,c1).
+    y_down=True uses image-style axes (rows increase downward).
+    """
+    dx = c1 - c0
+    dy = r1 - r0
+    if not y_down:
+        dy = -dy
+    ang = np.degrees(np.arctan2(dy, dx))    # (-180, 180]
+    return float((ang + 360) % 360)          # [0, 360)
+
+
+def _angle_deg_from_data(p0: Tuple[float, float], p1: Tuple[float, float]) -> float:
+    """Angle in degrees in data coords (x right, y up)."""
+    x0, y0 = p0
+    x1, y1 = p1
+    ang = np.degrees(np.arctan2(y1 - y0, x1 - x0))   # (-180, 180]
+    return float((ang + 360) % 360)                  # [0, 360)
+
+
+def _pixel_to_data_xy(r: int, c: int, H: int, W: int,
+                      extent: Tuple[float, float, float, float]) -> Tuple[float, float]:
+    """
+    Map pixel center (r,c) to data coords given extent=(xmin, xmax, ymin, ymax).
+    x increases with column, y increases upward (so row 0 is at ymax).
+    """
+    xmin, xmax, ymin, ymax = extent
+    x = xmin + (c + 0.5) * (xmax - xmin) / W
+    # rows go down, so invert to get y-up coordinates (center-of-pixel mapping)
+    y = ymax - (r + 0.5) * (ymax - ymin) / H
+    return float(x), float(y)
+
+# ------------------------- main generator --------------------------------
+
 def generate_random_tracks(
     shape: Tuple[int, int],
     lengths: List[int] | int,
@@ -197,12 +287,19 @@ def generate_random_tracks(
     """
     Generate straight tracks (Bresenham lines) with exact pixel lengths.
 
+    Angles are no longer biased: endpoints are sampled uniformly on the
+    Chebyshev perimeter { (dr,dc): max(|dr|,|dc|)=L-1 }, which admits all
+    lattice directions including true 45° diagonals and guarantees a
+    Bresenham path of length L (unless border clipping occurs, in which
+    case we retry).
+
     Parameters
     ----------
     shape : (H, W)
     lengths : list[int] or int
         If int, you must also pass n_tracks (all tracks same length).
-        If list, its length is the number of tracks and each entry is the pixel length.
+        If list, its length is the number of tracks and each entry is
+        the pixel length.
     n_tracks : int | None
         Number of tracks if `lengths` is an int.
     seed : int | None
@@ -210,7 +307,7 @@ def generate_random_tracks(
     max_attempts : int
         Max attempts per track to find a valid line of exact length.
     extent : (xmin, xmax, ymin, ymax) | None
-        If provided, data coords (p0, p1) will also be included in the result.
+        If provided, data coords (p0, p1) and data-space angle will be included.
     avoid_overlap : bool
         If True, tries to avoid reusing pixels used by previous tracks.
 
@@ -223,8 +320,12 @@ def generate_random_tracks(
             - 'rr': array of row indices (Bresenham path)
             - 'cc': array of col indices (Bresenham path)
             - 'length': int (number of pixels)
+            - 'angle_deg': float (pixel-space, y-down convention, [0,360))
             - 'p0': (x0, y0)  [only if extent provided]
             - 'p1': (x1, y1)  [only if extent provided]
+            - 'angle_deg_data': float [only if extent provided]
+            - 'coords': ((r0,c0),(r1,c1))
+            - 'coords_pix': (rr,cc)
     """
     rng = np.random.default_rng(seed)
     H, W = shape
@@ -244,7 +345,7 @@ def generate_random_tracks(
         if L < 1:
             raise ValueError("Track length must be >= 1")
 
-        # Short length: pick single pixel
+        # L == 1: single-pixel "track" (angle undefined)
         if L == 1:
             for _ in range(max_attempts):
                 r0 = rng.integers(0, H)
@@ -252,18 +353,20 @@ def generate_random_tracks(
                 if avoid_overlap and used_mask[r0, c0]:
                     continue
                 rr, cc = np.array([r0]), np.array([c0])
-                track = {
+                track: Dict[str, Any] = {
                     "pix0": (r0, c0),
                     "pix1": (r0, c0),
                     "rr": rr, "cc": cc,
                     "length": 1,
-                    "coords": ((r0, c0),(r0, c0)),
-                    "coords_pix": (rr, cc)
+                    "coords": ((r0, c0), (r0, c0)),
+                    "coords_pix": (rr, cc),
+                    "angle_deg": np.nan,
                 }
                 if extent is not None:
                     x0, y0 = _pixel_to_data_xy(r0, c0, H, W, extent)
                     track["p0"] = (x0, y0)
                     track["p1"] = (x0, y0)
+                    track["angle_deg_data"] = np.nan
                 tracks.append(track)
                 if avoid_overlap:
                     used_mask[rr, cc] = True
@@ -272,50 +375,64 @@ def generate_random_tracks(
                 raise RuntimeError("Could not place length-1 track without overlap.")
             continue
 
-        # For L >= 2:
+        # L >= 2
+        M = L - 1
         placed = False
         for _ in range(max_attempts):
-            # random start pixel
-            r0 = rng.integers(0, H)
-            c0 = rng.integers(0, W)
+            # pick start with margin when possible so the whole track fits
+            if H > 2 * M and W > 2 * M:
+                r0 = rng.integers(M, H - M)
+                c0 = rng.integers(M, W - M)
+            else:
+                r0 = rng.integers(0, H)
+                c0 = rng.integers(0, W)
 
-            # random direction as unit vector on grid via angle
-            theta = rng.random() * 2.0 * np.pi
-            # Convert required *pixel count* to endpoint displacement in continuous space:
-            # We want exactly L pixels on the Bresenham path,
-            # so try to make the endpoint approximately (L-1) pixels away.
-            dr = (L - 1) * np.sin(theta)
-            dc = (L - 1) * np.cos(theta)
+            # --- uniform endpoint on Chebyshev perimeter ---
+            side = rng.integers(0, 4)
+            t = rng.integers(-M, M + 1)
+            if side == 0:         # top edge: Δr = -M
+                dr, dc = -M, t
+            elif side == 1:       # right edge: Δc = +M
+                dr, dc = t, +M
+            elif side == 2:       # bottom edge: Δr = +M
+                dr, dc = +M, t
+            else:                 # left edge: Δc = -M
+                dr, dc = t, -M
 
-            r1 = int(round(r0 + dr))
-            c1 = int(round(c0 + dc))
+            r1 = r0 + dr
+            c1 = c0 + dc
 
-            # Keep inside bounds
-            r1 = max(0, min(H - 1, r1))
-            c1 = max(0, min(W - 1, c1))
+            # If we used margins, clipping should rarely happen.
+            if not (0 <= r1 < H and 0 <= c1 < W):
+                # would go out of bounds; try again
+                continue
 
             rr, cc = bresenham_line(r0, c0, r1, c1)
-
             if rr.size != L:
-                # Not the length we need; try again
+                # this should basically never happen with the Chebyshev construction
                 continue
 
             if avoid_overlap and used_mask[rr, cc].any():
                 continue
 
-            track = {
+            angle_deg = _angle_deg_from_pixels(r0, c0, r1, c1, y_down=True)
+
+            track: Dict[str, Any] = {
                 "pix0": (r0, c0),
                 "pix1": (r1, c1),
                 "rr": rr, "cc": cc,
                 "length": int(L),
-                "coords": ((r0, c0),(r1, c1)),
-                "coords_pix": (rr, cc)
+                "coords": ((r0, c0), (r1, c1)),
+                "coords_pix": (rr, cc),
+                "angle_deg": angle_deg,
             }
+
             if extent is not None:
                 x0, y0 = _pixel_to_data_xy(r0, c0, H, W, extent)
                 x1, y1 = _pixel_to_data_xy(r1, c1, H, W, extent)
                 track["p0"] = (x0, y0)
                 track["p1"] = (x1, y1)
+                track["angle_deg_data"] = _angle_deg_from_data(track["p0"], track["p1"])
 
             tracks.append(track)
             if avoid_overlap:
@@ -324,7 +441,9 @@ def generate_random_tracks(
             break
 
         if not placed:
-            raise RuntimeError(f"Could not place a track of length {L} after {max_attempts} attempts. "
-                            "Consider reducing length, allowing overlap, or increasing max_attempts.")
+            raise RuntimeError(
+                f"Could not place a track of length {L} after {max_attempts} attempts. "
+                "Consider reducing length, allowing overlap, or increasing max_attempts."
+            )
 
     return tracks

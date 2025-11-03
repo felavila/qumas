@@ -175,12 +175,12 @@ class Result_Handler(
                 raise ValueError("x_zoom_list and y_zoom_list must have the same length.")
             else:
                 num_zooms = len(x_zoom_list)
-        fig, ax = plt.subplots(1+num_zooms, 1, figsize=(20, 15*(1+num_zooms)))
+        fig, ax = plt.subplots(1+num_zooms, 1, figsize=(20, 20))
         ax = np.atleast_1d(ax)
-        ax[0].scatter(ra_imput, dec_imput, label="Input Coordinates", facecolors='none', edgecolors='blue')
-        ax[0].scatter(ra_output, dec_output, label="Output Coordinates", color="g", alpha=0.7)
-        ax[0].scatter(ra_lens_model, dec_lens_model, label="Output Coordinates Lens", color="k", alpha=0.7)
-        ax[0].scatter(ra_lens_in, dec_lens_in, label="Input Coordinates Lens", facecolors='none', edgecolors='red')
+        ax[0].scatter(ra_imput, dec_imput, label="Input Coordinates", facecolors='none', edgecolors='purple',s=200,linewidths=3,zorder=100)
+        ax[0].scatter(ra_output, dec_output, label="Output Coordinates", color="C1", alpha=.85,s=200)
+        ax[0].scatter(ra_lens_model, dec_lens_model, label="Output Coordinates Lens", color="k", alpha=0.95,linewidths=3,s=200)
+        ax[0].scatter(ra_lens_in, dec_lens_in, label="Input Coordinates Lens", facecolors='none', edgecolors='red',s=200,linewidths=3)
 
         # Add text labels
         for i, v in enumerate(components):
@@ -194,8 +194,8 @@ class Result_Handler(
             v = critical["v"]
             y = critical["y"]
             step = np.argmax(np.sqrt(np.diff(x)**2 + np.diff(y)**2))
-            ax[0].plot(x[:step+1], y[:step+1], label="Critical Curves", alpha=0.5)
-            ax[0].plot(u[:step+1], v[:step+1], label="Caustic Curves", alpha=0.5)
+            ax[0].plot(x[:step+1], y[:step+1], label="Critical Curves", alpha=0.5,linewidth=10)
+            ax[0].plot(u[:step+1], v[:step+1], label="Caustic Curves", alpha=0.5,linewidth=10)
 
         # Add additional info text if requested
         if add_info:
@@ -209,11 +209,13 @@ class Result_Handler(
                 fontsize=20
             )
 
-        ax[0].set_ylabel(r"$\Delta \delta \quad [\mathrm{arcsec}]$")
-        ax[0].set_xlabel(r"$\Delta \alpha \quad [\mathrm{arcsec}]$")
+        ax[0].set_ylabel(r"$\Delta \delta \quad [\mathrm{arcsec}]$", fontsize=35)
+        ax[0].set_xlabel(r"$\Delta \alpha \quad [\mathrm{arcsec}]$", fontsize=35)
+        ax[0].set_xlim(-6,6)
+        ax[0].set_ylim(-6,6)
         ax[0].invert_xaxis()
-        ax[0].legend(loc="upper left", bbox_to_anchor=(1.05, 0.75), borderaxespad=0)  # Legend outside
-        
+        ax[0].legend(loc="upper left",fontsize=25,ncol=3)#, bbox_to_anchor=(1.05, 0.75), borderaxespad=0)  # Legend outside
+        ax[0].tick_params(axis='both', labelsize=35, pad=10)
         # Remove axes if requested
         if remove_axis:
             for spine in ax.spines.values():
@@ -227,7 +229,7 @@ class Result_Handler(
             ax[0].set_xticklabels([])
             ax[0].set_yticklabels([])
         if save:
-            plt.savefig(f"{save}.jpg")
+            plt.savefig(f"{save}.pdf", dpi=300, bbox_inches='tight')
             plt.close()
         else:
             plt.show()

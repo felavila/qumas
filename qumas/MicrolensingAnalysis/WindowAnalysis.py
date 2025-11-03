@@ -28,7 +28,55 @@ def convert_none_to_nan(item):
     else:
         return item
 
+def _close_existing_figures():
+    import matplotlib.pyplot as plt
+    try:
+        # Close all known figures cleanly
+        from matplotlib._pylab_helpers import Gcf
+        for manager in list(Gcf.get_all_fig_managers()):
+            try:
+                plt.close(manager.canvas.figure)
+            except Exception:
+                pass
+    except Exception:
+        # Fallback if helper import changes between matplotlib versions
+        plt.close('all')
 
+
+def calculate_line(X, Y, window_range_left, window_range_right):
+    """
+    Parameters
+    ----------
+    X : (N, M) array or list of arrays
+    Y : (N, M) array or list of arrays
+    window_range_left, window_range_right : (lo, hi)
+
+    Returns
+    -------
+    Y_wo : (N, M) ndarray
+        Continuum-subtracted spectra per object.
+    CONT : (N, M) ndarray
+        Fitted linear continuum evaluated over full X per object.
+    """
+    Y_wo = []
+    CONT = []
+
+    for x, y in zip(X, Y):
+        mask_lc = (x >= window_range_left[0]) & (x <= window_range_left[1])
+        mask_rc = (x >= window_range_right[0]) & (x <= window_range_right[1])
+
+        x_combined = np.concatenate((x[mask_lc], x[mask_rc]))
+        y_combined = np.concatenate((y[mask_lc], y[mask_rc]))
+
+        slope_fit, intercept_fit = linear_model(x_combined, y_combined)
+
+        cont = linear_func(x, slope_fit, intercept_fit)       # continuum on full grid
+        y_wo = y - cont                                       # continuum-subtracted
+
+        CONT.append(cont)
+        Y_wo.append(y_wo)
+
+    return np.asarray(Y_wo), np.asarray(CONT)
 
 
 class WindowAnalysis:
@@ -43,7 +91,7 @@ class WindowAnalysis:
         assert isinstance(zs,float) or isinstance(zs,int) , "zs have to be float or int"
         self.zs = zs
         self.save_name = save_name
-        self._previous_results =  self._read_previous_results(path_previous_results)
+        #self._previous_results =  self._read_previous_results(path_previous_results)
         
         if not self.save_name:
             self.save_name = "flux_cont_core.csv"
@@ -144,218 +192,347 @@ class WindowAnalysis:
                                     "lr_init":lr_init,"lc_init":lc_init,"core_init":core_init,"band":band,"line_name":line_name,"Y_local":0,
                                     "max_local":max_local,"min_local":min_local,"aspect_ratio":aspect_ratio,"q4":q4}
 
-                    
-            # #self.interactive_plot(**row)
-            #X,Y,OBJ =
-            #for band in self.spectra_dict.keys():
-            #   x,y,objs = np.array(self.spectra_dict[band]["wavelength"]), np.array(self.spectra_dict[band]["flux"]),self.spectra_dict[band]["obj"]
-            #  w_mask = (x[0]>= min(window)) & (x[0]<= max(window))
-            # Y_local = y[:,w_mask]
-            #max_local = np.max(Y_local) #
-            #min_local = np.min(Y_local) #
-            #aspect_ratio = 1.5 #
-            #q4 = np.percentile(Y_local, 99.97) 
-            #if center_window < np.min(x) or center_window > np.max(y):
-            #   continue
-            #self.interactive_plot(X,Y,objs,center_window,window,lr_init,lc_init,core_init,band,line_name)
-    
-    
-    
-    
-    def interactive_plot(self,X,Y,objs,center_window,window,lr_init,lc_init,core_init,band,line_name):
-        #X,Y,objs = np.array(self.spectra_dict[band]["wavelength"]), np.array(self.spectra_dict[band]["flux"]),self.spectra_dict[band]["obj"]
-        #if center_window < np.min(X[0]) or center_window > np.max(X[0]):
-        #   return "cant do nothing"
-        #else:
-            w_mask = (X[0]>=min(window)) & (X[0]<=max(window)) #soft coming sooon 
-            Y_local = Y[:,w_mask]
-            q2 = np.percentile(Y_local, 89)
-            q3 = np.percentile(Y_local, 95) 
-            q4 = np.percentile(Y_local, 99.97) 
-            max_local = np.max(Y_local)
-            min_local = np.min(Y_local)
-            aspect_ratio = 1.5
-            
-            fig = plt.figure(figsize=(20, 15 / 1.5))
-            
-            grid = plt.GridSpec(2, 2, width_ratios=[2, 2], height_ratios=[3, 1], hspace=0.4)
-            Lp = plt.subplot(grid[0, 0])
-            Rp = plt.subplot(grid[0, 1])
-            bbox_Lp = Lp.get_position()
-            bbox_Rp = Rp.get_position()
-            gap_left = bbox_Lp.x0/4 + bbox_Lp.width
-            #the val init aqui luego 
-            #line -> todo el resto adentro ? lo q seria un doble looop?
-            #if self._previous_results.get(f"{}_{}"):
-                #Wrange_lc_Lp,Wrange_rc_Lp,Wrange_core,Wrange_Lp,Wrange_Rp,Frange_Lp,Frange_Rp
-            
-            #window = [center_window - 500, center_window + 500]
-            _d = 0.15
-            Wslider_lc = plt.axes([gap_left, bbox_Lp.y0 -_d,  bbox_Lp.width, 0.03])
-            Wslider_core = plt.axes([gap_left, bbox_Lp.y0 -_d - 0.05,  bbox_Lp.width, 0.03])
-            Wslider_rc = plt.axes([gap_left, bbox_Lp.y0 - _d -0.10,  bbox_Lp.width, 0.03])
-            
-            Wslider_Lp = plt.axes([bbox_Lp.x0, bbox_Lp.y1*1.01, bbox_Lp.width, 0.03]) 
-            Wslider_Rp = plt.axes([bbox_Rp.x0, bbox_Rp.y1*1.01, bbox_Rp.width, 0.03]) 
-            
-            Fslider_Lp = plt.axes([bbox_Lp.x0 + bbox_Lp.width, bbox_Lp.y0, 0.03, bbox_Lp.height])
-            Fslider_Rp = plt.axes([bbox_Rp.x0 + bbox_Rp.width , bbox_Rp.y0, 0.03, bbox_Rp.height]) 
-            #Wslider_core_Rp = plt.axes([bbox_Rp.x0, bbox_Rp.y0-0.1, bbox_Rp.width, 0.03]) 
-            Wrange_lc_Lp = RangeSlider(Wslider_lc, "left \ncontinium",np.min(X),center_window , valinit=lc_init,color="purple",alpha=0.5) 
-            Wrange_rc_Lp = RangeSlider(Wslider_rc, "right \ncontinium",center_window,np.max(X),valinit=lr_init,color="green",alpha=0.2) 
-            Wrange_core = RangeSlider(Wslider_core ,"line core",center_window-100,center_window+100,valinit=core_init,color="r",alpha=0.2)
-            
-            Wrange_Lp = RangeSlider(Wslider_Lp,None,np.min(X),np.max(X),valinit=window)
-            Wrange_Rp = RangeSlider(Wslider_Rp,None,np.min(X),np.max(X),valinit=window)
-            Frange_Lp = RangeSlider(Fslider_Lp, None, 0, max_local , valinit=[0,q4], orientation='vertical')
-            Frange_Rp = RangeSlider(Fslider_Rp,None , -max_local*0.5, max_local , valinit=[-max_local*0.01,max_local*0.5], orientation='vertical')
-            
-            Wrange_Lp.valtext.set_visible(False)
-            Wrange_Rp.valtext.set_visible(False)
-            Frange_Lp.valtext.set_visible(False)
-            Frange_Rp.valtext.set_visible(False)
-            Wrange_lc_Lp.valtext.set_visible(False)
-            Wrange_rc_Lp.valtext.set_visible(False)
-            Wrange_core.valtext.set_visible(False)
-            
-            # Use the helper method for the initial plot
-            self._window_plot(Lp, Rp, X, Y, objs, center_window, line_name, band, 
-                            Wrange_lc_Lp, Wrange_rc_Lp, Wrange_core, 
-                            Wrange_Lp, Frange_Lp, Wrange_Rp, Frange_Rp)
-            
-            # Connect sliders to update the plot using the same helper method in the callback
-            slider_update = lambda val: self._window_plot(Lp, Rp, X, Y, objs, center_window, line_name, band, Wrange_lc_Lp, Wrange_rc_Lp, Wrange_core, Wrange_Lp, Frange_Lp, Wrange_Rp, Frange_Rp)
-            
-            Wrange_Lp.on_changed(slider_update)
-            Frange_Lp.on_changed(slider_update)
-            Wrange_Rp.on_changed(slider_update)
-            Frange_Rp.on_changed(slider_update)
-            Wrange_lc_Lp.on_changed(slider_update)
-            Wrange_rc_Lp.on_changed(slider_update)
-            Wrange_core.on_changed(slider_update)
-            
-            save_button = plt.axes([0.4, 0.02, 0.2, 0.04])
-            button_save = Button(save_button, 'Save', color='lightgoldenrodyellow', hovercolor='0.975')
-            
-            button_save.on_clicked(lambda event: self._on_save_button_clicked(event,Lp, Rp, X, Y, objs, center_window, line_name, band, Wrange_lc_Lp, Wrange_rc_Lp, Wrange_core, Wrange_Lp, Frange_Lp, Wrange_Rp, Frange_Rp))
-            
-            #if name_file in os.listdir(os.getcwd()):
-            #   if any((panda_read[["name"]].values == [line_name]).all(axis=1)):
-            #      ax_save_button = plt.axes([0.6, 0.02, 0.2, 0.04])
-            #     button_remove = Button(ax_save_button, 'remove line', color='lightgoldenrodyellow', hovercolor='0.975')
-            #    button_remove.on_clicked(on_remove_line_clicked)
-            # Update the plot when slider values change
-            #ax_save_button = plt.axes([0.01, 0.95, 0.2, 0.04])
-            #button_close = Button(ax_save_button, 'Close', color='lightgoldenrodyellow', hovercolor='0.975')
-            #button_close.on_clicked(on_close_all)
-            
-            plt.show()
-            
-            
-            return X, Y, window, Lp.get_position()
-    
-    
-    
+
     def _interactive_microlensing(self):
+        _close_existing_figures()
         output = widgets.Output()
         n_max = len(self.kwargs_h.keys())
         current_index = [0]
         
+        # Initialize as class attribute if it doesn't exist
+        if not hasattr(self, 'saved_parameters'):
+            self.saved_parameters = {}
+        
+        # Flag to control the routine
+        stop_routine = [False]
+        
+        def save_parameters(index, slider_left_window, slider_right_window, slider_line_core,
+                        slider_xlim_left, slider_ylim_left, slider_xlim_right, slider_ylim_right,
+                        line_name, band, objs):
+            """Save current slider values and parameters"""
+            self.saved_parameters[index] = {
+                'line_name': line_name,
+                'band': band,
+                'objects': objs,
+                'left_window': slider_left_window.value,
+                'right_window': slider_right_window.value,
+                'line_core': slider_line_core.value,
+                'xlim_left': slider_xlim_left.value,
+                'ylim_left': slider_ylim_left.value,
+                'xlim_right': slider_xlim_right.value,
+                'ylim_right': slider_ylim_right.value,
+            }
+            
+            # Also update the kwargs_h with current values
+            self.kwargs_h[index]['lr_init'] = slider_right_window.value
+            self.kwargs_h[index]['lc_init'] = slider_left_window.value
+            self.kwargs_h[index]['core_init'] = slider_line_core.value
+            
+            return self.saved_parameters[index]
+        
+        def export_to_csv(filename=None):
+            """Export saved parameters to CSV"""
+            if not self.saved_parameters:
+                print("No parameters to export!")
+                return
+            
+            if filename is None:
+                filename = f"microlensing_params_{pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')}.csv"
+            
+            # Flatten the nested dictionary
+            rows = []
+            for idx, params in self.saved_parameters.items():
+                row = {
+                    'plot_index': idx,
+                    'line_name': params['line_name'],
+                    'band': params['band'],
+                    'objects': ','.join(params['objects']) if isinstance(params['objects'], list) else params['objects'],
+                    'left_window_min': params['left_window'][0],
+                    'left_window_max': params['left_window'][1],
+                    'right_window_min': params['right_window'][0],
+                    'right_window_max': params['right_window'][1],
+                    'line_core_min': params['line_core'][0],
+                    'line_core_max': params['line_core'][1],
+                    'xlim_left_min': params['xlim_left'][0],
+                    'xlim_left_max': params['xlim_left'][1],
+                    'ylim_left_min': params['ylim_left'][0],
+                    'ylim_left_max': params['ylim_left'][1],
+                    'xlim_right_min': params['xlim_right'][0],
+                    'xlim_right_max': params['xlim_right'][1],
+                    'ylim_right_min': params['ylim_right'][0],
+                    'ylim_right_max': params['ylim_right'][1],
+                }
+                rows.append(row)
+            
+            df = pd.DataFrame(rows)
+            df.to_csv(filename, index=False)
+            print(f"Parameters exported to: {filename}")
+            return filename
+        
+        def export_to_pickle(filename=None):
+            """Export saved parameters to pickle"""
+            if not self.saved_parameters:
+                print("No parameters to export!")
+                return
+            
+            if filename is None:
+                filename = f"microlensing_params_{pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')}.pkl"
+            
+            with open(filename, 'wb') as f:
+                pickle.dump(self.saved_parameters, f)
+            print(f"Parameters exported to: {filename}")
+            return filename
+        
         def show_plot(index):
-            X, Y, objs, center_window, window, lr_init, lc_init,  core_init, band, line_name, Y_local, max_local, min_local, aspect_ratio, q4 = self.kwargs_h[index].values()
-            #print(lr_init,lc_init,core_init)
+            # Check if routine should stop
+            if stop_routine[0]:
+                print("Routine stopped by user.")
+                return
+            
+            X, Y, objs, center_window, window, lr_init, lc_init, core_init, band, line_name, Y_local, max_local, min_local, aspect_ratio, q4 = self.kwargs_h[index].values()
+            
             with output:
                 clear_output(wait=True)
-                fig = plt.figure(figsize=(15, 10), layout="constrained")
+                _close_existing_figures()
+                fig = plt.figure(figsize=(17, 4), layout="constrained")
                 fig.canvas.draw()
-                gs = fig.add_gridspec(2, 2, width_ratios=[2, 2], height_ratios=[3, 1], hspace=0.4)
+                
+                gs = fig.add_gridspec(1, 2, width_ratios=None, height_ratios=None, hspace=0.4)
                 Leftplot = fig.add_subplot(gs[0, 0], axes_class=axisartist.Axes)
                 Rightplot = fig.add_subplot(gs[0, 1], axes_class=axisartist.Axes)
                 
-                # Initialize x data for parabola
-                x_data = np.linspace(0, 1, 100)
+                ##############set-up-basic-plot##############
                 
-                # Initial parabola parameters
-                a_init = 1.0
-                b_init = 0.0
-                y_data = a_init * x_data**2 + b_init
+                lines_left = []
+                if Y.ndim == 2:
+                    for n, (x, y) in enumerate(zip(X, Y)):
+                        line, = Leftplot.plot(x, y, alpha=0.7, label=f'Object {objs[n]}')
+                        lines_left.append(line)
+                    Leftplot.legend()
+                else:
+                    line, = Leftplot.plot(X, Y)
+                    lines_left.append(line)
                 
-                (line_left,) = Leftplot.plot(X.T, Y.T)
-                line_right, = Rightplot.plot(x_data, y_data)
-
+                
+                ##############set-labels-and-titles##############
+                
                 Leftplot.set_title(f"Interactive left {index+1}/{n_max}")
                 Rightplot.set_title(f"Interactive right {index+1}/{n_max}")
-                Leftplot.set_xlabel("X")
-                Rightplot.set_xlabel("X")
-                Leftplot.set_ylabel("Amplitude")
-                Rightplot.set_ylabel("Amplitude")
+                Leftplot.set_xlabel(r'$\rm Rest \ Wavelength$ ($\rm \AA$)', fontsize=20)
+                Rightplot.set_xlabel(r'$\rm Rest \ Wavelength$ ($\rm \AA$)', fontsize=20)
+                Leftplot.set_ylabel(r"$f_\lambda\,(\mathrm{erg\,s^{-1}\,cm^{-2}\,\AA^{-1}})$", fontsize=20)
+                Rightplot.set_ylabel(r"$f_\lambda\,(\mathrm{erg\,s^{-1}\,cm^{-2}\,\AA^{-1}})$", fontsize=20)
                 
-                # Initial axis limits
-                Leftplot.set_xlim(np.min(X),np.max(X))
-                Leftplot.set_ylim(np.min(Y),np.max(Y))
-                Rightplot.set_xlim(0, 1)
-                Rightplot.set_ylim(0, 2)
+                ##############set-slider##############
+                slider_left_window = widgets.FloatRangeSlider(
+                    value=lc_init, min=np.min(X), max=np.max(core_init), step=0.1,
+                    description='Left window', layout=widgets.Layout(width='100%'),
+                    style={'description_width': '120px'})
+                
+                slider_right_window = widgets.FloatRangeSlider(
+                    value=lr_init, min=np.min(core_init), max=np.max(X), step=0.1,
+                    description='Right window', layout=widgets.Layout(width='100%'),
+                    style={'description_width': '120px'})
+                
+                
+                slider_line_core = widgets.FloatRangeSlider(
+                    value=core_init, min=min(core_init)-100, max= max(core_init)+100, step=0.1,
+                    description='Line core', layout=widgets.Layout(width='100%'),
+                    style={'description_width': '120px'})
+                
+                ######################################
+                fill_objects = {"left_line":None}
                 
                 
                 
+                lines_right = []     # continuum-subtracted lines (Rightplot)
+                cont_lines  = []     # fitted continuum lines (Leftplot, dashed)
+
+                if Y.ndim == 2:
+                    # initial compute for current slider windows
+                    Y_wo, CONT = calculate_line(X, Y, slider_left_window.value, slider_right_window.value)
+
+                    for n, (x, ywo, cont) in enumerate(zip(X, Y_wo, CONT)):
+                        # right: continuum-subtracted spectra
+                        rline, = Rightplot.plot(x, ywo, alpha=0.7, label=f'Object {objs[n]}')
+                        lines_right.append(rline)
+
+                        # left: show the fitted continuum as dashed overlay
+                        cline, = Leftplot.plot(x, cont, linestyle="--", linewidth=2,color="k")
+                        cont_lines.append(cline)
+
+                    Rightplot.legend()
+                else:
+                    # 1D case
+                    Y_wo, CONT = calculate_line([X], [Y], slider_left_window.value, slider_right_window.value)
+                    Y_wo, CONT = Y_wo[0], CONT[0]
+
+                    rline, = Rightplot.plot(X, Y_wo)
+                    lines_right.append(rline)
+
+                    cline, = Leftplot.plot(X, CONT, linestyle="--", linewidth=2,color="k")
+                    cont_lines.append(cline)
                 
-                # Create six sliders - separate limits for each plot
-                slider_a = widgets.FloatSlider(value=1.0, min=-5.0, max=5.0, step=0.1, 
-                                            description='a (x²)')
-                slider_b = widgets.FloatSlider(value=0.0, min=-5.0, max=5.0, step=0.1, 
-                                            description='b')
-                slider_c = widgets.FloatSlider(value=0.0, min=-5.0, max=5.0, step=0.1, 
-                                            description='c')
+
                 
-                # Left plot limits
-                slider_xlim_left = widgets.FloatRangeSlider(value=[np.min(X),np.max(X)], min=np.min(X), max=np.max(X), step=0.1,
-                                                            description='Left X')
-                slider_ylim_left = widgets.FloatRangeSlider(value=[np.min(Y),np.max(Y)], min=np.min(Y), max=np.max(Y), step=0.1,
-                                                            description='Left Y')
+                ##############xlim-ylim-left-right-sliders##############
                 
-                # Right plot limits
-                slider_xlim_right = widgets.FloatRangeSlider(value=[0.0, 1.0], min=-2.0, max=5.0, step=0.1,
-                                                            description='Right X')
-                slider_ylim_right = widgets.FloatRangeSlider(value=[0.0, 2.0], min=-5.0, max=10.0, step=0.1,
-                                                            description='Right Y')
+                slider_xlim_left = widgets.FloatRangeSlider(
+                    value=[center_window-150,center_window+150], 
+                    min=np.min(X), max=np.max(X), step=0.1,
+                    description='Left Wavelength', layout=widgets.Layout(width='100%'),
+                    style={'description_width': '120px'})
                 
+                max_y = np.max(Y[(X > center_window-150) & (X< center_window+150)])
+                max_y_wo = np.max(Y_wo[(X > center_window-150) & (X< center_window+150)])
+
+                slider_ylim_left = widgets.FloatRangeSlider(
+                    value=[np.min(Y), max_y*1.1], 
+                    min=np.min(Y), max=np.max(Y), 
+                    step=(np.max(Y) - np.min(Y)) / 100,
+                    description='Left Flux', layout=widgets.Layout(width='100%'),
+                    style={'description_width': '120px'})
+                
+                slider_xlim_right = widgets.FloatRangeSlider(
+                    value=[center_window-150,center_window+150], 
+                    min=np.min(X), max=np.max(X), step=0.1,
+                    description='Right Wavelength', layout=widgets.Layout(width='100%'),
+                    style={'description_width': '120px'})
+                
+                slider_ylim_right = widgets.FloatRangeSlider(
+                    value=[np.min(Y_wo), max_y_wo*1.1], 
+                    min=np.min(Y_wo), max=np.max(Y_wo), 
+                    step=(np.max(Y) - np.min(Y)) / 100,
+                    description='Right Flux', layout=widgets.Layout(width='100%'),
+                    style={'description_width': '120px'})
+                
+                ##############set-xlim-ylim##############
+                
+                ##############initial-plots##############
+                fill_objects.update({'left_window': None,"rigth_window":None, "line_core_left":None, "center_window_left":None, "line_core_right":None, "center_window_right":None})
+                
+                fill_objects['left_window'] = Leftplot.fill_betweenx([-100, 100], slider_left_window.value[0], slider_left_window.value[1],label='left window', color='purple', alpha=0.2)
+                fill_objects['right_window'] = Leftplot.fill_betweenx([-100, 100], slider_right_window.value[0], slider_right_window.value[1],label='right window', color='green', alpha=0.2)
+                
+                
+                fill_objects['line_core_left'] = Leftplot.fill_betweenx([-100, 100], slider_line_core.value[0], slider_line_core.value[1],label='line core', color='black', alpha=0.2)
+                fill_objects['center_window_left'] = Leftplot.axvline(x=np.mean(slider_line_core.value), color='k', linestyle="--")
+                
+                fill_objects['line_core_right'] = Rightplot.fill_betweenx([-100, 100], slider_line_core.value[0], slider_line_core.value[1],label='line core', color='black', alpha=0.2)
+                fill_objects['center_window_right'] = Rightplot.axvline(x=np.mean(slider_line_core.value), color='k', linestyle="--")
+                
+                zero_line = Rightplot.axhline(y=0.0, color='k', linestyle='--', linewidth=1)
+            
+                Leftplot.set_xlim(slider_xlim_left.value)
+                Leftplot.set_ylim(slider_ylim_left.value)
+                
+                Rightplot.set_xlim(slider_xlim_right.value)
+                Rightplot.set_ylim(slider_ylim_right.value)
+                
+                
+            
                 def update_plot(change):
-                    # Get current values
-                    a = slider_a.value
-                    b = slider_b.value
-                    c = slider_c.value
+                    
+                    if fill_objects['left_window'] is not None:
+                        fill_objects['left_window'].remove()
+                    if fill_objects['right_window'] is not None:
+                        fill_objects['right_window'].remove()
+                    
+                    if fill_objects['line_core_left'] is not None:
+                        fill_objects['line_core_left'].remove()
+                    if fill_objects['center_window_left'] is not None:
+                        fill_objects['center_window_left'].remove()
+                    if fill_objects['line_core_right'] is not None:
+                        fill_objects['line_core_right'].remove()
+                    if fill_objects['center_window_right'] is not None:
+                        fill_objects['center_window_right'].remove()
+                    
+                    
+                    
+                    left_window_val = slider_left_window.value
+                    line_core_val = slider_line_core.value
+                    right_window_val = slider_right_window.value
+                    
                     xlim_left = slider_xlim_left.value
                     ylim_left = slider_ylim_left.value
                     xlim_right = slider_xlim_right.value
                     ylim_right = slider_ylim_right.value
                     
-                    # Update left plot
-                    x_left = np.linspace(xlim_left[0], xlim_left[1], 100)
-                    y_left = a * x_left**2 + b*x_left + c
-                    line_left.set_data(x_left, y_left)
+                    # Update left plot limits
                     Leftplot.set_xlim(xlim_left[0], xlim_left[1])
                     Leftplot.set_ylim(ylim_left[0], ylim_left[1])
                     
-                    # Update right plot
-                    x_right = np.linspace(xlim_right[0], xlim_right[1], 100)
-                    y_right = a * x_right**2 + b*x_right + c
-                    line_right.set_data(x_right, y_right)
                     Rightplot.set_xlim(xlim_right[0], xlim_right[1])
                     Rightplot.set_ylim(ylim_right[0], ylim_right[1])
                     
-                    fig.canvas.draw_idle()
+                    
+                    # Redraw fill with new values
+                    fill_objects['left_window'] = Leftplot.fill_betweenx(
+                        [-100, 100], left_window_val[0], left_window_val[1],
+                        label='left window', color='purple', alpha=0.2)
+                    
+                    fill_objects['right_window'] = Leftplot.fill_betweenx(
+                        [-100, 100], right_window_val[0], right_window_val[1],
+                        label='right window', color='green', alpha=0.2)
+                    
+                    fill_objects['line_core_left'] = Leftplot.fill_betweenx([-100, 100], line_core_val[0], line_core_val[1],label='line core', color='black', alpha=0.2)
+                    fill_objects['center_window_left'] =Leftplot.axvline(x=np.mean(line_core_val), color='k', linestyle="--")
+                    
+                    fill_objects['line_core_right'] = Rightplot.fill_betweenx([-100, 100], line_core_val[0], line_core_val[1],label='line core', color='black', alpha=0.2)
+                    fill_objects['center_window_right'] = Rightplot.axvline(x=np.mean(line_core_val), color='k', linestyle="--")
+                    
+                    if Y.ndim == 2:
+                        Y_wo, CONT = calculate_line(X, Y, left_window_val, right_window_val)
 
+                        # update Rightplot lines (continuum-subtracted)
+                        for line, x, ywo in zip(lines_right, X, Y_wo):
+                            line.set_data(x, ywo)
+
+                        # update Leftplot continuum overlays
+                        for cline, x, cont in zip(cont_lines, X, CONT):
+                            cline.set_data(x, cont)
+                    else:
+                        Y_wo, CONT = calculate_line([X], [Y], left_window_val, right_window_val)
+                        Y_wo, CONT = Y_wo[0], CONT[0]
+
+                        lines_right[0].set_data(X, Y_wo)
+                        cont_lines[0].set_data(X, CONT)
+
+                    
+                    zero_line.set_ydata([0.0, 0.0])
+                    fig.canvas.draw_idle()
+                
                 # Attach update function to all sliders
-                slider_a.observe(update_plot, names='value')
-                slider_b.observe(update_plot, names='value')
-                slider_c.observe(update_plot, names='value')
+                slider_left_window.observe(update_plot, names='value')
+                slider_line_core.observe(update_plot, names='value')
+                slider_right_window.observe(update_plot, names='value')
                 slider_xlim_left.observe(update_plot, names='value')
                 slider_ylim_left.observe(update_plot, names='value')
                 slider_xlim_right.observe(update_plot, names='value')
                 slider_ylim_right.observe(update_plot, names='value')
                 
-                next_button = widgets.Button(description="Next Plot" if index < n_max - 1 else "Finish",
-                                            button_style='success')
+                # Create status label
+                status_label = widgets.Label(value="", layout=widgets.Layout(width='100%'))
+                
+                # Button callbacks
+                def on_save_clicked(b):
+                    params = save_parameters(index, slider_left_window, slider_right_window, 
+                                            slider_line_core, slider_xlim_left, slider_ylim_left,
+                                            slider_xlim_right, slider_ylim_right, line_name, band, objs)
+                    status_label.value = f"✓ Saved parameters for {line_name} (Plot {index+1}/{n_max})"
+                    print(f"Saved parameters for plot {index+1}:")
+                    print(f"  Line: {params['line_name']}, Band: {params['band']}")
+                    print(f"  Left window: {params['left_window']}")
+                    print(f"  Right window: {params['right_window']}")
+                    print(f"  Line core: {params['line_core']}")
+                
+                def on_previous_clicked(b):
+                    plt.close(fig)
+                    if current_index[0] > 0:
+                        current_index[0] -= 1
+                        show_plot(current_index[0])
+                    else:
+                        print("Already at first plot!")
                 
                 def on_next_clicked(b):
                     plt.close(fig)
@@ -364,374 +541,117 @@ class WindowAnalysis:
                         show_plot(current_index[0])
                     else:
                         print("All plots completed!")
+                        print(f"\nTotal saved parameters: {len(self.saved_parameters)}/{n_max}")
                 
-                next_button.on_click(on_next_clicked)
+                def on_stop_clicked(b):
+                    stop_routine[0] = True
+                    plt.close(fig)
+                    print(f"\n{'='*60}")
+                    print(f"Routine stopped at plot {index+1}/{n_max}")
+                    print(f"Saved parameters for {len(self.saved_parameters)} plot(s)")
+                    print(f"{'='*60}")
+                    
+                    # Show saved plots summary
+                    if self.saved_parameters:
+                        print("\nSaved plots:")
+                        for idx, params in sorted(self.saved_parameters.items()):
+                            print(f"  Plot {idx+1}: {params['line_name']} ({params['band']})")
                 
-                print(f"Plot {index+1}/{n_max}")
-            
-            # Display widgets OUTSIDE the output context
-            # Organize sliders: parabola params, then left plot limits, then right plot limits
-            display(widgets.VBox([
-                widgets.Label("Parabola Parameters (y = ax² + b):"),
-                widgets.HBox([slider_a, slider_b,slider_c]),
-                widgets.Label("Left Plot Limits:"),
-                widgets.VBox([slider_xlim_left, slider_ylim_left]),
-                widgets.Label("Right Plot Limits:"),
-                widgets.VBox([slider_xlim_right, slider_ylim_right]),
-                next_button
-            ]))
-            plt.show()
-        
-        display(output)
-        show_plot(0)
-        
-        
-        
-        
-    def _interactive_microlensing2(self):
-        output = widgets.Output()
-        n_max = len(self.kwargs_h.keys())
-        current_index = [0]
-
-        def show_plot(index):
-            with output:
-                clear_output(wait=True)
-
-                fig = plt.figure(figsize=(15, 5), layout="constrained")
-
-                # Top-level: 2 columns (Left/Right)
-                outer = fig.add_gridspec(nrows=1, ncols=2, width_ratios=[1, 1], wspace=0.25)
-
-                # Each column gets a 2-row subgrid: [plot, slider]
-                left_gs  = outer[0].subgridspec(nrows=2, ncols=1, height_ratios=[30, 1], hspace=0.05)
-                right_gs = outer[1].subgridspec(nrows=2, ncols=1, height_ratios=[30, 1], hspace=0.05)
-
-                # Axes for plots (axisartist if you need it)
-                Leftplot  = fig.add_subplot(left_gs[0],  axes_class=axisartist.Axes)
-                Rightplot = fig.add_subplot(right_gs[0], axes_class=axisartist.Axes)
-
-                # Axes *dedicated* to sliders; they share the exact same width as their plot
-                axSliderL = fig.add_subplot(left_gs[1])
-                axSliderR = fig.add_subplot(right_gs[1])
-
-                # Optional: make slider axes neat
-                for axS in (axSliderL, axSliderR):
-                    axS.set_facecolor("none")
-                    for spine in axS.spines.values():
-                        spine.set_visible(False)
-                    axS.tick_params(left=False, labelleft=False, bottom=False, labelbottom=False)
-
-                # Example lines
-                (line_left,)  = Leftplot.plot([0, 1], [0, 1])
-                (line_right,) = Rightplot.plot([0, 1], [0, 1])
-
-                Leftplot.set_title(f"Interactive left {index+1}/{n_max}")
-                Rightplot.set_title(f"Interactive right {index+1}/{n_max}")
-                Leftplot.set_xlabel("X");  Leftplot.set_ylabel("Amplitude")
-                Rightplot.set_xlabel("X"); Rightplot.set_ylabel("Amplitude")
-
-                # Sliders with identical widths to their plots
-                sliderL = Slider(axSliderL, "Amplitude (%)", 0, 100, valinit=50)
-                sliderR = Slider(axSliderR, "Amplitude (%)", 0, 100, valinit=50)
-
-                def update_left(val):
-                    new_amp = sliderL.val / 50.0
-                    line_left.set_ydata(new_amp * np.array([0, 1]))
-                    fig.canvas.draw_idle()
-
-                def update_right(val):
-                    new_amp = sliderR.val / 50.0
-                    line_right.set_ydata(2 * new_amp * np.array([0, 1]))
-                    fig.canvas.draw_idle()
-
-                sliderL.on_changed(update_left)
-                sliderR.on_changed(update_right)
-
+                def on_export_csv_clicked(b):
+                    if self.saved_parameters:
+                        filename = export_to_csv()
+                        status_label.value = f"✓ Exported to {filename}"
+                    else:
+                        status_label.value = "⚠ No parameters to export"
+                        print("No parameters saved yet!")
+                
+                def on_export_pickle_clicked(b):
+                    if self.saved_parameters:
+                        filename = export_to_pickle()
+                        status_label.value = f"✓ Exported to {filename}"
+                    else:
+                        status_label.value = "⚠ No parameters to export"
+                        print("No parameters saved yet!")
+                
+                # Create buttons
+                save_button = widgets.Button(
+                    description="Save",
+                    button_style='info',
+                    icon='check',
+                    layout=widgets.Layout(width='120px', height='35px'))
+                
+                previous_button = widgets.Button(
+                    description="Previous",
+                    button_style='warning',
+                    icon='arrow-left',
+                    disabled=(index == 0),
+                    layout=widgets.Layout(width='120px', height='35px'))
+                
                 next_button = widgets.Button(
-                    description=("Next Plot" if index < n_max-1 else "Finish"),
-                    button_style='success'
-                )
-
-                def on_next_clicked(_):
-                    plt.close(fig)
-                    current_index[0] += 1
-                    if current_index[0] < n_max:
-                        show_plot(current_index[0])
-                    else:
-                        print("All plots completed!")
-
+                    description="Next" if index < n_max - 1 else "Finish",
+                    button_style='success',
+                    icon='arrow-right',
+                    layout=widgets.Layout(width='120px', height='35px'))
+                
+                stop_button = widgets.Button(
+                    description="Stop & Exit",
+                    button_style='danger',
+                    icon='stop',
+                    layout=widgets.Layout(width='120px', height='35px'))
+                
+                export_csv_button = widgets.Button(
+                    description="Export CSV",
+                    button_style='',
+                    icon='download',
+                    layout=widgets.Layout(width='120px', height='35px'))
+                
+                export_pickle_button = widgets.Button(
+                    description="Export PKL",
+                    button_style='',
+                    icon='save',
+                    layout=widgets.Layout(width='120px', height='35px'))
+                
+                # Attach callbacks
+                save_button.on_click(on_save_clicked)
+                previous_button.on_click(on_previous_clicked)
                 next_button.on_click(on_next_clicked)
-
-                print(f"Plot {index+1}/{n_max}")
-
-            # Jupyter widgets live outside the matplotlib Output
-            display(widgets.HBox([next_button]))
-            plt.show()
-
-        display(output)
-        show_plot(0)
-
-    
-    def _experiment(self):
-        import ipywidgets as widgets
-        from IPython.display import display, clear_output
-        
-        output = widgets.Output()
-        current_index = [0]
-        
-        def show_plot(index):
-            with output:
-                clear_output(wait=True)
+                stop_button.on_click(on_stop_clicked)
+                export_csv_button.on_click(on_export_csv_clicked)
+                export_pickle_button.on_click(on_export_pickle_clicked)
                 
-                x = np.linspace(0, 10, 100)
-                initial_amplitude = 1
-                y = initial_amplitude * np.sin(x)
-
-                fig, ax = plt.subplots(figsize=(10, 5))
-                line, = ax.plot(x, y)
-                ax.set_title(f"Interactive Sine Wave {index+1}/3")
-                ax.set_xlabel("X")
-                ax.set_ylabel("Amplitude")
-
-                slider = widgets.IntSlider(value=50, min=0, max=100, step=1, 
-                                        description='Amplitude (%)')
-
-                def update_plot(change):
-                    new_amplitude = slider.value / 50.0
-                    line.set_ydata(new_amplitude * np.sin(x))
-                    fig.canvas.draw_idle()
-
-                slider.observe(update_plot, names='value')
-                
-                next_button = widgets.Button(description="Next Plot" if index < 2 else "Finish",
-                                            button_style='success')
-                
-                def on_next_clicked(b):
-                    plt.close(fig)
-                    current_index[0] += 1
-                    if current_index[0] < 3:
-                        show_plot(current_index[0])
-                    else:
-                        print("All plots completed!")
-                
-                next_button.on_click(on_next_clicked)
-                
-                # Just display the controls, matplotlib handles the plot
-                print(f"Plot {index+1}/3")
+                print(f"Plot {index+1}/{n_max} - {line_name}")
+                if index in self.saved_parameters:
+                    print("  (Previously saved parameters loaded)")
             
-            # Display widgets OUTSIDE the output context
-            display(widgets.HBox([slider, next_button]))
+            # CHANGED ORDER: Plot output first, then sliders below
+            # First display the plot
             plt.show()
+            
+            # Then display sliders and controls below the plot
+            display(widgets.VBox([
+                widgets.HTML(f"<h3 style='text-align: center; margin-top: 10px;'>{line_name}</h3>"),
+                widgets.HTML("<hr style='margin: 10px 0;'>"),
+                widgets.HTML("<b>Continuum Windows:</b>"),
+                slider_left_window,
+                slider_line_core,
+                slider_right_window,
+                widgets.HTML("<br><b>Left Plot Limits:</b>"),
+                slider_xlim_left,
+                slider_ylim_left,
+                widgets.HTML("<br><b>Right Plot Limits:</b>"),
+                slider_xlim_right,
+                slider_ylim_right,
+                widgets.HTML("<hr style='margin: 10px 0;'>"),
+                status_label,
+                widgets.HBox([previous_button, save_button, next_button, stop_button], 
+                            layout=widgets.Layout(justify_content='center', width='100%')),
+                widgets.HTML("<br><b>Export Options:</b>"),
+                widgets.HBox([export_csv_button, export_pickle_button], 
+                            layout=widgets.Layout(justify_content='center', width='100%'))
+            ], layout=widgets.Layout(width='100%', padding='20px')))
         
         display(output)
         show_plot(0)
         
-    def windows_analysis(self,band="nir",):
-        """_summary_
-            overall i will build all around the idea of that the two bands share the same number of pixels because is more easier but
-            maybe is more consistent have the idea of this is not always the case.
-        """
-        
-        row = self.pre_define_windows.iloc[8]
-        line = row['line_name']
-        center_window = np.mean(row["core_range"])
-        window = [center_window-500,center_window+500]
-        lr_init = row["right_range"]
-        lc_init = row["left_range"]
-        core_init = row["core_range"]
-        #band = "nir"
-        X,Y,objs = np.array(self.spectra_dict[band]["wavelength"]), np.array(self.spectra_dict[band]["flux"]),self.spectra_dict[band]["obj"]
-        
-        if center_window < np.min(X[0]) or center_window > np.max(X[0]):
-            return "cant do nothing"
-        else:
-            w_mask = (X[0]>=min(window)) & (X[0]<=max(window)) #soft coming sooon 
-            Y_local = Y[:,w_mask]
-            q2 = np.percentile(Y_local, 89)
-            q3 = np.percentile(Y_local, 95) 
-            q4 = np.percentile(Y_local, 99.97) 
-            max_local = np.max(Y_local)
-            min_local = np.min(Y_local)
-            aspect_ratio = 1.5
-            fig = plt.figure(figsize=(20, 15 / 1.5))
-            grid = plt.GridSpec(2, 2, width_ratios=[2, 2], height_ratios=[3, 1], hspace=0.4)
-            Lp = plt.subplot(grid[0, 0])
-            Rp = plt.subplot(grid[0, 1])
-            bbox_Lp = Lp.get_position()
-            bbox_Rp = Rp.get_position()
-            gap_left = bbox_Lp.x0/4 + bbox_Lp.width
-            #the val init aqui luego 
-            #line -> todo el resto adentro ? lo q seria un doble looop?
-            #if self._previous_results.get(f"{}_{}"):
-                #Wrange_lc_Lp,Wrange_rc_Lp,Wrange_core,Wrange_Lp,Wrange_Rp,Frange_Lp,Frange_Rp
-            
-            window = [center_window - 500, center_window + 500]
-            _d = 0.15
-            Wslider_lc = plt.axes([gap_left, bbox_Lp.y0 -_d,  bbox_Lp.width, 0.03])
-            Wslider_core = plt.axes([gap_left, bbox_Lp.y0 -_d - 0.05,  bbox_Lp.width, 0.03])
-            Wslider_rc = plt.axes([gap_left, bbox_Lp.y0 - _d -0.10,  bbox_Lp.width, 0.03])
-            
-            Wslider_Lp = plt.axes([bbox_Lp.x0, bbox_Lp.y1*1.01, bbox_Lp.width, 0.03]) 
-            Wslider_Rp = plt.axes([bbox_Rp.x0, bbox_Rp.y1*1.01, bbox_Rp.width, 0.03]) 
-            
-            Fslider_Lp = plt.axes([bbox_Lp.x0 + bbox_Lp.width, bbox_Lp.y0, 0.03, bbox_Lp.height])
-            Fslider_Rp = plt.axes([bbox_Rp.x0 + bbox_Rp.width , bbox_Rp.y0, 0.03, bbox_Rp.height]) 
-            #Wslider_core_Rp = plt.axes([bbox_Rp.x0, bbox_Rp.y0-0.1, bbox_Rp.width, 0.03]) 
-            Wrange_lc_Lp = RangeSlider(Wslider_lc, "left \ncontinium",np.min(X),center_window , valinit=lc_init,color="purple",alpha=0.5) 
-            Wrange_rc_Lp = RangeSlider(Wslider_rc, "right \ncontinium",center_window,np.max(X),valinit=lr_init,color="green",alpha=0.2) 
-            Wrange_core = RangeSlider(Wslider_core ,"line core",center_window-100,center_window+100,valinit=core_init,color="r",alpha=0.2)
-            
-            Wrange_Lp = RangeSlider(Wslider_Lp,None,np.min(X),np.max(X),valinit=window)
-            Wrange_Rp = RangeSlider(Wslider_Rp,None,np.min(X),np.max(X),valinit=window)
-            Frange_Lp = RangeSlider(Fslider_Lp, None, 0, max_local , valinit=[0,q4], orientation='vertical')
-            Frange_Rp = RangeSlider(Fslider_Rp,None , -max_local*0.5, max_local , valinit=[-max_local*0.01,max_local*0.5], orientation='vertical')
-            
-            Wrange_Lp.valtext.set_visible(False)
-            Wrange_Rp.valtext.set_visible(False)
-            Frange_Lp.valtext.set_visible(False)
-            Frange_Rp.valtext.set_visible(False)
-            Wrange_lc_Lp.valtext.set_visible(False)
-            Wrange_rc_Lp.valtext.set_visible(False)
-            Wrange_core.valtext.set_visible(False)
-            
-            # Use the helper method for the initial plot
-            self._window_plot(Lp, Rp, X, Y, objs, center_window, line, band, 
-                            Wrange_lc_Lp, Wrange_rc_Lp, Wrange_core, 
-                            Wrange_Lp, Frange_Lp, Wrange_Rp, Frange_Rp)
-            
-            # Connect sliders to update the plot using the same helper method in the callback
-            slider_update = lambda val: self._window_plot(Lp, Rp, X, Y, objs, center_window, line, band, Wrange_lc_Lp, Wrange_rc_Lp, Wrange_core, Wrange_Lp, Frange_Lp, Wrange_Rp, Frange_Rp)
-            
-            Wrange_Lp.on_changed(slider_update)
-            Frange_Lp.on_changed(slider_update)
-            Wrange_Rp.on_changed(slider_update)
-            Frange_Rp.on_changed(slider_update)
-            Wrange_lc_Lp.on_changed(slider_update)
-            Wrange_rc_Lp.on_changed(slider_update)
-            Wrange_core.on_changed(slider_update)
-            
-            save_button = plt.axes([0.4, 0.02, 0.2, 0.04])
-            button_save = Button(save_button, 'Save', color='lightgoldenrodyellow', hovercolor='0.975')
-            
-            button_save.on_clicked(lambda event: self._on_save_button_clicked(event,Lp, Rp, X, Y, objs, center_window, line, band, Wrange_lc_Lp, Wrange_rc_Lp, Wrange_core, Wrange_Lp, Frange_Lp, Wrange_Rp, Frange_Rp))
-            #if name_file in os.listdir(os.getcwd()):
-            #   if any((panda_read[["name"]].values == [line_name]).all(axis=1)):
-            #      ax_save_button = plt.axes([0.6, 0.02, 0.2, 0.04])
-            #     button_remove = Button(ax_save_button, 'remove line', color='lightgoldenrodyellow', hovercolor='0.975')
-            #    button_remove.on_clicked(on_remove_line_clicked)
-            # Update the plot when slider values change
-            #ax_save_button = plt.axes([0.01, 0.95, 0.2, 0.04])
-            #button_close = Button(ax_save_button, 'Close', color='lightgoldenrodyellow', hovercolor='0.975')
-            #button_close.on_clicked(on_close_all)
-            plt.show()
-            
-            
-            return X, Y, window, Lp.get_position()
-    
-    def _on_save_button_clicked(self,event,Lp, Rp, X, Y, objs, center_window, line, band, Wrange_lc_Lp, Wrange_rc_Lp, Wrange_core, Wrange_Lp, Frange_Lp, Wrange_Rp, Frange_Rp):
-        #Add rutine to change the multiple dictionaries in case of been necesary 
-        fig, (Lp, Rp) = plt.subplots(1, 2, figsize=(30, 10), gridspec_kw={'width_ratios': [2, 2]})
-        self._window_plot(Lp, Rp, X, Y, objs, center_window, line, band, Wrange_lc_Lp, Wrange_rc_Lp, Wrange_core, Wrange_Lp, Frange_Lp, Wrange_Rp, Frange_Rp)
-        plt.savefig("aja.png", dpi=300, bbox_inches='tight')
-        plt.close()
-        with open('microlensing.pkl', 'wb') as f:
-            print("saved as microlensing.pkl")
-            pickle.dump(self.local_list, f)
-        
-    def _local(self,line_name,imagen,band,x,Wrange_lc_Lp,Wrange_rc_Lp,Wrange_core,Wrange_Lp,Wrange_Rp,Frange_Lp,Frange_Rp):
-        result_ = {"line_name":line_name,"band": band,'min_x':np.min(x),
-                'max_x': np.max(x),'Wrange_lc_Lp_max': max(Wrange_lc_Lp.val),
-                'Wrange_lc_Lp_min': min(Wrange_lc_Lp.val),
-                'Wrange_rc_Lp_max': max(Wrange_rc_Lp.val),
-                'Wrange_rc_Lp_min': min(Wrange_rc_Lp.val),
-                'Wrange_core_max': max(Wrange_core.val),
-                'Wrange_core_min': min(Wrange_core.val),
-                'Wrange_Lp_max': max(Wrange_Lp.val),
-                'Wrange_Lp_min': min(Wrange_Lp.val),
-                'Wrange_Rp_max': max(Wrange_Rp.val),
-                'Wrange_Rp_min': min(Wrange_Rp.val),
-                'Frange_Lp_max': max(Frange_Lp.val),
-                'Frange_Lp_min': min(Frange_Lp.val),
-                'Frange_Rp_max': max(Frange_Rp.val),
-                'Frange_Rp_min': min(Frange_Rp.val)}
-        #if self._previous_results:
-            #print(imagen)
-            #print(self._previous_results[imagen])
-         #   prev=self._previous_results.get(f"{imagen}_{band}")
-            #print(prev.keys())
-            #print([[prev[key],current[key]] for key in current.keys()])
-          #  same = all([prev.get(key) == result_.get(key) for key in result_.keys()])
-            
-            #print(same)
-        return result_
-    
-    
-    def _read_previous_results(self, path):
-        if isinstance(path, str) and os.path.isfile(path):
-            with open(path, 'rb') as f:
-                loaded_list = pd.DataFrame(list(pickle.load(f).values()))
-                #print(loaded_list)
-            return loaded_list
-        else:
-            return None
-        
-    #def _compare_dict()
-    
-    
-    
-    
-    
-    def _window_plot(self, Lp, Rp, X, Y, objs, center_window, line, band, 
-                     Wrange_lc_Lp, Wrange_rc_Lp, Wrange_core, 
-                     Wrange_Lp, Frange_Lp, Wrange_Rp, Frange_Rp):
-        """
-        Plot the common elements on the provided axes.
-        """
-        Lp.clear()
-        Rp.clear()
-        Lp.set_xlim(Wrange_Lp.val)
-        Lp.set_ylim(Frange_Lp.val)
-        Rp.set_xlim(Wrange_Rp.val)
-        Rp.set_ylim(Frange_Rp.val)
-        
-        Lp.plot(X.T, Y.T, label=objs)
-        Lp.legend(framealpha=0, fontsize=12)
-        Lp.text(Lp.get_xlim()[0] + 0.01, Lp.get_ylim()[1] * 0.95, f"Window {line} in {band}", fontsize=12)
-        Lp.axvline(x=center_window, color='k', linestyle="--")
-        Rp.axvline(x=center_window, color='k', linestyle="--")
-        
-        Lp.fill_betweenx([-100, 100], *Wrange_lc_Lp.val, label='left continuum', color='purple', alpha=0.2)
-        Lp.fill_betweenx([-100, 100], *Wrange_rc_Lp.val, label='right continuum', color='g', alpha=0.2)
-        Lp.fill_betweenx([-100, 100], *Wrange_core.val, label='Core', color='r', alpha=0.2)
-        Rp.fill_betweenx([-100, 100], *Wrange_core.val, label='Core', color='r', alpha=0.2)
-        Rp.hlines(y=[0, 0], xmin=np.min(X), xmax=np.max(X), colors='k', linestyles='dashed', zorder=3)
-        self.local_list = {}
-        for i, (x, y, key) in enumerate(zip(X, Y, objs)):
-            mask_lc = (x >= min(Wrange_lc_Lp.val)) & (x <= max(Wrange_lc_Lp.val))
-            mask_rc = (x >= min(Wrange_rc_Lp.val)) & (x <= max(Wrange_rc_Lp.val))
-            x_combined = np.concatenate((x[mask_lc], x[mask_rc]))
-            y_combined = np.concatenate((y[mask_lc], y[mask_rc]))
-            slope_fit, intercept_fit = linear_model(x_combined, y_combined)
-            y_fit = linear_func(x_combined, slope_fit, intercept_fit)
-            Lp.plot(x_combined, y_fit, label=f'Fitted Linear Function for {key}', color='k', linestyle="--")
-            y_without_cont = y - linear_func(x, slope_fit, intercept_fit)
-            Rp.plot(x, y_without_cont, label=key, alpha=0.5)
-            self.local_list[f"{key}_{band}"] = self._local(line,key,band,x,Wrange_lc_Lp,Wrange_rc_Lp,Wrange_core,Wrange_Lp,Wrange_Rp,Frange_Lp,Frange_Rp)
-            #.append(self._local(line,key,band,x,Wrange_lc_Lp,Wrange_rc_Lp,Wrange_core,Wrange_Lp,Wrange_Rp,Frange_Lp,Frange_Rp))
-            #self.local_ = 
-            #         # Calculate the area under the linear function between Barrier 1 and Barrier 4
-            #area, _ = quad(linear_fit, x_barrier1, x_barrier4, args=(slope_fit, intercept_fit))
-            #y_curve = y_noisy - linear_fit(x, slope_fit, intercept_fit)
-            #Y_curve = Y[key] - linear_fit(X, slope_fit, intercept_fit)
-            #suma = np.sum(y_curve[(x_barrier5 <= x) & (x_barrier6 >= x)])
-
-        Rp.legend(framealpha=0, fontsize=12)
-        Lp.tick_params(which="both", length=10, width=2, labelsize=20)
-        Rp.tick_params(which="both", length=10, width=2, labelsize=20)
-        Lp.set_ylabel(r"$f_\lambda\,(\mathrm{erg\,s^{-1}\,cm^{-2}\,\AA^{-1}})$", fontsize=20)
-        Lp.set_xlabel(r'$\rm Rest \ Wavelength$ ($\rm \AA$)', fontsize=20)
-        Rp.set_ylabel(r"$f_\lambda\,(\mathrm{erg\,s^{-1}\,cm^{-2}\,\AA^{-1}})$", fontsize=20)
-        Rp.set_xlabel(r'$\rm Rest \ Wavelength$ ($\rm \AA$)', fontsize=20)
-        plt.draw()
-        
-        
+        # Return saved parameters when done
+        return self.saved_parameters

@@ -302,91 +302,125 @@ def map_plot_with_zoom(
 
 
 
-    
-def compare_maps_pmf(mag_map_left,mag_map_right
-                , vmin=-1.5, vmax=0.5,label_color_bar =r"$-2.5 \, \log(\mu/\langle \mu \rangle)$",bins_limit=3,num_bins=100,cmap="RdYlBu",**kwargs):
-    """The code assume that the two maps are normalize  but if this is not the case you can change the label_color_bar
-    Args:
-        mag_map_left (_type_): _description_
-        mag_map_right (_type_): _description_
-        text_left_plot (str, optional): _description_. Defaults to "Left plot".
-        text_right_plot (str, optional): _description_. Defaults to "Right plot".
-        vmin (float, optional): _description_. Defaults to -1.5.
-        vmax (float, optional): _description_. Defaults to 0.5.
-        label_color_bar (regexp, optional): _description_. Defaults to r"$-2.5 \, \log(\mu/\langle \mu \rangle)$".
-        'RdYlBu_r' or 'RdYlBu_r'
-    """
-    #, text_left_plot = "Left plot", text_right_plot = "Right plot"
-    text_left_plot = kwargs.get("text_left_plot", "Left plot")
-    text_right_plot = kwargs.get("text_right_plot","Right plot")
-    fig, (ax1,ax3,ax2) = plt.subplots(1, 3, figsize=(47, 10))
 
-    im1 = ax1.imshow(mag_map_left, cmap=cmap, 
-                    extent=[-2, 2, -2, 2], vmin=vmin, vmax=vmax)
-    ax1.set_xticks([])
-    ax1.set_yticks([])
-    ax1.text(0.05, 0.95,text_left_plot, transform=ax1.transAxes,
-             fontsize=30, fontweight='bold', va='top', ha='left',bbox=dict(facecolor='white', edgecolor='none', alpha=0.8))
-    
-  
-    cbar1 = fig.colorbar(im1, ax=ax1, fraction=0.046, pad=0.04)
-    cbar1.ax.tick_params(labelsize=20)
-    cbar1.ax.set_position([ax1.get_position().x0-0.1*ax1.get_position().x0, 0.15, 0.02,  0.73])
-    cbar1.ax.yaxis.set_ticks_position('left')
-    cbar1.ax.yaxis.set_label_position('left')
-    cbar1.set_label(label_color_bar, fontsize=30, labelpad=20)
-    
-    # Add a triangle patch to the colorbar
-    bluest_color = im1.cmap(im1.norm(vmin))
-    trixy = np.array([[0, 0], [1, 0], [0.5, -0.05]])
-    patch1 = Polygon(trixy, transform=cbar1.ax.transAxes, clip_on=False,
-                     edgecolor='k', linewidth=0.7, facecolor=bluest_color,
-                     zorder=4, snap=True)
-    cbar1.ax.add_patch(patch1)
-    # ---------------------------
-    # Right: Mirrored version
-    # ---------------------------
-    # Create the horizontally mirrored data using np.fliplr
-    #mag_map_2d_norm_mirror = np.fliplr(mag_map_2d_norm)
-    im2 = ax2.imshow(mag_map_right, cmap=cmap, 
-                     extent=[-2, 2, -2, 2], vmin=vmin, vmax=vmax)
-    ax2.set_xticks([])
-    ax2.set_yticks([])
+def compare_maps_pmf(
+    mag_map_left, mag_map_right,
+    vmin=-1.5, vmax=0.5,
+    label_color_bar=r"$-2.5 \, \log(\mu/\langle \mu \rangle)$",
+    bins_limit=3, num_bins=100,
+    cmap="RdYlBu",
+    plot_sep=0.2,
+    **kwargs
+):
+    """
+    Compare two magnification maps side by side with their Probability Mass Functions (PMF).
+
+    Parameters
+    ----------
+    mag_map_left, mag_map_right : 2D arrays
+        Magnification maps to compare.
+
+    vmin, vmax : float, optional
+        Color scale limits for both maps. Defaults are -1.5 and 0.5.
+
+    label_color_bar : str, optional
+        Label for the colorbars.
+
+    bins_limit : float, optional
+        Range for PMF histogram edges (in log μ). Default = 3.
+
+    num_bins : int, optional
+        Number of histogram bins for PMF calculation. Default = 100.
+
+    cmap : str, optional
+        Colormap to use for the images. Default = 'RdYlBu'.
+
+    plot_sep : float, optional
+        Horizontal separation between panels (same as wspace in subplots_adjust).
+
+    Other Parameters
+    ----------------
+    text_left_plot, text_right_plot : str, optional
+        Titles for each map panel.
+
+    cbar_size, cbar_pad : str or float, optional
+        Size and padding of the colorbars (used in make_axes_locatable).
+
+    save : str, optional
+        If provided, saves the figure to this path (with .pdf extension if not included).
+    """
+    text_left_plot  = kwargs.get("text_left_plot",  "Left plot")
+    text_right_plot = kwargs.get("text_right_plot", "Right plot")
+    name_file       = kwargs.get("save", None)
+    cbar_size       = kwargs.get("cbar_size", "6%")
+    cbar_pad        = kwargs.get("cbar_pad", 0.25)
+
+    # --- Create figure: 3 panels of equal width ---
+    fig, (ax1, ax3, ax2) = plt.subplots(
+        1, 3, figsize=(30, 10),
+        gridspec_kw={'width_ratios': [1, 1, 1]}
+    )
+    plt.subplots_adjust(wspace=plot_sep)
+
+    # --- Left map ---
+    im1 = ax1.imshow(mag_map_left, cmap=cmap, extent=[-2, 2, -2, 2],
+                     vmin=vmin, vmax=vmax)
+    vmin_locked, vmax_locked = im1.get_clim()
+    ax1.set_xticks([]); ax1.set_yticks([])
+    ax1.text(0.05, 0.95, text_left_plot, transform=ax1.transAxes,
+             fontsize=30, fontweight='bold', va='top', ha='left',
+             bbox=dict(facecolor='white', edgecolor='none', alpha=0.8))
+
+    div1 = make_axes_locatable(ax1)
+    cax1 = div1.append_axes("left", size=cbar_size, pad=cbar_pad)
+    cbar1 = fig.colorbar(im1, cax=cax1, extend="min", orientation="vertical")
+    cbar1.ax.tick_params(labelsize=25)
+    cbar1.set_label(label_color_bar, fontsize=28)
+    cbar1.ax.yaxis.set_ticks_position("left")
+    cbar1.ax.yaxis.set_label_position("left")
+
+    # --- Right map ---
+    im2 = ax2.imshow(mag_map_right, cmap=cmap, extent=[-2, 2, -2, 2],
+                     vmin=vmin_locked, vmax=vmax_locked)
+    ax2.set_xticks([]); ax2.set_yticks([])
     ax2.text(0.05, 0.95, text_right_plot, transform=ax2.transAxes,
-             fontsize=30, fontweight='bold', va='top', ha='left',bbox=dict(facecolor='white', edgecolor='none', alpha=0.8))
-    # Create a colorbar for the mirrored plot (positioned on the left side)
-    cbar2 = fig.colorbar(im2, ax=ax2, fraction=0.046, pad=0.04)
-    cbar2.ax.tick_params(labelsize=20)
-    cbar2.ax.set_position([ax2.get_position().x1+0.005*ax2.get_position().x1, 0.15, 0.05, 0.73]) 
-    cbar2.ax.yaxis.set_ticks_position('right')
-    cbar2.ax.yaxis.set_label_position('right')
-    cbar2.set_label(label_color_bar, fontsize=30, labelpad=20)
-    
-    # Add a similar patch to the second colorbar
-    patch2 = Polygon(trixy, transform=cbar2.ax.transAxes, clip_on=False,
-                      edgecolor='k', linewidth=0.7, facecolor=bluest_color,
-                      zorder=4, snap=True)
-    cbar2.ax.add_patch(patch2)
-    colors_a = {text_left_plot:"C0",text_right_plot:"C1"}
-    colors_b = {text_left_plot:"k",text_right_plot:"r"}
-    for key,map in {text_left_plot:mag_map_left,text_right_plot:mag_map_right}.items():
+             fontsize=30, fontweight='bold', va='top', ha='left',
+             bbox=dict(facecolor='white', edgecolor='none', alpha=0.8))
+
+    div2 = make_axes_locatable(ax2)
+    cax2 = div2.append_axes("right", size=cbar_size, pad=cbar_pad)
+    cbar2 = fig.colorbar(im2, cax=cax2, extend="min", orientation="vertical")
+    cbar2.ax.tick_params(labelsize=25)
+    cbar2.set_label(label_color_bar, fontsize=28)
+    cbar2.ax.yaxis.set_ticks_position("right")
+    cbar2.ax.yaxis.set_label_position("right")
+
+    # --- Middle PMF (equal width to maps) ---
+    for label, data, color in zip(
+        [text_left_plot, text_right_plot],
+        [mag_map_left, mag_map_right],
+        ["C0", "C1"]
+    ):
         bins = np.linspace(-bins_limit, bins_limit, num_bins + 1)
-        counts, bin_edges = np.histogram(map.ravel(), bins=bins)
+        counts, _ = np.histogram(data.ravel(), bins=bins)
         pmf = counts / counts.sum()
-        pmf_plos = np.r_[pmf, pmf[-1]]
-        mean_p = np.sum(bin_edges * pmf_plos)
-        bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
-        expected_pmf = sum(pmf * bin_centers)
-        ax3.step(bin_edges,np.r_[pmf, pmf[-1]], alpha=0.7, linestyle="-", label=f"PMF ({key})")
-        #ax3.axvline(expected_pmf,ls="--",label=f"Expected pmf {key}",alpha=0.7,c=colors_a[key])
-        #ax3.axvline(mean_p,ls="-",label=f"mean_p {key}",alpha=0.7,c=colors_b[key])
-    
-    ax3.legend(loc="best", fontsize=21)
+        bin_centers = 0.5 * (bins[:-1] + bins[1:])
+        ax3.step(bin_centers, pmf, where='mid', lw=3,
+                 alpha=0.9, label=f"PMF ({label})", color=color)
+
+    ax3.legend(loc="best", fontsize=22)
     ax3.set_xlabel(r"$-2.5 \, \log(\mu/\langle \mu \rangle)$", fontsize=30)
-    ax3.set_ylabel('Density(PMF)', fontsize=30)
-    ax3.tick_params(axis='both', which='major', labelsize=20)
+    ax3.set_ylabel("Density (PMF)", fontsize=30)
+    ax3.tick_params(axis='both', which='major', labelsize=22)
     ax3.set_xlim(-bins_limit, bins_limit)
-    
+    ax3.grid(True, alpha=0.3)
+
+    # --- Optional save ---
+    if name_file:
+        #if not name_file.endswith(".pdf"):
+         #   name_file += ".pdf"
+        plt.savefig(name_file, bbox_inches="tight")
+
     plt.show()
 
 
