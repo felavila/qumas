@@ -101,18 +101,6 @@ def automatic_modeling(system,max_separation=0.01,path_for_models=None,dir_model
                 #return dic_lens_system,modeling_path
         if lap==0:
             center_mass_error = 0.01
-        if lap==1:
-            center_mass_error = 0.01
-            astrometry_error = 0.01 
-        if lap==2:
-            relative_flux_error = 0.5
-            center_mass_error = 0.01 
-            astrometry_error = 0.003
-        if lap==3:
-            relative_flux_error = 0.5
-            center_mass_error = 0.01 
-            astrometry_error = 0.01
-        if lap == 4:
             print("Looks like any model works")
             break
     if not do_mcmc:
