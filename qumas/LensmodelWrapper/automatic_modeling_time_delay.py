@@ -101,8 +101,12 @@ def automatic_modeling(system,max_separation=0.01,path_for_models=None,dir_model
                 #return dic_lens_system,modeling_path
         if lap==0:
             center_mass_error = 0.01
+            #print("Looks like any model works")
+        if lap == 1:
             print("Looks like any model works")
             break
+            
+            #break
     if not do_mcmc:
         return System_Class,modeling_path
     else:
