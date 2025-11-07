@@ -425,6 +425,116 @@ def compare_maps_pmf(
 
 
 
+class CompareMapsPMF:
+    """
+    Compare two magnification maps side by side with their Probability Mass Functions (PMF).
+
+    Example
+    -------
+    cmp = CompareMapsPMF()
+    cmp.plot(mag_map_left, mag_map_right, text_left_plot="Model A", text_right_plot="Model B")
+    """
+
+    def __init__(self,
+                 vmin=-1.5,
+                 vmax=0.5,
+                 label_color_bar=r"$-2.5 \, \log(\mu/\langle \mu \rangle)$",
+                 bins_limit=3,
+                 num_bins=100,
+                 cmap="RdYlBu",
+                 plot_sep=0.2):
+        self.vmin = vmin
+        self.vmax = vmax
+        self.label_color_bar = label_color_bar
+        self.bins_limit = bins_limit
+        self.num_bins = num_bins
+        self.cmap = cmap
+        self.plot_sep = plot_sep
+
+    def plot(self, mag_map_left, mag_map_right, **kwargs):
+        text_left_plot  = kwargs.get("text_left_plot",  "Left map")
+        text_right_plot = kwargs.get("text_right_plot", "Right map")
+        name_file       = kwargs.get("save", None)
+        cbar_size       = kwargs.get("cbar_size", "6%")
+        cbar_pad        = kwargs.get("cbar_pad", 0.25)
+
+        # --- Create figure: 3 panels (map–PMF–map)
+        fig, (ax1, ax3, ax2) = plt.subplots(
+            1, 3, figsize=(30, 10),
+            gridspec_kw={'width_ratios': [1, 1, 1]}
+        )
+        plt.subplots_adjust(wspace=self.plot_sep)
+
+        # --- Left map ---
+        im1 = ax1.imshow(mag_map_left, cmap=self.cmap, extent=[-2, 2, -2, 2],
+                         vmin=self.vmin, vmax=self.vmax)
+        vmin_locked, vmax_locked = im1.get_clim()
+        ax1.set_xticks([]); ax1.set_yticks([])
+        ax1.text(0.05, 0.95, text_left_plot, transform=ax1.transAxes,
+                 fontsize=30, fontweight='bold', va='top', ha='left',
+                 bbox=dict(facecolor='white', edgecolor='none', alpha=0.8))
+
+        div1 = make_axes_locatable(ax1)
+        cax1 = div1.append_axes("left", size=cbar_size, pad=cbar_pad)
+        cbar1 = fig.colorbar(im1, cax=cax1, extend="min", orientation="vertical")
+        cbar1.ax.tick_params(labelsize=25)
+        cbar1.set_label(self.label_color_bar, fontsize=28)
+        cbar1.ax.yaxis.set_ticks_position("left")
+        cbar1.ax.yaxis.set_label_position("left")
+
+        # --- Right map ---
+        im2 = ax2.imshow(mag_map_right, cmap=self.cmap, extent=[-2, 2, -2, 2],
+                         vmin=vmin_locked, vmax=vmax_locked)
+        ax2.set_xticks([]); ax2.set_yticks([])
+        ax2.text(0.05, 0.95, text_right_plot, transform=ax2.transAxes,
+                 fontsize=30, fontweight='bold', va='top', ha='left',
+                 bbox=dict(facecolor='white', edgecolor='none', alpha=0.8))
+
+        div2 = make_axes_locatable(ax2)
+        cax2 = div2.append_axes("right", size=cbar_size, pad=cbar_pad)
+        cbar2 = fig.colorbar(im2, cax=cax2, extend="min", orientation="vertical")
+        cbar2.ax.tick_params(labelsize=25)
+        cbar2.set_label(self.label_color_bar, fontsize=28)
+        cbar2.ax.yaxis.set_ticks_position("right")
+        cbar2.ax.yaxis.set_label_position("right")
+
+        # --- Middle PMF (square aspect & same width) ---
+        for label, data, color in zip(
+            [text_left_plot, text_right_plot],
+            [mag_map_left, mag_map_right],
+            ["C0", "C1"]
+        ):
+            bins = np.linspace(-self.bins_limit, self.bins_limit, self.num_bins + 1)
+            counts, _ = np.histogram(data.ravel(), bins=bins)
+            pmf = counts / counts.sum()
+            bin_centers = 0.5 * (bins[:-1] + bins[1:])
+            ax3.step(bin_centers, pmf, where='mid', lw=3,
+                     alpha=0.9, label=f"PMF ({label})", color=color)
+
+        # Make the PMF panel square and match map widths
+        div3 = make_axes_locatable(ax3)
+        cax3 = div3.append_axes("right", size=cbar_size, pad=cbar_pad)
+        cax3.set_visible(False)
+        ax3.set_box_aspect(1)
+
+        # Also ensure maps are square
+        ax1.set_box_aspect(1)
+        ax2.set_box_aspect(1)
+
+        ax3.legend(loc="best", fontsize=22)
+        ax3.set_xlabel(r"$-2.5 \, \log(\mu/\langle \mu \rangle)$", fontsize=30)
+        ax3.set_ylabel("Density (PMF)", fontsize=30)
+        ax3.tick_params(axis='both', which='major', labelsize=22)
+        ax3.set_xlim(-self.bins_limit, self.bins_limit)
+        ax3.grid(True, alpha=0.3)
+
+        # --- Optional save ---
+        if name_file:
+            plt.savefig(name_file, bbox_inches="tight")
+
+        plt.show()
+
+
 
 def map_plot_with_profiles(
     mag_map_2d: np.ndarray,
