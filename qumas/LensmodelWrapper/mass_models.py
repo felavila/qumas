@@ -70,6 +70,33 @@ def mass_models(mass_distribution,n_galaxies, p1, lens_centered, path):
                 for _ in range(1, n_galaxies):
                     model += "1 0 0 0 0 0 0 0 0 0\n"  # Concatenate the fixed line multiple times
         model += f"optimize {path}/final_step\n"
+    elif "POWSE+shear" == mass_distribution:
+        model = f"alpha {p1} 0 0 0.0 0.0 0.003 10.0 0 0 1\n"
+        if n_galaxies > 1:
+                for n in range(1, n_galaxies):
+                    ra, dec = lens_centered[n]
+                    # Create the line with p1/2 and the current ra, dec
+                    model += f"alpha {p1 / 2} {ra} {dec} 0.0 0.0 0 0.0 0 0 1\n"
+                    #l += line  # Concatenate the line to l
+        model+= "1 0 0 0 0 1 1 0 0 0\n"
+        if n_galaxies > 1:
+                for _ in range(1, n_galaxies):
+                    model += "1 0 0 0 0 0 0 0 0 1\n"  # Concatenate the fixed line multiple times
+        model+= f"varyone 1 7 -90.0 90.0 19 {path}/step_1\n"
+        model+= f"setlens {path}/step_1.start\n"
+        model+= f"changevary 1 \n1 0 0 0 0 1 1 0 0 1\n"
+        if n_galaxies > 1:
+                for _ in range(1, n_galaxies):
+                    model += "1 0 0 0 0 0 0 0 0 0\n"  # Concatenate the fixed line multiple times
+        model+= f"\noptimize {path}/step_2\n"
+        model += f"set chimode= 1\nsetlens {path}/step_2.start\n"
+        model += f"changevary 1\n"
+        model += "1 1 1 0 0 1 1 0 0 1\n"
+        if n_galaxies > 1:
+                for _ in range(1, n_galaxies):
+                    model += "1 0 0 0 0 0 0 0 0 0\n"  # Concatenate the fixed line multiple times
+        model += f"optimize {path}/final_step\n"   
+        
     elif mass_distribution in ["SIE+shear","POW+shear"]:
         model = f"alpha {p1} 0 0 0.03 10.0 0 0.0 0 0 1\n"
         if n_galaxies > 1:

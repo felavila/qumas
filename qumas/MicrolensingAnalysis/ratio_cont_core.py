@@ -15,8 +15,8 @@ def ratio_cont_core(file,ref,img=None,save=False,obj_name=None):
     elif img==None:
         img = [i for i in integrated.imagen.unique() if i !=ref]
     Ref = integrated.loc[(integrated["imagen"]==ref).values & ([bool("cont" not in i) for i in integrated["name"]])].copy()
-    Ima = integrated.loc[np.array([bool(i in img) for i in integrated["imagen"].values]) & ([bool("cont" not in i) for i in integrated["name"]])].copy()
     Ref_c = integrated.loc[(integrated["imagen"]==ref).values & ([bool("cont" in i) for i in integrated["name"]])].copy()
+    Ima = integrated.loc[np.array([bool(i in img) for i in integrated["imagen"].values]) & ([bool("cont" not in i) for i in integrated["name"]])].copy()
     Ima_c = integrated.loc[np.array([bool(i in img) for i in integrated["imagen"].values]) & ([bool("cont" in i) for i in integrated["name"]])].copy()
     for n,ima in enumerate(img):
         I = Ima[Ima["imagen"]==ima].copy()

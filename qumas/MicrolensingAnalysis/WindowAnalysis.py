@@ -97,20 +97,15 @@ def build_limits(spectra_dict, row):
     )
     band = pool_sorted[0]["name"]
 
-    # ------------------------------------------------------------------
-    # Get X, Y for the chosen band and compute band min/max
-    # ------------------------------------------------------------------
     X = np.array(spectra_dict[band]["wavelength"])
     Y = np.array(spectra_dict[band]["flux"])
     OBJS = spectra_dict[band]["obj"]
 
-    # X is usually 2D: (nobj, npix), so use global min/max
+
     x_min = float(np.min(X))
     x_max = float(np.max(X))
 
-    # ------------------------------------------------------------------
-    # Continuum-only lines: build windows around core and then clip them
-    # ------------------------------------------------------------------
+
     if "cont" in line_name:
         core_min = float(min(core_init))
         core_max = float(max(core_init))
@@ -118,9 +113,6 @@ def build_limits(spectra_dict, row):
         left_window_init  = [core_min - 100.0, core_min]
         # print(right_window_init, left_window_init, core_init)
 
-    # ------------------------------------------------------------------
-    # Helper to clip any [lo, hi] window to [x_min, x_max]
-    # ------------------------------------------------------------------
     def _clip_window(win, lo=x_min, hi=x_max):
         a, b = float(win[0]), float(win[1])
         # enforce ordering
@@ -134,15 +126,14 @@ def build_limits(spectra_dict, row):
             a = b = lo
         return [a, b]
 
-    # Clip all windows to wavelength coverage
     left_window_init  = _clip_window(left_window_init)
     right_window_init = _clip_window(right_window_init)
     core_init         = _clip_window(core_init)
 
-    # Optionally: clip center_window itself if you want it inside X range too
+    
     center_window = float(np.clip(center_window, x_min, x_max))
 
-    print(right_window_init, left_window_init, core_init, line_name)
+    #print(right_window_init, left_window_init, core_init, line_name)
 
     return {
         "X": X,
@@ -201,7 +192,7 @@ class WindowAnalysis:
                 self.spectra_dict[band]["wavelength"].append(wavelength)
                 flux = value.get("flux")
                 self.spectra_dict[band]["flux"].append(flux)
-                self.spectra_dict[band]["error"].append(value.get("error",np.ones_like(flux)))
+                self.spectra_dict[band]["error"].append(value.get("error",np.zeros_like(flux)))
                 self.spectra_dict[band]["obj"].append(obj)
                 
             self.kwargs_h ={}
@@ -227,23 +218,28 @@ class WindowAnalysis:
         # Flag to control the routine
         stop_routine = [False]
         
-        def save_parameters(index, slider_left_window, slider_right_window, slider_line_core,
+        def save_parameters(index, left_window, right_window, slider_line_core,
                         slider_xlim_left, slider_ylim_left, slider_xlim_right, slider_ylim_right,
                         line_name, band, objs,X,Y,n_bootstrap=n_bootstrap,random_state=random_state):
             """Save current slider values and parameters"""
+            if left_window:
+                left_window = left_window.value
+            if right_window:
+                right_window = right_window.value
+            
             self.saved_parameters[index] = {'line_name': line_name,'band': band,'objects': objs,
-                'left_window': slider_left_window.value,'right_window': slider_right_window.value,'line_core': slider_line_core.value,
+                'left_window':left_window ,'right_window': right_window,'line_core': slider_line_core.value,
                 'xlim_left': slider_xlim_left.value,'ylim_left': slider_ylim_left.value,'xlim_right': slider_xlim_right.value,'ylim_right': slider_ylim_right.value,}
             
             if "cont" not in line_name:
-                _numerics = _compute_metrics_for_image(X,Y,slider_left_window.value,slider_right_window.value,slider_line_core.value,n_bootstrap=n_bootstrap,random_state=random_state)
+                _numerics = _compute_metrics_for_image(X,Y,left_window,right_window,slider_line_core.value,n_bootstrap=n_bootstrap,random_state=random_state)
             else:
                 _numerics = _compute_metrics_for_image_continuum(X,Y,slider_line_core.value,n_bootstrap=n_bootstrap,random_state=random_state)
             
             self.saved_parameters[index].update(_numerics)
             # Also update the kwargs_h with current values
-            self.kwargs_h[index]['right_window_init'] = slider_right_window.value
-            self.kwargs_h[index]['left_window_init'] = slider_left_window.value
+            self.kwargs_h[index]['right_window_init'] = right_window
+            self.kwargs_h[index]['left_window_init'] = left_window
             self.kwargs_h[index]['core_init'] = slider_line_core.value
             
             #return self.saved_parameters[index]
@@ -344,7 +340,8 @@ class WindowAnalysis:
                 Rightplot.set_xlabel(r'$\rm Rest \ Wavelength$ ($\rm \AA$)', fontsize=20)
                 Leftplot.set_ylabel(r"F$_\lambda\,(\mathrm{erg\,s^{-1}\,cm^{-2}\,\AA^{-1}}) \times$"+f"1e{Y_factor}", fontsize=20)
                 Rightplot.set_ylabel(r"F$_\lambda\,(\mathrm{erg\,s^{-1}\,cm^{-2}\,\AA^{-1}}) \times$"+f"1e{Y_factor}", fontsize=20)
-                
+                slider_left_window = None
+                slider_right_window = None 
                 ##############set-slider##############
                 if "cont" not in line_name:
                     slider_left_window = widgets.FloatRangeSlider(value=left_window_init, min=np.min(X), max=np.max(core_init), step=0.1,
@@ -458,8 +455,6 @@ class WindowAnalysis:
                 Rightplot.set_xlim(slider_xlim_right.value)
                 Rightplot.set_ylim(slider_ylim_right.value)
                 
-                
-            
                 def update_plot(change):
                     
                    
@@ -549,7 +544,6 @@ class WindowAnalysis:
                 
                 def _save_current_plots():
                     from pathlib import Path
-                    # Folder to store plots
                     save_dir = Path("microlensing_plots")
                     save_dir.mkdir(exist_ok=True)
 
@@ -560,25 +554,12 @@ class WindowAnalysis:
                     full_path = save_dir / f"{base}_both.pdf"
                     fig.savefig(full_path, dpi=150, bbox_inches="tight")
 
-                    # 2) Save left and right panels individually
-                    # Make sure layout is up to date
                     fig.canvas.draw()
 
                     # Left panel
                     left_extent = Leftplot.get_window_extent().transformed(
                         fig.dpi_scale_trans.inverted()
                     )
-                    # left_path = save_dir / f"{base}_left.png"
-                    # fig.savefig(left_path, bbox_inches=left_extent, dpi=150)
-
-                    # # Right panel
-                    # right_extent = Rightplot.get_window_extent().transformed(
-                    #     fig.dpi_scale_trans.inverted()
-                    # )
-                    # right_path = save_dir / f"{base}_right.png"
-                    # fig.savefig(right_path, bbox_inches=right_extent, dpi=150)
-
-                    # Optionally, store filenames in saved_parameters
                     self.saved_parameters.setdefault(index, {})
                     self.saved_parameters[index].update(
                         {
@@ -586,18 +567,12 @@ class WindowAnalysis:
                         }
                     )
                 def on_save_clicked(b):
-                    # params = save_parameters(index, slider_left_window, slider_right_window, 
-                    #                         slider_line_core, slider_xlim_left, slider_ylim_left,
-                    #                         slider_xlim_right, slider_ylim_right, line_name, band, objs,X,Y_original,n_bootstrap=n_bootstrap,random_state=random_state)
-                    _save_current_plots()
+                    #_save_current_plots()
+                    save_parameters(index, slider_left_window, slider_right_window, 
+                                             slider_line_core, slider_xlim_left, slider_ylim_left,
+                                             slider_xlim_right, slider_ylim_right, line_name, band, objs,X,Y_original,n_bootstrap=n_bootstrap,random_state=random_state)
                     status_label.value = f"✓ Saved parameters for {line_name} (Plot {index+1}/{n_max})"
                     
-                    # print(f"Saved parameters for plot {index+1}:")
-                    # print(f"  Line: {params['line_name']}, Band: {params['band']}")
-                    # print(f"  Left window: {params['left_window']}")
-                    # print(f"  Right window: {params['right_window']}")
-                    # print(f"  Line core: {params['line_core']}")
-                
                 def on_previous_clicked(b):
                     plt.close(fig)
                     if current_index[0] > 0:

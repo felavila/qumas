@@ -63,12 +63,13 @@ class Result_Handler(
             raise ModelNotFoundError(model, self.models)
         return self.lensmodel_system[model]
     
-    def get_lens_params(self,model:str=None):
+    def get_lens_params(self,model:str=None,verbose=False):
         model = model or self.current_best_n_model
         if model not in self.models:
             raise ModelNotFoundError(model, self.models)
         local_model = self.get_model(model)
-        print("mass_distribution:",local_model.get("model_setup").get("model_setup").get("mass_distribution"))
+        if verbose:
+            print("mass_distribution:",local_model.get("model_setup").get("model_setup").get("mass_distribution"))
         return local_model.get('final_step').get('LENS PARMS')
     
     def make_pandas_from_results(self,model:str=None):
@@ -77,6 +78,9 @@ class Result_Handler(
             raise ModelNotFoundError(model, self.models)
         model_dic = self.get_model(model)
         model_k = model_dic["kappa_gamma"]["kappa_gamma"]
+        model_a = self.get_lens_params(model)["alpha1"]
+        if len(list(self.get_lens_params(model).keys())) > 1:
+            print("WARNING model_a more than one key")
         model_h = model_dic['final_step']
         model_s = model_dic["model_setup"]["model_setup"]
         model_er = model_dic["RE"]["RE"]
@@ -86,7 +90,8 @@ class Result_Handler(
         B =pd.DataFrame(list(model_h['SOURCE PARMS'].values()) * len(combined_df))
         C = pd.DataFrame([list(model_h['CHISQ'].values())]* len(combined_df),columns=['chis2_'+i for i in model_h['CHISQ'].keys()])
         D = pd.DataFrame([list(model_s.values())]* len(combined_df),columns=[i for i in model_s.keys()])
-        pandas_comb = pd.concat([combined_df,B.reset_index(drop=True),C.reset_index(drop=True),D.reset_index(drop=True)], axis=1) 
+        E = pd.DataFrame([model_a]* len(combined_df))
+        pandas_comb = pd.concat([combined_df,B.reset_index(drop=True),C.reset_index(drop=True),D.reset_index(drop=True),E.reset_index(drop=True)], axis=1) 
         pandas_comb["magnitudes"] = model_s["magnitudes"]
         pandas_comb['astrometry_error'] = pandas_comb['astrometry_error'].values[0]
         pandas_comb['center_mass_error'] = np.array([*pandas_comb['center_mass_error'].values])
@@ -194,8 +199,11 @@ class Result_Handler(
             v = critical["v"]
             y = critical["y"]
             step = np.argmax(np.sqrt(np.diff(x)**2 + np.diff(y)**2))
-            ax[0].plot(x[:step+1], y[:step+1], label="Critical Curves", alpha=0.5,linewidth=10)
-            ax[0].plot(u[:step+1], v[:step+1], label="Caustic Curves", alpha=0.5,linewidth=10)
+            ax[0].plot(x[:step+1], y[:step+1], label="Critical Curve", alpha=0.5,linewidth=10)
+            ax[0].plot(x[step+1:], y[step+1:], label="Critical Curve", alpha=0.5,linewidth=10)
+            
+            ax[0].plot(u[:step+1], v[:step+1], label="Caustic Curve", alpha=0.5,linewidth=10)
+            ax[0].plot(u[step+1:], v[step+1:], label="Critical Curve", alpha=0.5,linewidth=10)
 
         # Add additional info text if requested
         if add_info:
