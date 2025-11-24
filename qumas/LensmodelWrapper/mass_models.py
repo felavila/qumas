@@ -96,7 +96,7 @@ def mass_models(mass_distribution,n_galaxies, p1, lens_centered, path):
                 for _ in range(1, n_galaxies):
                     model += "1 0 0 0 0 0 0 0 0 0\n"  # Concatenate the fixed line multiple times
         model += f"optimize {path}/final_step\n"   
-        
+       ########################################### 
     elif mass_distribution in ["SIE+shear","POW+shear"]:
         model = f"alpha {p1} 0 0 0.03 10.0 0 0.0 0 0 1\n"
         if n_galaxies > 1:

@@ -35,7 +35,7 @@ def automatic_modeling(system,max_separation=0.01,path_for_models=None,dir_model
     if len(lensmodel_system.images) == 2:
         available_lens_models_to_model = ['SIS', 'SIE','SIS+shear']
     if len(lensmodel_system.images) > 2:
-        available_lens_models_to_model = ['SIS+shear','SIS+shear','SIE','SIE+shear',"POW",'POW+shear',"POWSE+shear"]
+        available_lens_models_to_model = ["POWSE+shear"]#['SIS+shear','SIS+shear','SIE','SIE+shear',"POW",'POW+shear',"POWSE+shear"]
     if system.total_lens.values[0]>1:
         available_lens_models_to_model = np.array([[model if r==1 else model+f"-{r}G" for r in range(1,system.total_lens.values[0]+1)] for model in available_lens_models_to_model]).ravel()
     if system.z_l.astype(float).values[0] > system.z_s.astype(float).values[0]:
