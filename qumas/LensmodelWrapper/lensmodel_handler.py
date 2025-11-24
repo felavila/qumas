@@ -45,8 +45,11 @@ class lensmodel_handler:
         self.images,self.lens = columns_to_float(self.system,self.band_to_model)
         #self.models_file = "double_models.json" if len(self.images)==2 else "quad_models.json"
         self.models_file = "quad_models.json" 
-        with open(os.path.join(self.model_setup_path,self.models_file), 'r') as file_mass:
-             self.mass_models = json.load(file_mass)
+        #with open(os.path.join(self.model_setup_path,self.models_file), 'r') as file_mass:
+         #    self.mass_models = json.load(file_mass)
+          #   print(self.mass_models)
+        self.mass_models = ['SIS', 'SIE','SIS+shear','SIE+shear',"POW",'POW+shear',"POWSE+shear"]
+        #self.mass_models = ["POWSE+shear"]
         #prior Er
         self.p1 = round(np.max(distance.pdist(np.array([self.images["RA"].values,self.images["DEC"].values]).T,metric='euclidean')/2),2)
         self.time_delay = time_delay
@@ -182,9 +185,9 @@ class lensmodel_handler:
         if "-" in self.mass_distribution:
             number_of_lens = int(self.mass_distribution.split("-")[1][0])
             mass_distribution = self.mass_distribution.split("-")[0]
-        if mass_distribution not in self.mass_models.keys():
+        if mass_distribution not in self.mass_models:
                 return print(f"{mass_distribution} mass model is not available")
-        mass = self.mass_models[mass_distribution]
+        #mass = self.mass_models[mass_distribution]
         if self.data_path != None:
             f = open(os.path.join(self.modeling_path,f"{name_run}.dat"), 'w')
             f.write(f"#mass_distribution = {mass_distribution} \n")

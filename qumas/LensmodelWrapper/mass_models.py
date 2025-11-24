@@ -1,4 +1,5 @@
 def mass_models(mass_distribution,n_galaxies, p1, lens_centered, path):
+    print(mass_distribution)
     if mass_distribution == "SIS":
             # Initialize l as an empty string
             model = f"alpha {p1} 0 0 0.0 0.0 0 0.0 0 0 1\n"
@@ -71,6 +72,7 @@ def mass_models(mass_distribution,n_galaxies, p1, lens_centered, path):
                     model += "1 0 0 0 0 0 0 0 0 0\n"  # Concatenate the fixed line multiple times
         model += f"optimize {path}/final_step\n"
     elif "POWSE+shear" == mass_distribution:
+        print(mass_distribution)
         model = f"alpha {p1} 0 0 0.0 0.0 0.003 10.0 0 0 1\n"
         if n_galaxies > 1:
                 for n in range(1, n_galaxies):
