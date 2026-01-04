@@ -150,30 +150,57 @@ def image_whit_photometry(L:pd.DataFrame,verbose=False):
     system_clean["available_bands"] =len(system_clean) * [bands]
     return system_clean
 
+# def pandas_to_model(Lenses:pd.DataFrame,verbose=False,only_astrometry=False):
+#     if "IS" not in Lenses.columns:
+#         if verbose:
+#             print("IS not in columns")
+#         Lenses["can_be_modeled"] = [False]*len(Lenses)
+#         return Lenses
+#     if "ima" not in Lenses.IS.values:
+#         return Lenses
+#     if not any(["G" in str(i) for i in Lenses["component"].values]):
+#         if verbose:
+#             print("not G in the system")
+#         Lenses["can_be_modeled"] = [False]*len(Lenses)
+#         return Lenses
+#     Lenses_f = pd.concat([image_whit_photometry(Lenses[Lenses["name"]==name]) for name in Lenses.name.drop_duplicates()],ignore_index=True)
+#     if len(Lenses_f)==0:
+#         Lenses["can_be_modeled"] = [False]*len(Lenses)
+#         return Lenses
+#     Lenses_f = is_know_redshift(deepcopy(Lenses_f))
+#     if 'photometric_system' not in Lenses_f.columns:
+#         Lenses_f['photometric_system'] = None
+#     if only_astrometry:
+#         Lenses_f = Lenses_f[['name', 'z_l', 'z_s', 'ra', 'dec', 'component', 'IS', 'RA', 'dRA','DEC', 'dDEC','Bibcode', 'file', 'year', 'Bibcode_zl', 'Bibcode_zs','known_names', 'can_be_modeled', 'total_images', 'model_images','image_cant_be_modeled', 'total_lens', 'model_available', 'issues', 'zl_known', 'zs_known', 'old_z_s', 'old_z_l','photometric_system','Telescope', 'instrument']]
+#     return Lenses_f
 def pandas_to_model(Lenses:pd.DataFrame,verbose=False,only_astrometry=False):
-    if "IS" not in Lenses.columns:
-        if verbose:
-            print("IS not in columns")
-        Lenses["can_be_modeled"] = [False]*len(Lenses)
-        return Lenses
-    if "ima" not in Lenses.IS.values:
-        return Lenses
-    if not any(["G" in str(i) for i in Lenses["component"].values]):
-        if verbose:
-            print("not G in the system")
-        Lenses["can_be_modeled"] = [False]*len(Lenses)
-        return Lenses
-    Lenses_f = pd.concat([image_whit_photometry(Lenses[Lenses["name"]==name]) for name in Lenses.name.drop_duplicates()],ignore_index=True)
-    if len(Lenses_f)==0:
-        Lenses["can_be_modeled"] = [False]*len(Lenses)
-        return Lenses
-    Lenses_f = is_know_redshift(deepcopy(Lenses_f))
-    if 'photometric_system' not in Lenses_f.columns:
-        Lenses_f['photometric_system'] = None
-    if only_astrometry:
-        Lenses_f = Lenses_f[['name', 'z_l', 'z_s', 'ra', 'dec', 'component', 'IS', 'RA', 'dRA','DEC', 'dDEC','Bibcode', 'file', 'year', 'Bibcode_zl', 'Bibcode_zs','known_names', 'can_be_modeled', 'total_images', 'model_images','image_cant_be_modeled', 'total_lens', 'model_available', 'issues', 'zl_known', 'zs_known', 'old_z_s', 'old_z_l','photometric_system','Telescope', 'instrument']]
-    return Lenses_f
+	if "IS" not in Lenses.columns:
+		if verbose:
+			print("IS not in columns,check the columns")
+		Lenses["can_be_modeled"] = [False]*len(Lenses)
+		return Lenses
+	elif "ima" not in Lenses.IS.values:
+		return Lenses
+	elif not any(["G" in str(i) for i in Lenses["component"].values]):
+		if verbose:
+			print("not G in the system")
+		Lenses["can_be_modeled"] = [False]*len(Lenses)
+		return Lenses
+	Lenses["name_bib"] = Lenses["name"]+Lenses["Bibcode"]
+	Lenses_f = [image_whit_photometry(Lenses[Lenses["name_bib"]==name]) for name in Lenses.name_bib.drop_duplicates()]
+	if len(Lenses_f)==0:
+		Lenses["can_be_modeled"] = [False]*len(Lenses)
+		return Lenses
+	print("len of the subpandas",[len(i) for i in Lenses_f])
+	index_f =np.argmax([len(i) for i in Lenses_f])
 
+	Lenses_f = Lenses_f[index_f]
+	Lenses_f = is_know_redshift(deepcopy(Lenses_f))
+	if 'photometric_system' not in Lenses_f.columns:
+		Lenses_f['photometric_system'] = None
+	if only_astrometry:
+		Lenses_f = Lenses_f[['name', 'z_l', 'z_s', 'ra', 'dec', 'component', 'IS', 'RA', 'dRA','DEC', 'dDEC','Bibcode', 'file', 'year', 'Bibcode_zl', 'Bibcode_zs','known_names', 'can_be_modeled', 'total_images', 'model_images','image_cant_be_modeled', 'total_lens', 'model_available', 'issues', 'zl_known', 'zs_known', 'old_z_s', 'old_z_l','photometric_system','Telescope', 'instrument']]
+	return Lenses_f
 
 
 def get_paths_before(target_path):
@@ -223,6 +250,7 @@ def get_kappa_gamma(list_of_lines):
 def get_result_lensmodel(list_of_lines):
     possible_keys=['LENS PARMS','SOURCE PARMS','CHISQ','Source','images','Extra model images']
     where_appear= np.array([[pk,i] for pk in possible_keys for i,line in enumerate(list_of_lines) if pk == line.split(":")[0]])
+    #print(where_appear)
     where_appear_final = np.vstack((where_appear.T,np.hstack((where_appear[1:,1],-1)))).T
     result = {str(k):{} for k in where_appear_final[:,0]}
     for k,f_i,u_i in where_appear_final:
@@ -240,7 +268,7 @@ def get_result_lensmodel(list_of_lines):
         if k=="CHISQ":
             chi_values,chi_columns = list_of_lines[int(f_i)].split("#")
             result["CHISQ"]= {v: float(k) for k, v in zip(chi_values.replace("CHISQ:","").split(" ")[1:-1],chi_columns.replace("\n","").split(" ")[1:])}
-            result["Source"] = {local_list[i].replace("\n","").split(":")[0].replace(" ",""):local_list[i].replace("\n","").split(":")[1]  for i in range(3,len(local_list[1:])+1)} #only works for one source 
+            #result["Source"] = {local_list[i].replace("\n","").split(":")[0].replace(" ",""):local_list[i].replace("\n","").split(":")[1]  for i in range(3,len(local_list[1:])+1)} #only works for one source 
         if k=="images":
             result["images"] = get_images_result(local_list[1:])
     return result

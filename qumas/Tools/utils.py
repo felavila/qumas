@@ -1,7 +1,9 @@
+import pandas as pd 
+from pathlib import Path
 
+_DEFAULT_filterinfo = Path(__file__).resolve().parent.parent / "Tables" / "filterinfo" / "filter_unique.csv"
 
-
-
+filterinfo = pd.read_csv(_DEFAULT_filterinfo)
 
 def clean_name(L):
     "remove leters from the name, caracteres, hopefully we can obtain compare those with previous results"

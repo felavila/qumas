@@ -72,6 +72,7 @@ class LensedQsoCensus:
         return count
     
     def hierarchical_selection(self,name):
+    
         system = self.look_for_a_system(name).sort_values("year", ascending=False)
         pandas_s = np.array([[i,len(system[system["Bibcode"]==i])] for i in system.Bibcode.drop_duplicates().values])
         n_ = np.argmax(pandas_s[:,1].astype(int))
@@ -86,6 +87,7 @@ class LensedQsoCensus:
         data_to_model["known_names"] = [system.name.drop_duplicates().values]* len(data_to_model)
         data_to_model["can_be_modeled"] = [any([(("band" in col) and ("ima" in data_to_model["IS"].values)) for col in data_to_model.columns])] * len(data_to_model)
         return data_to_model
+    
     def pandas_for_model(self):
         pandas_to_be_use_in_model = pd.concat([pandas_to_model(self.hierarchical_selection(system_name)) for system_name in self.unique_systems_count(get_unique_names=True)]
         ).reset_index(drop=True)

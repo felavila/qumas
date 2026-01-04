@@ -10,7 +10,7 @@
     "set_zsrc": "set zsrc =",
     "set_checkparity": "set checkparity =",
     "set_gridflag": "#set gridflag = ",
-    "set_restart": "#set restart = ",
+    "set_restart": "set restart = ",
     "jump":"#Start modeling",
     "set_lens_number": "startup "},
  "lensmodel_values":{
@@ -20,7 +20,7 @@
     "set_lambda": "0.7",
     "set_hval" : "0.7",
     "set_hvale": "1000",
-    "set_chimode": "0",
+    "set_chimode": "1",
     "set_zlens": "0.5",
     "set_zsrc": "2.0",
     "set_checkparity": "0",

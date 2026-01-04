@@ -62,6 +62,7 @@ def map_plot(mag_map_2d, cmap='RdYlBu', vmin=-1.5, vmax=0.5,
 def map_pmf_plot(mag_map,label="",label_color_bar =r"$-2.5 \, \log(\mu/\langle \mu \rangle)$", vmin=-1.5, vmax=0.5,text_right_plot="Right plot",bins_limit=3,
             num_bins=100,cmap='RdYlBu',**kwargs):
     #rf"{name} {component} $\ast$ {factor} rs $\alpha = {alpha.split('_')[1]}$ mean={mean:.3f}"
+    name_file       = kwargs.get("name_file", None)
     fig, (ax2, ax1) = plt.subplots(1, 2, figsize=(27, 10))
     bins = np.linspace(-bins_limit, bins_limit, num_bins + 1)
     counts, bin_edges = np.histogram(mag_map.ravel(), bins=bins)
@@ -98,6 +99,8 @@ def map_pmf_plot(mag_map,label="",label_color_bar =r"$-2.5 \, \log(\mu/\langle \
     bluest_color = im2.cmap(im2.norm(vmin))
     patch2 = Polygon(trixy, transform=cbar2.ax.transAxes, clip_on=False,edgecolor='k', linewidth=0.7, facecolor=bluest_color,zorder=4, snap=True)
     cbar2.ax.add_patch(patch2)
+    if name_file:
+        plt.savefig(f"{name_file}.pdf", bbox_inches='tight')
     plt.show()
 
 

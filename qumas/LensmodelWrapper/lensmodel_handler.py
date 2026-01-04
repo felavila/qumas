@@ -168,7 +168,7 @@ class lensmodel_handler:
                 #   flux = ((-1)**(ii))*image[1]/np.max(image[1])
                 f.write(f"{ra:.3f} {dec:.3f} {flux[n]:.3f} {astrometry_error[n]:.3f} {flux_error[n]:.3f} {time_delay[n]:.3f} {time_delay_error[n]:.3f} {image[0]} \n")
             f.close()
-        print(self.system_name)
+        #print(self.system_name)
         data_model = {"name":self.system_name,"component":images["component"].values,"ra":images_lens_centered[:,0],"dec":images_lens_centered[:,1],"astrometry_error":astrometry_error \
                     ,"flux":flux,"flux_error":flux_error,"magnitudes":magnitudes,"band_to_model":band_to_model,"lens_ra":lens_lens_centered[:,0],"lens_dec":lens_lens_centered[:,1] \
                     ,"center_mass_error":center_mass_error,"zl":self.zl,"zs":self.zs,'photometric_system':"?", 'Telescope':"?", 'instrument':"?", 

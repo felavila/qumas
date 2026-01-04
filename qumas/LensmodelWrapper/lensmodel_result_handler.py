@@ -79,8 +79,8 @@ class Result_Handler(
         model_dic = self.get_model(model)
         model_k = model_dic["kappa_gamma"]["kappa_gamma"]
         model_a = self.get_lens_params(model)["alpha1"]
-        if len(list(self.get_lens_params(model).keys())) > 1:
-            print("WARNING model_a more than one key")
+        # if len(list(self.get_lens_params(model).keys())) > 1:
+        #     print("WARNING model_a more than one key")
         model_h = model_dic['final_step']
         model_s = model_dic["model_setup"]["model_setup"]
         model_er = model_dic["RE"]["RE"]
@@ -138,7 +138,8 @@ class Result_Handler(
             pandas_stats.append([*panda_loc[relevant_keys].drop_duplicates().values[0],max_sep,median_demag,std_demag])
         return pd.DataFrame(pandas_stats,columns=relevant_keys+["max(delta_images)",'median_demag','std_demag'])
     
-    def make_plot(self, model=None, add_info=False, add_critical=False, save='',remove_axis=False, x_zoom_list=None, y_zoom_list=None, zoom_size=0.2, zoom_positions=None):
+    def make_plot(self, model=None, add_info=False, add_critical=False, save='',remove_axis=False, x_zoom_list=None, y_zoom_list=None, zoom_size=0.2
+                  , zoom_positions=None,add_legend=True):
         """
         Creates a scatter plot with optional zoomed inset subplots.
 
@@ -157,7 +158,7 @@ class Result_Handler(
         model = model or self.current_best_n_model
         if model not in self.models:
             raise ModelNotFoundError(model, self.models)
-        print(model)
+        #print(model)
         
         model_dic = self.lensmodel_system[model]
         ra_imput = model_dic['final_step']['images']['ra_imput']
@@ -183,7 +184,7 @@ class Result_Handler(
         fig, ax = plt.subplots(1+num_zooms, 1, figsize=(20, 20))
         ax = np.atleast_1d(ax)
         ax[0].scatter(ra_imput, dec_imput, label="Input Coordinates", facecolors='none', edgecolors='purple',s=200,linewidths=3,zorder=100)
-        ax[0].scatter(ra_output, dec_output, label="Output Coordinates", color="C1", alpha=.85,s=200)
+        ax[0].scatter(ra_output, dec_output, label="Output Coordinates", color="blue", alpha=.85,s=200)
         ax[0].scatter(ra_lens_model, dec_lens_model, label="Output Coordinates Lens", color="k", alpha=0.95,linewidths=3,s=200)
         ax[0].scatter(ra_lens_in, dec_lens_in, label="Input Coordinates Lens", facecolors='none', edgecolors='red',s=200,linewidths=3)
 
@@ -203,7 +204,7 @@ class Result_Handler(
             ax[0].plot(x[step+1:], y[step+1:], label="Critical Curve", alpha=0.5,linewidth=10)
             
             ax[0].plot(u[:step+1], v[:step+1], label="Caustic Curve", alpha=0.5,linewidth=10)
-            ax[0].plot(u[step+1:], v[step+1:], label="Critical Curve", alpha=0.5,linewidth=10)
+            ax[0].plot(u[step+1:], v[step+1:], label="Caustic Curve", alpha=0.5,linewidth=10)
 
         # Add additional info text if requested
         if add_info:
@@ -219,10 +220,11 @@ class Result_Handler(
 
         ax[0].set_ylabel(r"$\Delta \delta \quad [\mathrm{arcsec}]$", fontsize=35)
         ax[0].set_xlabel(r"$\Delta \alpha \quad [\mathrm{arcsec}]$", fontsize=35)
-        ax[0].set_xlim(-6,6)
-        ax[0].set_ylim(-6,6)
+        #ax[0].set_xlim(-6,6)
+        #ax[0].set_ylim(-6,6)
         ax[0].invert_xaxis()
-        ax[0].legend(loc="upper left",fontsize=25,ncol=3)#, bbox_to_anchor=(1.05, 0.75), borderaxespad=0)  # Legend outside
+        if add_legend:
+            ax[0].legend(loc="best",fontsize=25,ncol=1)#, bbox_to_anchor=(1.05, 0.75), borderaxespad=0)  # Legend outside
         ax[0].tick_params(axis='both', labelsize=35, pad=10)
         # Remove axes if requested
         if remove_axis:
@@ -299,69 +301,6 @@ class Result_Handler(
 
         # Save or show the plot
         
-    
-    # def make_plot(self,model=None,add_info=False,add_critial=False,save='',remove_axis=False):
-    #     model = model or self.current_best_n_model
-    #     if model not in self.models:
-    #         raise ModelNotFoundError(model, self.models)
-    #     model_dic = self.lensmodel_system[model]
-    #     ra_imput =model_dic['final_step']['images']['ra_imput']
-    #     dec_imput =model_dic['final_step']['images']['dec_imput']
-
-    #     ra_output =model_dic['final_step']['images']['ra_output']
-    #     dec_output = model_dic['final_step']['images']['dec_output']
-    #     ra_lens_model,dec_lens_model = [],[]
-    #     ra_lens_in,dec_lens_in = [],[]
-    #     for i,key in enumerate(model_dic['final_step']['LENS PARMS'].keys()):
-    #         ra_lens_model.append(model_dic['final_step']['LENS PARMS'][key]['p[1]'])
-    #         dec_lens_model.append(model_dic['final_step']['LENS PARMS'][key]['p[2]'])#, model_dic['final_step']['LENS PARMS']['alpha1']['p[2]']
-    #         ra_lens_in.append( model_dic["model_setup"]["model_setup"]['lens_ra'][i]),dec_lens_in.append( model_dic["model_setup"]["model_setup"]['lens_dec'][i])
-    #     #ra_lens_in,dec_lens_in = model_dic["model_setup"]["model_setup"]['lens_ra'][0],model_dic["model_setup"]["model_setup"]['lens_dec'][0]
-
-    #     fig, axes = plt.subplots(1, 1, figsize=(20, 10))
-    #     axes.scatter(ra_imput,dec_imput,label="input coordinates",facecolors='none', edgecolors='blue')
-    #     axes.scatter(ra_output,dec_output,label="output coordinates",color="g",alpha=0.7)
-    #     axes.scatter(ra_lens_model,dec_lens_model,label="output coordinates lens",color="k",alpha=0.7)
-    #     axes.scatter(ra_lens_in,dec_lens_in,label="input coordinates lens",facecolors='none', edgecolors='red')
-    #     #print(component)
-    #     [axes.text(ra_imput[i],dec_imput[i],v,fontsize=40,alpha=0.8,horizontalalignment="right") for i,v in enumerate(model_dic["model_setup"]['model_setup']['component'])]
-        
-    #     if add_critial:
-    #         x = model_dic["critical_caustic"]["critical_caustic"]["x"]
-    #         u = model_dic["critical_caustic"]["critical_caustic"]["u"]
-    #         v = model_dic["critical_caustic"]["critical_caustic"]["v"]
-    #         y = model_dic["critical_caustic"]["critical_caustic"]["y"]
-    #         step = np.argmax(np.sqrt(np.diff(x)**2+np.diff(y)**2))
-    #         axes.plot(x[:step+1],y[:step+1],label="critical curves",alpha=0.5)
-    #         axes.plot(u[:step+1],v[:step+1],label="caustic curves",alpha=0.5)
-    #     if add_info:
-    #         stats=self.pandas_model_stats[self.pandas_model_stats.model_name==model]
-    #         axes.text(axes.get_xlim()[0]-axes.get_xlim()[1]*0.2,axes.get_ylim()[0]+axes.get_ylim()[1]*0.11,rf"Mass distribution:{stats.mass_distribution.values[0]}"+"\n"+rf"$max(\Delta images) = {stats['max(delta_images)'].values[0]:.3f}$"+"\n"+fr"$\chi^2 (total) = {stats['chis2_tot'].values[0]}$",fontsize=20)
-    #     axes.set_ylabel(r"$\Delta \delta \quad [\mathrm{arcsec}]$")
-    #     axes.set_xlabel(r"$\Delta \alpha \quad [\mathrm{arcsec}]$")
-    #     axes.invert_xaxis()
-    #     axes.legend(loc="upper left", bbox_to_anchor=(1.05, 0.75), borderaxespad=0)  # Legend outside
-    #     plt.tight_layout(rect=[0, 0, 0.85, 1])  # Adjust layout to make room for the legend
-    #     if remove_axis:
-    #         for spine in axes.spines.values():
-    #             spine.set_visible(False)
-
-    #         # Remove ticks
-    #         axes.set_xticks([])
-    #         axes.set_yticks([])
-
-    #         # Optionally remove tick labels
-    #         axes.set_xticklabels([])
-    #         axes.set_yticklabels([])
-        
-    #     if save:
-    #         plt.savefig(f"{save}.jpg")
-    #         plt.close()
-    #     else:
-    #         plt.show()
-    
-    
-    
     
     #return model_dic 
     
