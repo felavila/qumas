@@ -5,6 +5,8 @@ import warnings
 import json
 import matplotlib.pyplot as plt 
 from copy import deepcopy
+import sys 
+from pathlib import Path
 
 from scipy.integrate import quad
 from matplotlib.widgets import Button,RangeSlider,Slider
@@ -49,7 +51,6 @@ def build_limits(spectra_dict, row):
     center_window = float(np.mean(row["core_range"].values[0]))
     window = [center_window - 500.0, center_window + 500.0]
 
-    # Band wavelength limits from spectra_dict
     band_limits = {
         band: np.array(spectra_dict[band]["wavelength"])[0][[0, -1]]
         for band in spectra_dict.keys()
@@ -59,9 +60,6 @@ def build_limits(spectra_dict, row):
     left_window_init  = list(row["left_range"].values[0])
     core_init         = list(row["core_range"].values[0])
 
-    # ------------------------------------------------------------------
-    # Choose best band (as you had)
-    # ------------------------------------------------------------------
     wl, wr = float(min(window)), float(max(window))
     w_center = 0.5 * (wl + wr)
 
@@ -146,23 +144,44 @@ def build_limits(spectra_dict, row):
         "band": band,
         "line_name": line_name,
     }
-        
+
+class ListCursor:
+    def __init__(self, items):
+        self.items = list(items)
+        self.i = 0  # cursor starts "before" the first item
+
+    def next(self):
+        if self.i + 1 >= len(self.items):
+            raise StopIteration("Already at the end.")
+        self.i += 1
+        return self.items[self.i]
+
+    def prev(self):
+        if self.i - 1 < 0:
+            raise StopIteration("Already at the beginning.")
+        self.i -= 1
+        return self.items[self.i]
+
+    def current(self):
+        if not (0 <= self.i < len(self.items)):
+            return None
+        return self.items[self.i]
+# calculate default limits -> if already save values replace the default for the new ones -> what happend when it is require added new lines?
+
 class WindowAnalysis:
-    def __init__(self,results,zs=0.0,rest_frame=True,save_name = None,obj_name=None,path_previous_results=None):
+    
+    def __init__(self,spectral_dictionary,zs=0.0,rest_frame=True,path_previous_results=None,obj_name=None,add_lines=None):
         """_summary_
 
         Args:
-            results (_type_): _description_
+            spectral_dictionary (_type_): dictionary with images etc etc
             zs (_type_, optional): _description_. Defaults to None.
             rest_frame (bool, optional): _description_. Defaults to True.
         """
         assert isinstance(zs,float) or isinstance(zs,int) , "zs have to be float or int"
         self.zs = zs
-        self.save_name = save_name
-        #self._previous_results =  self._read_previous_results(path_previous_results)
-        
-        if not self.save_name:
-            self.save_name = "flux_cont_core.csv"
+        # if not self.save_name:
+        #     self.save_name = "flux_cont_core.csv"
         if self.zs == 0:
             print("Warning: zs set to default value 0.0.")
         self.pre_define_windows = convert_none_to_nan(windows_rest_frame)
@@ -170,13 +189,16 @@ class WindowAnalysis:
             for i in [ "left_range","right_range","core_range"]:
                 self.pre_define_windows[i] = (np.array(self.pre_define_windows[i])*(1+self.zs)).tolist()
         self.pre_define_windows = pd.DataFrame(self.pre_define_windows)
-        if isinstance(results,str):
+        if isinstance(add_lines,dict):
+            add_lines = pd.DataFrame([add_lines])
+            self.pre_define_windows = pd.concat([self.pre_define_windows, add_lines], ignore_index=True)
+        if isinstance(spectral_dictionary,str):
             print("WORK IN PROGRESS")
-        elif isinstance(results,dict):
-            results = deepcopy(results)
+        elif isinstance(spectral_dictionary,dict):
+            spectral_dictionary = deepcopy(spectral_dictionary)
             band_list = []
             self.spectra_dict = {}
-            for obj,value in results.items():
+            for obj,value in spectral_dictionary.items():
                 if "G" in obj:
                     print("We will discard the spectra's galaxy ")
                     continue
@@ -195,23 +217,36 @@ class WindowAnalysis:
                 self.spectra_dict[band]["error"].append(value.get("error",np.zeros_like(flux)))
                 self.spectra_dict[band]["obj"].append(obj)
                 
-            self.kwargs_h ={}
-
+        #self.default_limits ={}
+        self.default_limits = {}
         self.band_limits = {band: np.array(self.spectra_dict[band]["wavelength"])[0][[0,-1]] for band in self.spectra_dict.keys()}
         
-        for number,line_name in enumerate(self.pre_define_windows["line_name"].values):
+        self.line_names = []
+        for _,line_name in enumerate(self.pre_define_windows["line_name"].values):
             row = self.pre_define_windows[self.pre_define_windows["line_name"]==line_name]
-            self.kwargs_h[number] = build_limits(self.spectra_dict,row)
-
+            self.default_limits[line_name] = build_limits(self.spectra_dict,row)
+            self.line_names.append(line_name)
+                
+        self.saved_parameters = None 
+        if isinstance(path_previous_results,str):
+            self.load_pickle(path_previous_results)
     
+    def _add_lines(self,add_lines):
+        if isinstance(add_lines,dict):
+            add_lines = pd.DataFrame([add_lines])
+            self.pre_define_windows = pd.concat([self.pre_define_windows, add_lines], ignore_index=True)
+        else:
+            print("add_lines, can only be a dictionary line with keys line_name,left_range,right_range,core_range, as list" )
     
-    def _interactive_microlensing(self,n_bootstrap=5_000,random_state=0,figsize= (15, 5)):
+    def _interactive_microlensing(self,selected_lines=None,use_save_limits=False,n_bootstrap=5_000,random_state=0,figsize= (15, 5)):
         _close_existing_figures()
         output = widgets.Output()
-        n_max = len(self.kwargs_h.keys())
-        current_index = [0]
-        
-        # Initialize as class attribute if it doesn't exist
+        n_max = len(self.default_limits.keys())
+        it = ListCursor(self.line_names)
+        if isinstance(selected_lines,list):
+            it = ListCursor(selected_lines)
+            n_max = len(it.items)
+
         if not hasattr(self, 'saved_parameters'):
             self.saved_parameters = {}
         
@@ -226,7 +261,8 @@ class WindowAnalysis:
                 left_window = left_window.value
             if right_window:
                 right_window = right_window.value
-            
+            if not self.saved_parameters:
+                self.saved_parameters = {}
             self.saved_parameters[index] = {'line_name': line_name,'band': band,'objects': objs,
                 'left_window':left_window ,'right_window': right_window,'line_core': slider_line_core.value,
                 'xlim_left': slider_xlim_left.value,'ylim_left': slider_ylim_left.value,'xlim_right': slider_xlim_right.value,'ylim_right': slider_ylim_right.value,}
@@ -237,10 +273,10 @@ class WindowAnalysis:
                 _numerics = _compute_metrics_for_image_continuum(X,Y,slider_line_core.value,n_bootstrap=n_bootstrap,random_state=random_state)
             
             self.saved_parameters[index].update(_numerics)
-            # Also update the kwargs_h with current values
-            self.kwargs_h[index]['right_window_init'] = right_window
-            self.kwargs_h[index]['left_window_init'] = left_window
-            self.kwargs_h[index]['core_init'] = slider_line_core.value
+            # Also update the default_limits with current values <-
+            self.default_limits[index]['right_window_init'] = right_window
+            self.default_limits[index]['left_window_init'] = left_window
+            self.default_limits[index]['core_init'] = slider_line_core.value
             
             #return self.saved_parameters[index]
         
@@ -298,12 +334,19 @@ class WindowAnalysis:
             #return filename
        
         def show_plot(index):
-            # Check if routine should stop
+            "the actual function index -> can be a number maybe the best option is save it as line a rewritte it"
             if stop_routine[0]:
                 print("Routine stopped by user.")
                 return
             
-            X, Y_original, objs, center_window, right_window_init, left_window_init, core_init, band, line_name  = self.kwargs_h[index].values()
+            d = self.default_limits[index]
+            #print(d.keys())
+            X, Y_original, objs, center_window, right_window_init, left_window_init, core_init, band, line_name = (d["X"], d["Y"], d["objs"],
+                                                                                                                   d["center_window"],d["right_window_init"], 
+                                                                                                                   d["left_window_init"],d["core_init"], d["band"], 
+                                                                                                                   d["line_name"])
+            #print(type(center_window))
+            #print(Y_original)
            
             
             with output:
@@ -323,7 +366,8 @@ class WindowAnalysis:
                 Rightplot.axis["left"].label.set_visible(False)
                 ##############set-up-basic-plot##############
                 Y_factor = int(np.log10(np.nanmedian(Y_original)))
-                Y = Y_original*10**-Y_factor
+                Y = Y_original*10**(-Y_factor)
+                
                 lines_left = []
                 if Y.ndim == 2:
                     for n, (x, y) in enumerate(zip(X, Y)):
@@ -457,8 +501,6 @@ class WindowAnalysis:
                 
                 def update_plot(change):
                     
-                   
-                    
                     if fill_objects['line_core_left'] is not None:
                         fill_objects['line_core_left'].remove()
                     if fill_objects['center_core_window_left'] is not None:
@@ -571,31 +613,21 @@ class WindowAnalysis:
                     save_parameters(index, slider_left_window, slider_right_window, 
                                              slider_line_core, slider_xlim_left, slider_ylim_left,
                                              slider_xlim_right, slider_ylim_right, line_name, band, objs,X,Y_original,n_bootstrap=n_bootstrap,random_state=random_state)
-                    status_label.value = f"✓ Saved parameters for {line_name} (Plot {index+1}/{n_max})"
+                    status_label.value = f"✓ Saved parameters for {line_name} (Plot {it.i+1}/{n_max})"
                     
                 def on_previous_clicked(b):
                     plt.close(fig)
-                    if current_index[0] > 0:
-                        current_index[0] -= 1
-                        show_plot(current_index[0])
-                    else:
-                        print("Already at first plot!")
-                
+                    show_plot(it.prev())
+                 
                 def on_next_clicked(b):
-                   
                     plt.close(fig)
-                    current_index[0] += 1
-                    if current_index[0] < n_max:
-                        show_plot(current_index[0])
-                    else:
-                        print("All plots completed!")
-                        print(f"\nTotal saved parameters: {len(self.saved_parameters)}/{n_max}")
+                    show_plot(it.next())
                 
                 def on_stop_clicked(b):
                     stop_routine[0] = True
                     plt.close(fig)
                     print(f"\n{'='*60}")
-                    print(f"Routine stopped at plot {index+1}/{n_max}")
+                    print(f"Routine stopped at plot {it.i+1}/{n_max}")
                     print(f"Saved parameters for {len(self.saved_parameters)} plot(s)")
                     print(f"{'='*60}")
                     
@@ -636,7 +668,7 @@ class WindowAnalysis:
                     layout=widgets.Layout(width='120px', height='35px'))
                 
                 next_button = widgets.Button(
-                    description="Next" if index < n_max - 1 else "Finish",
+                    description="Next" if it.i < n_max - 1 else "Finish",
                     button_style='success',
                     icon='arrow-right',
                     layout=widgets.Layout(width='120px', height='35px'))
@@ -667,9 +699,9 @@ class WindowAnalysis:
                 export_csv_button.on_click(on_export_csv_clicked)
                 export_pickle_button.on_click(on_export_pickle_clicked)
                 
-                print(f"Plot {index+1}/{n_max} - {line_name}")
-                if index in self.saved_parameters:
-                    print("  (Previously saved parameters loaded)")
+                print(f"Plot {it.i+1}/{n_max} - {line_name}")
+                if self.saved_parameters and index in self.saved_parameters:
+                    print(" (Previously saved parameters loaded)")
             
             # CHANGED ORDER: Plot output first, then sliders below
             # First display the plot
@@ -721,6 +753,87 @@ class WindowAnalysis:
                 ], layout=widgets.Layout(width='100%', padding='20px')))
                 
         display(output)
-        show_plot(0)
+        show_plot(it.current()) #the first call ? 
+    
+    
+    
+    
+    
+    
+    
+    def _save(self):
+        """
+        Internal: assemble a dict of object state for pickling.
+
+        Returns
+        -------
+        dict
+            Keys/values for spectra, results, and metadata.
+        """
+        if not self.saved_parameters:
+            print("No parameters to export!")
+            return None
+
+        dic_ = self.saved_parameters
+
+        estimated_size = sys.getsizeof(pickle.dumps(dic_))
+        print(f"Estimated pickle size: {estimated_size / 1024:.2f} KB")
+
+        return dic_
+    
+    def save_pickle(self, filename):
+        """
+        Save ``self.saved_parameters`` to a pickle file.
+
+        Parameters
+        ----------
+        filename : str or pathlib.Path
+            Output pickle file name.
+        """
+        data = self._save()
+        if data is None:
+            return
+
+        filename = Path(filename)
+        if filename.suffix != ".pkl":
+            filename = filename.with_suffix(".pkl")
+
+        with open(filename, "wb") as f:
+            pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
+
+        print(f"Saved results to: {filename}")
         
- 
+        
+    def load_pickle(self, filename):
+        """
+        Load results from a pickle file and store them in ``self.saved_parameters``.
+
+        Parameters
+        ----------
+        filename : str or pathlib.Path
+            Input pickle file.
+        """
+        filename = Path(filename)
+
+        if not filename.exists():
+            raise FileNotFoundError(f"Pickle file not found: {filename}")
+
+        with open(filename, "rb") as f:
+            self.saved_parameters = pickle.load(f)
+            for index,_ in self.saved_parameters.items():
+                if index not in self.default_limits:
+                    print(f"{index} is not part of the default_limits but will be added from the saves" )
+                    self.default_limits[index]= self.saved_parameters[index]
+                    #print(self.default_limits[index]["line_core"])
+                    band = self.default_limits[index]["band"]
+                    #print(self.spectra_dict[band].keys())
+                    self.default_limits[index]["X"] = np.array(self.spectra_dict[band]["wavelength"])
+                    self.default_limits[index]["Y"] = np.array(self.spectra_dict[band]["flux"]) #<-
+                    self.default_limits[index]["objs"] = self.spectra_dict[band]["obj"]
+                    self.default_limits[index]["center_window"] = float(np.mean(self.default_limits[index]["line_core"])) #
+                
+                self.default_limits[index]['right_window_init'] = self.saved_parameters[index]['right_window']
+                self.default_limits[index]['left_window_init'] = self.saved_parameters[index]['left_window']
+                self.default_limits[index]['core_init'] = self.saved_parameters[index]['line_core']
+        
+        print(f"Loaded results from: {filename}")
