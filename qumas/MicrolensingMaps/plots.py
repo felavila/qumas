@@ -9,7 +9,7 @@ from matplotlib.patches import Polygon, Rectangle, ConnectionPatch
 from qumas.MicrolensingMaps.micro_maps_tracks_func import _sample_profile_along_line_pixels,_sample_profile_along_line_bilinear_pixels
 
 
-def map_plot(mag_map_2d, cmap='RdYlBu', vmin=-1.5, vmax=0.5,
+def map_plot(mag_map_2d, cmap='RdYlBu', vmin=None, vmax=None,
             cbar_side="right",
             remove_labels=True,
             cbar_label=r"$-2.5 \, \log(\mu/\langle \mu \rangle)$",
@@ -59,48 +59,58 @@ def map_plot(mag_map_2d, cmap='RdYlBu', vmin=-1.5, vmax=0.5,
 
 
 
-def map_pmf_plot(mag_map,label="",label_color_bar =r"$-2.5 \, \log(\mu/\langle \mu \rangle)$", vmin=-1.5, vmax=0.5,text_right_plot="Right plot",bins_limit=3,
-            num_bins=100,cmap='RdYlBu',**kwargs):
-    #rf"{name} {component} $\ast$ {factor} rs $\alpha = {alpha.split('_')[1]}$ mean={mean:.3f}"
-    name_file       = kwargs.get("name_file", None)
+def map_pmf_plot(mag_map,label="",label_color_bar=r"$-2.5 \, \log(\mu/\langle \mu \rangle)$",vmin=None,vmax=None,
+    text_right_plot="Right plot",bins_limit=3,num_bins=100, cmap="RdYlBu",add_expected_pmf=True,add_mean=True,**kwargs,):
+    name_file = kwargs.get("name_file", None)
+
+    cbar_size = kwargs.get("cbar_size", "6%")  # width of the colorbar relative to axes bbox
+    cbar_pad  = kwargs.get("cbar_pad", 0.25)   # gap between axes and colorbar, in inches
+
     fig, (ax2, ax1) = plt.subplots(1, 2, figsize=(27, 10))
+    fig.subplots_adjust(wspace=0.02)
+    
     bins = np.linspace(-bins_limit, bins_limit, num_bins + 1)
     counts, bin_edges = np.histogram(mag_map.ravel(), bins=bins)
     pmf = counts / counts.sum()
-    pmf_plos = np.r_[pmf, pmf[-1]]
-    mean_p = np.sum(bin_edges * pmf_plos)
-    bin_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
-    expected_pmf = sum(pmf * bin_centers)
+
+    pmf_plot = np.r_[pmf, pmf[-1]]
+    mean_p = np.sum(bin_edges * pmf_plot)
+
+    bin_centers = 0.5 * (bin_edges[:-1] + bin_edges[1:])
+    expected_pmf = np.sum(pmf * bin_centers)
     
-    im1 = ax1.step(bin_edges,pmf_plos, alpha=0.7, linestyle="-", label=label,c="C0")
-    ax1.axvline(expected_pmf,c="k",ls="--",label="Expected PMF")
-    ax1.axvline(mean_p,c="r",ls="--",label="Mean")
-    
-    ax1.legend(loc="best", fontsize=12)
-    ax1.legend(loc="best", fontsize=12)
+    ax1.step(bin_edges, pmf_plot, alpha=0.7, linestyle="-", label=label, c="k",lw=4)
+    if add_expected_pmf:
+        ax1.axvline(expected_pmf, c="k", ls="--", label="Expected PMF")
+    if add_mean:
+        ax1.axvline(mean_p, c="r", ls="--", label="Mean")
     ax1.set_xlabel(r"$-2.5 \, \log(\mu/\langle \mu \rangle)$", fontsize=30)
-    ax1.set_ylabel('Density(PMF)', fontsize=30)
-    
-    ax1.tick_params(axis='both', which='major', labelsize=20)
-    ax1.set_xlim(-bins_limit,bins_limit)
-    
-    im2 = ax2.imshow(mag_map, cmap=cmap,extent=[-2, 2, -2, 2], vmin=vmin, vmax=vmax)
+    ax1.set_ylabel("dP", fontsize=30)
+    ax1.tick_params(axis="both", which="major", labelsize=30)
+    ax1.set_xlim(-bins_limit, bins_limit)
+    ax1.yaxis.tick_right()
+    ax1.yaxis.set_label_position("right")
+    #
+    #ax1.legend(loc="best", fontsize=12)
+    ###Map###
+    im2 = ax2.imshow(mag_map, cmap=cmap,extent=[-2, 2, -2, 2], vmin=vmin,vmax=vmax,)
+
     ax2.set_xticks([])
     ax2.set_yticks([])
-    ax2.text(0.05, 0.95, text_right_plot, transform=ax2.transAxes, fontsize=30, fontweight='bold', va='top', ha='left',bbox=dict(facecolor='white', edgecolor='none', alpha=0.8))
-    # Create a colorbar for the mirrored plot (positioned on the left side)
-    cbar2 = fig.colorbar(im2, ax=ax2, fraction=0.046, pad=0.04)
-    cbar2.ax.tick_params(labelsize=30)
-    cbar2.ax.set_position([ax2.get_position().x0-0.1*ax2.get_position().x0, 0.15, 0.02,  0.73]) 
-    cbar2.ax.yaxis.set_ticks_position('left')
-    cbar2.ax.yaxis.set_label_position('left')
-    cbar2.set_label(label_color_bar, fontsize=30, labelpad=20)
-    trixy = np.array([[0, 0], [1, 0], [0.5, -0.05]])
-    bluest_color = im2.cmap(im2.norm(vmin))
-    patch2 = Polygon(trixy, transform=cbar2.ax.transAxes, clip_on=False,edgecolor='k', linewidth=0.7, facecolor=bluest_color,zorder=4, snap=True)
-    cbar2.ax.add_patch(patch2)
+    ax2.text(0.05,0.95, text_right_plot, transform=ax2.transAxes,fontsize=30, fontweight="bold",va="top",ha="left",bbox=dict(facecolor="white", edgecolor="none", alpha=0.8),)
+
+
+    div1 = make_axes_locatable(ax2)
+    cax1 = div1.append_axes("left", size=cbar_size, pad=cbar_pad)
+    cbar1 = fig.colorbar(im2, cax=cax1, extend="min", orientation="vertical")
+    cbar1.ax.tick_params(labelsize=30)
+    cbar1.set_label(label_color_bar, fontsize=30)
+    cbar1.ax.yaxis.set_ticks_position("left")
+    cbar1.ax.yaxis.set_label_position("left")
+    
     if name_file:
-        plt.savefig(f"{name_file}.pdf", bbox_inches='tight')
+        plt.savefig(f"{name_file}.pdf", bbox_inches="tight")
+
     plt.show()
 
 
@@ -458,6 +468,7 @@ class CompareMapsPMF:
         text_left_plot  = kwargs.get("text_left_plot",  "Left map")
         text_right_plot = kwargs.get("text_right_plot", "Right map")
         name_file       = kwargs.get("save", None)
+        print(name_file)
         cbar_size       = kwargs.get("cbar_size", "6%")
         cbar_pad        = kwargs.get("cbar_pad", 0.25)
 

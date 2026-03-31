@@ -332,7 +332,7 @@ class WindowAnalysis:
                 pickle.dump(self.saved_parameters, f)
             print(f"Parameters exported to: {filename}")
             #return filename
-       
+
         def show_plot(index):
             "the actual function index -> can be a number maybe the best option is save it as line a rewritte it"
             if stop_routine[0]:

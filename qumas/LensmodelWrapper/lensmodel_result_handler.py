@@ -139,7 +139,7 @@ class Result_Handler(
         return pd.DataFrame(pandas_stats,columns=relevant_keys+["max(delta_images)",'median_demag','std_demag'])
     
     def make_plot(self, model=None, add_info=False, add_critical=False, save='',remove_axis=False, x_zoom_list=None, y_zoom_list=None, zoom_size=0.2
-                  , zoom_positions=None,add_legend=True):
+                  , zoom_positions=None,add_legend=True,add_source=False,legend_loc = "best",nlim=None):
         """
         Creates a scatter plot with optional zoomed inset subplots.
 
@@ -193,6 +193,12 @@ class Result_Handler(
             ax[0].text(ra_imput[i], dec_imput[i], v, fontsize=40, alpha=0.8, horizontalalignment="right")
 
         # Add critical curves if requested
+        if add_source:
+            lst =  model_dic['final_step']["Source"]['posn'].split(" ")
+            xs, ys = [float(S) for S in lst if S.strip() != '']
+            ax[0].scatter(xs, ys, label="Source position", facecolors='#E69F00', edgecolors='#E69F00',s=200,linewidths=3,zorder=100,marker="*")
+            #ax[0].scatter()
+        
         if add_critical:
             critical = model_dic["critical_caustic"]["critical_caustic"]
             x = critical["x"]
@@ -220,11 +226,12 @@ class Result_Handler(
 
         ax[0].set_ylabel(r"$\Delta \delta \quad [\mathrm{arcsec}]$", fontsize=35)
         ax[0].set_xlabel(r"$\Delta \alpha \quad [\mathrm{arcsec}]$", fontsize=35)
-        #ax[0].set_xlim(-6,6)
-        #ax[0].set_ylim(-6,6)
+        if nlim:
+            ax[0].set_xlim(-nlim,nlim)
+            ax[0].set_ylim(-nlim,nlim)
         ax[0].invert_xaxis()
         if add_legend:
-            ax[0].legend(loc="best",fontsize=25,ncol=1)#, bbox_to_anchor=(1.05, 0.75), borderaxespad=0)  # Legend outside
+            ax[0].legend(loc=legend_loc,fontsize=25,ncol=1)#, bbox_to_anchor=(1.05, 0.75), borderaxespad=0)  # Legend outside
         ax[0].tick_params(axis='both', labelsize=35, pad=10)
         # Remove axes if requested
         if remove_axis:
