@@ -53,7 +53,7 @@ def map_plot(mag_map_2d, cmap='RdYlBu', vmin=None, vmax=None,
         ax.tick_params(axis='both', which='major', labelsize=10)
 
     if save:
-        plt.savefig(f"{save}.jpg", bbox_inches='tight')
+        plt.savefig(f"{save}.pdf", bbox_inches='tight')
 
     #plt.show()
 

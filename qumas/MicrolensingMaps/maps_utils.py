@@ -48,9 +48,8 @@ def map2d_to_stats(map_2d,pix,rs_lday,num_bins=100,bins_limit = 3,rs_times = 1,f
         _type_: _description_
     """
     map_2d_norm = map_2d/np.mean(map_2d)
-    mag_map_2d_norm = -2.5*np.log10(map_2d_norm)
-    #print(factor_scale_to_sigma*rs_lday*rs_times/pix)
-    mag_map_2d_norm_conv = gaussian_filter(mag_map_2d_norm, [factor_scale_to_sigma*rs_lday*rs_times/pix,factor_scale_to_sigma*rs_lday*rs_times/pix],mode='mirror')
+    mag_map_2d_norm_conv = gaussian_filter(map_2d_norm, [factor_scale_to_sigma*rs_lday*rs_times/pix,factor_scale_to_sigma*rs_lday*rs_times/pix],mode='mirror')
+    mag_map_2d_norm_conv = -2.5*np.log10(mag_map_2d_norm_conv)
     bins = np.linspace(-bins_limit, bins_limit, num_bins + 1)
     counts, bin_edges = np.histogram(mag_map_2d_norm_conv.ravel(), bins=bins)
     pmf = counts / counts.sum()
