@@ -322,116 +322,177 @@ def compare_maps_pmf(
     label_color_bar=r"$-2.5 \, \log(\mu/\langle \mu \rangle)$",
     bins_limit=3, num_bins=100,
     cmap="RdYlBu",
-    plot_sep=0.2,
+    plot_sep=0.15,
     **kwargs
 ):
     """
     Compare two magnification maps side by side with their Probability Mass Functions (PMF).
-
-    Parameters
-    ----------
-    mag_map_left, mag_map_right : 2D arrays
-        Magnification maps to compare.
-
-    vmin, vmax : float, optional
-        Color scale limits for both maps. Defaults are -1.5 and 0.5.
-
-    label_color_bar : str, optional
-        Label for the colorbars.
-
-    bins_limit : float, optional
-        Range for PMF histogram edges (in log μ). Default = 3.
-
-    num_bins : int, optional
-        Number of histogram bins for PMF calculation. Default = 100.
-
-    cmap : str, optional
-        Colormap to use for the images. Default = 'RdYlBu'.
-
-    plot_sep : float, optional
-        Horizontal separation between panels (same as wspace in subplots_adjust).
-
-    Other Parameters
-    ----------------
-    text_left_plot, text_right_plot : str, optional
-        Titles for each map panel.
-
-    cbar_size, cbar_pad : str or float, optional
-        Size and padding of the colorbars (used in make_axes_locatable).
-
-    save : str, optional
-        If provided, saves the figure to this path (with .pdf extension if not included).
+    The three main panels are forced to have the same size.
     """
+
     text_left_plot  = kwargs.get("text_left_plot",  "Left plot")
     text_right_plot = kwargs.get("text_right_plot", "Right plot")
     name_file       = kwargs.get("save", None)
-    cbar_size       = kwargs.get("cbar_size", "6%")
-    cbar_pad        = kwargs.get("cbar_pad", 0.25)
 
-    # --- Create figure: 3 panels of equal width ---
+    cbar_width      = kwargs.get("cbar_width", "4%")
+    cbar_height     = kwargs.get("cbar_height", "100%")
+    cbar_pad_left   = kwargs.get("cbar_pad_left", -0.12)
+    cbar_pad_right  = kwargs.get("cbar_pad_right", 1.08)
+
+    label_size      = kwargs.get("label_size", 28)
+    tick_size       = kwargs.get("tick_size", 22)
+    text_size       = kwargs.get("text_size", 30)
+    legend_size     = kwargs.get("legend_size", 20)
+
+    extent = kwargs.get("extent", [-2, 2, -2, 2])
+
+    # ------------------------------------------------------------
+    # Figure with 3 main panels of equal width
+    # ------------------------------------------------------------
     fig, (ax1, ax3, ax2) = plt.subplots(
-        1, 3, figsize=(30, 10),
-        gridspec_kw={'width_ratios': [1, 1, 1]}
+        1, 3,
+        figsize=(27, 9),
+        gridspec_kw={"width_ratios": [1, 1, 1]},
+        constrained_layout=False
     )
+
     plt.subplots_adjust(wspace=plot_sep)
 
-    # --- Left map ---
-    im1 = ax1.imshow(mag_map_left, cmap=cmap, extent=[-2, 2, -2, 2],
-                     vmin=vmin, vmax=vmax)
-    vmin_locked, vmax_locked = im1.get_clim()
-    ax1.set_xticks([]); ax1.set_yticks([])
-    ax1.text(0.05, 0.95, text_left_plot, transform=ax1.transAxes,
-             fontsize=30, fontweight='bold', va='top', ha='left',
-             bbox=dict(facecolor='white', edgecolor='none', alpha=0.8))
+    # Force all main panels to have the same box size
+    for ax in [ax1, ax3, ax2]:
+        ax.set_box_aspect(1)
 
-    div1 = make_axes_locatable(ax1)
-    cax1 = div1.append_axes("left", size=cbar_size, pad=cbar_pad)
+    # ------------------------------------------------------------
+    # Left map
+    # ------------------------------------------------------------
+    im1 = ax1.imshow(
+        mag_map_left,
+        cmap=cmap,
+        extent=extent,
+        vmin=vmin,
+        vmax=vmax,
+        origin="lower"
+    )
+
+    vmin_locked, vmax_locked = im1.get_clim()
+
+    ax1.set_xticks([])
+    ax1.set_yticks([])
+
+    ax1.text(
+        0.05, 0.95, text_left_plot,
+        transform=ax1.transAxes,
+        fontsize=text_size,
+        fontweight="bold",
+        va="top",
+        ha="left",
+        bbox=dict(facecolor="white", edgecolor="none", alpha=0.8)
+    )
+
+    # Colorbar as inset axis, so it does not change ax1 size
+    cax1 = inset_axes(
+        ax1,
+        width=cbar_width,
+        height=cbar_height,
+        loc="center left",
+        bbox_to_anchor=(cbar_pad_left, 0.0, 1, 1),
+        bbox_transform=ax1.transAxes,
+        borderpad=0
+    )
+
     cbar1 = fig.colorbar(im1, cax=cax1, extend="min", orientation="vertical")
-    cbar1.ax.tick_params(labelsize=25)
-    cbar1.set_label(label_color_bar, fontsize=28)
+    cbar1.ax.tick_params(labelsize=tick_size)
+    cbar1.set_label(label_color_bar, fontsize=label_size)
     cbar1.ax.yaxis.set_ticks_position("left")
     cbar1.ax.yaxis.set_label_position("left")
 
-    # --- Right map ---
-    im2 = ax2.imshow(mag_map_right, cmap=cmap, extent=[-2, 2, -2, 2],
-                     vmin=vmin_locked, vmax=vmax_locked)
-    ax2.set_xticks([]); ax2.set_yticks([])
-    ax2.text(0.05, 0.95, text_right_plot, transform=ax2.transAxes,
-             fontsize=30, fontweight='bold', va='top', ha='left',
-             bbox=dict(facecolor='white', edgecolor='none', alpha=0.8))
+    # ------------------------------------------------------------
+    # Right map
+    # ------------------------------------------------------------
+    im2 = ax2.imshow(
+        mag_map_right,
+        cmap=cmap,
+        extent=extent,
+        vmin=vmin_locked,
+        vmax=vmax_locked,
+        origin="lower"
+    )
 
-    div2 = make_axes_locatable(ax2)
-    cax2 = div2.append_axes("right", size=cbar_size, pad=cbar_pad)
+    ax2.set_xticks([])
+    ax2.set_yticks([])
+
+    ax2.text(
+        0.05, 0.95, text_right_plot,
+        transform=ax2.transAxes,
+        fontsize=text_size,
+        fontweight="bold",
+        va="top",
+        ha="left",
+        bbox=dict(facecolor="white", edgecolor="none", alpha=0.8)
+    )
+
+    # Colorbar as inset axis, so it does not change ax2 size
+    cax2 = inset_axes(
+        ax2,
+        width=cbar_width,
+        height=cbar_height,
+        loc="center left",
+        bbox_to_anchor=(cbar_pad_right, 0.0, 1, 1),
+        bbox_transform=ax2.transAxes,
+        borderpad=0
+    )
+
     cbar2 = fig.colorbar(im2, cax=cax2, extend="min", orientation="vertical")
-    cbar2.ax.tick_params(labelsize=25)
-    cbar2.set_label(label_color_bar, fontsize=28)
+    cbar2.ax.tick_params(labelsize=tick_size)
+    cbar2.set_label(label_color_bar, fontsize=label_size)
     cbar2.ax.yaxis.set_ticks_position("right")
     cbar2.ax.yaxis.set_label_position("right")
 
-    # --- Middle PMF (equal width to maps) ---
+    # ------------------------------------------------------------
+    # Middle PMF
+    # ------------------------------------------------------------
+    bins = np.linspace(-bins_limit, bins_limit, num_bins + 1)
+    bin_centers = 0.5 * (bins[:-1] + bins[1:])
+
     for label, data, color in zip(
         [text_left_plot, text_right_plot],
         [mag_map_left, mag_map_right],
         ["C0", "C1"]
     ):
-        bins = np.linspace(-bins_limit, bins_limit, num_bins + 1)
-        counts, _ = np.histogram(data.ravel(), bins=bins)
-        pmf = counts / counts.sum()
-        bin_centers = 0.5 * (bins[:-1] + bins[1:])
-        ax3.step(bin_centers, pmf, where='mid', lw=3,
-                 alpha=0.9, label=f"PMF ({label})", color=color)
+        values = np.asarray(data).ravel()
+        values = values[np.isfinite(values)]
 
-    ax3.legend(loc="best", fontsize=22)
-    ax3.set_xlabel(r"$-2.5 \, \log(\mu/\langle \mu \rangle)$", fontsize=30)
-    ax3.set_ylabel("Density (PMF)", fontsize=30)
-    ax3.tick_params(axis='both', which='major', labelsize=22)
+        counts, _ = np.histogram(values, bins=bins)
+
+        if counts.sum() > 0:
+            pmf = counts / counts.sum()
+        else:
+            pmf = np.zeros_like(counts, dtype=float)
+
+        ax3.step(
+            bin_centers,
+            pmf,
+            where="mid",
+            lw=3,
+            alpha=0.9,
+            label=f"PMF ({label})",
+            color=color
+        )
+
+    ax3.legend(loc="best", fontsize=legend_size)
+    ax3.set_xlabel(
+        r"$-2.5 \, \log(\mu/\langle \mu \rangle)$",
+        fontsize=label_size
+    )
+    ax3.set_ylabel("PMF", fontsize=label_size)
+    ax3.tick_params(axis="both", which="major", labelsize=tick_size)
     ax3.set_xlim(-bins_limit, bins_limit)
     ax3.grid(True, alpha=0.3)
 
-    # --- Optional save ---
+    # ------------------------------------------------------------
+    # Save or show
+    # ------------------------------------------------------------
     if name_file:
-        #if not name_file.endswith(".pdf"):
-         #   name_file += ".pdf"
         plt.savefig(name_file, bbox_inches="tight")
 
     plt.show()
