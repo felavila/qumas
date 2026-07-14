@@ -103,9 +103,7 @@ class lensmodel_handler:
         flux_error = relative_flux_error*np.abs(flux)
         if use_real_error_flux:
             flux_error = images[band_to_model.replace("band",'error')].values
-            #return print("Not define yet a formula for the propagation of the error in the flux")
-            #flux_error = image[2] #error propagation from flux
-        #print(flux)
+            #print(flux_error)
         astrometry_error = self.n_images*[astrometry_error]
         if use_real_astrometry_error:
             error_images_lens_centered = np.sqrt(images[["dRA","dDEC"]].values**2+lens[["dRA","dDEC"]].values[0]**2)

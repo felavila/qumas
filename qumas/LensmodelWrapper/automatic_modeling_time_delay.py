@@ -20,15 +20,14 @@ def set_up_dir(path_for_models,dir_models,system_name):
 # To do change all the save and reading to pickle
 
 def automatic_modeling(system,max_separation=0.01,path_for_models=None,dir_models=None,model_All=False,do_mcmc=False,max_lap=10,
-                    relative_flux_error=0.2,use_informed_flux=False,use_real_error_flux=False,do_model_of=None,time_delay=None,time_delay_error=None,**kwargs):
+                    relative_flux_error=0.2,use_informed_flux=False,use_real_error_flux=False,do_model_of=None,time_delay=None,time_delay_error=None,center_mass_error = 0.003,astrometry_error = 0.003,**kwargs):
     #Check for existing results
     #path_model_result_csv = os.path.join(set_up_dir(system_name,path_for_models,dir_models),"final_result",f"models_{system_name}.csv")
     system_name = system.name.values[0]
     modeling_path = set_up_dir(path_for_models,dir_models,system_name)
     path_save = os.path.join(modeling_path,"model_result.pickle")
     lensmodel_system = lensmodel_handler(modeling_path,system,time_delay=time_delay,time_delay_error=time_delay_error)
-    center_mass_error = 0.003
-    astrometry_error = 0.003 
+     
     can_end = False
     #quick solution
     #available_lens_models = lensmodel_system.mass_models.keys()

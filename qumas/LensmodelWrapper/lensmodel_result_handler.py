@@ -96,7 +96,7 @@ class Result_Handler(
         pandas_comb['astrometry_error'] = pandas_comb['astrometry_error'].values[0]
         pandas_comb['center_mass_error'] = np.array([*pandas_comb['center_mass_error'].values])
         pandas_comb['flux_error_by_image'] = pandas_comb['flux_error'].values.T[1][0]
-        pandas_comb['flux_error'] = max(pandas_comb['flux_error_by_image'])
+        #pandas_comb['flux_error'] = max(pandas_comb['flux_error_by_image'])
         pandas_comb = pandas_comb.loc[:, ~pandas_comb.columns.duplicated()]
         pandas_comb["einstein_radii"] = [model_er]*len(pandas_comb["magnitudes"])
         pandas_comb["magnitudes_corrected"] = -2.5*np.log10(10**(-(np.abs(pandas_comb['flux_output'])+ np.min(pandas_comb["magnitudes"]))/2.5)/np.abs(pandas_comb["magnification"]))
@@ -122,7 +122,7 @@ class Result_Handler(
     
     def get_stats(self):
         pandas_stats = []
-        relevant_keys = ["name","model_name",'mass_distribution','einstein_radii','median_einstein_radii','std_einstein_radii','flux_error','astrometry_error','center_mass_error', \
+        relevant_keys = ["name","model_name",'mass_distribution','einstein_radii','median_einstein_radii','std_einstein_radii','flux_error_by_image','astrometry_error','center_mass_error', \
             'band_to_model','chis2_tot', 'chis2_pos','chis2_flux','log_Chi']
         if not self.older_version:
             relevant_keys += ['zl', 'zs', 'photometric_system', 'Telescope', 'instrument', 'zpt', 'lambda_cen']
@@ -139,7 +139,7 @@ class Result_Handler(
         return pd.DataFrame(pandas_stats,columns=relevant_keys+["max(delta_images)",'median_demag','std_demag'])
     
     def make_plot(self, model=None, add_info=False, add_critical=False, save='',remove_axis=False, x_zoom_list=None, y_zoom_list=None, zoom_size=0.2
-                  , zoom_positions=None,add_legend=True,add_source=False,legend_loc = "best",nlim=None):
+                  , zoom_positions=None,add_legend=True,add_source=False,legend_loc = "best",nlim=None,add_caustic=False):
         """
         Creates a scatter plot with optional zoomed inset subplots.
 
@@ -193,24 +193,26 @@ class Result_Handler(
             ax[0].text(ra_imput[i], dec_imput[i], v, fontsize=40, alpha=0.8, horizontalalignment="right")
 
         # Add critical curves if requested
+        #print( model_dic['final_step'].keys())
         if add_source:
-            lst =  model_dic['final_step']["Source"]['posn'].split(" ")
-            xs, ys = [float(S) for S in lst if S.strip() != '']
+            lst =  model_dic["final_step"]['SOURCE PARMS']['ptsrc1']
+            xs, ys = lst['s[1]'],lst['s[2]']
             ax[0].scatter(xs, ys, label="Source position", facecolors='#E69F00', edgecolors='#E69F00',s=200,linewidths=3,zorder=100,marker="*")
             #ax[0].scatter()
         
-        if add_critical:
+        if add_critical or add_caustic:
             critical = model_dic["critical_caustic"]["critical_caustic"]
             x = critical["x"]
             u = critical["u"]
             v = critical["v"]
             y = critical["y"]
             step = np.argmax(np.sqrt(np.diff(x)**2 + np.diff(y)**2))
-            ax[0].plot(x[:step+1], y[:step+1], label="Critical Curve", alpha=0.5,linewidth=10)
-            ax[0].plot(x[step+1:], y[step+1:], label="Critical Curve", alpha=0.5,linewidth=10)
-            
-            ax[0].plot(u[:step+1], v[:step+1], label="Caustic Curve", alpha=0.5,linewidth=10)
-            ax[0].plot(u[step+1:], v[step+1:], label="Caustic Curve", alpha=0.5,linewidth=10)
+            if add_critical:
+                ax[0].plot(x[:step+1], y[:step+1], label="Critical Curve", alpha=0.5,linewidth=10)
+                ax[0].plot(x[step+1:], y[step+1:], label="Critical Curve", alpha=0.5,linewidth=10)
+            if add_caustic:
+                ax[0].plot(u[:step+1], v[:step+1], label="Caustic Curve", alpha=0.5,linewidth=10)
+                ax[0].plot(u[step+1:], v[step+1:], label="Caustic Curve", alpha=0.5,linewidth=10)
 
         # Add additional info text if requested
         if add_info:
