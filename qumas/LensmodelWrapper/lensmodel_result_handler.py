@@ -72,6 +72,20 @@ class Result_Handler(
             print("mass_distribution:",local_model.get("model_setup").get("model_setup").get("mass_distribution"))
         return local_model.get('final_step').get('LENS PARMS')
     
+    def get_source_position(self,model:str=None,verbose=False):
+        model = model or self.current_best_n_model
+        if model not in self.models:
+            raise ModelNotFoundError(model, self.models)
+        local_model = self.get_model(model)
+        if verbose:
+            print("mass_distribution:",local_model.get("model_setup").get("model_setup").get("mass_distribution"))
+        lst = local_model.get('final_step')['SOURCE PARMS']['ptsrc1']
+        x,y = lst['s[1]'],lst['s[2]']
+        return (x,y)
+
+
+    # lst =  model_dic["final_step"]['SOURCE PARMS']['ptsrc1']
+    #         xs, ys = lst['s[1]'],lst['s[2]']
     def make_pandas_from_results(self,model:str=None):
         model = model or self.current_best_n_model
         if model not in self.models:
@@ -158,8 +172,6 @@ class Result_Handler(
         model = model or self.current_best_n_model
         if model not in self.models:
             raise ModelNotFoundError(model, self.models)
-        #print(model)
-        
         model_dic = self.lensmodel_system[model]
         ra_imput = model_dic['final_step']['images']['ra_imput']
         dec_imput = model_dic['final_step']['images']['dec_imput']
@@ -198,8 +210,6 @@ class Result_Handler(
             lst =  model_dic["final_step"]['SOURCE PARMS']['ptsrc1']
             xs, ys = lst['s[1]'],lst['s[2]']
             ax[0].scatter(xs, ys, label="Source position", facecolors='#E69F00', edgecolors='#E69F00',s=200,linewidths=3,zorder=100,marker="*")
-            #ax[0].scatter()
-        
         if add_critical or add_caustic:
             critical = model_dic["critical_caustic"]["critical_caustic"]
             x = critical["x"]

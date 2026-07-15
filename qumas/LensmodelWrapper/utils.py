@@ -191,7 +191,7 @@ def pandas_to_model(Lenses:pd.DataFrame,verbose=False,only_astrometry=False):
 	if len(Lenses_f)==0:
 		Lenses["can_be_modeled"] = [False]*len(Lenses)
 		return Lenses
-	print("len of the subpandas",[len(i) for i in Lenses_f])
+	#print("len of the subpandas",[len(i) for i in Lenses_f])
 	index_f =np.argmax([len(i) for i in Lenses_f])
 
 	Lenses_f = Lenses_f[index_f]
@@ -357,3 +357,11 @@ class ModelNotFoundError(Exception):
         message = f"The model '{model}' is not in the lensmodel keys list: {available_models}"
         super().__init__(message)
 
+def set_up_dir(path_for_models,dir_models,system_name):
+    if not os.path.isdir(path_for_models):
+        os.mkdir(path_for_models)
+    if not os.path.isdir(os.path.join(path_for_models,dir_models)):
+        os.mkdir(os.path.join(path_for_models,dir_models))
+    if not os.path.isdir(os.path.join(path_for_models,dir_models,system_name)):
+        os.mkdir(os.path.join(path_for_models,dir_models,system_name))
+    return os.path.join(path_for_models,dir_models,system_name)

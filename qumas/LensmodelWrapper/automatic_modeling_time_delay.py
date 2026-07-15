@@ -2,21 +2,14 @@ import os
 import numpy as np
 from .lensmodel_wrapper import run_lensmodel
 from .lensmodel_handler import lensmodel_handler
-from .utils import full_modeling_result,compare_dicts,write_pickle,read_pickle
+from .utils import full_modeling_result,compare_dicts,write_pickle,read_pickle,set_up_dir
 #,get_paths_before #?
 #run_lensmodel,save_dict_to_hdf5,full_modeling_result,read_hdf5,compare_dicts,write_pickle
 from .lensmodel_result_handler import Result_Handler
 from .mcmc_lensmodel import make_mcmc_lensmodel
 
 #maybe use YAML 
-def set_up_dir(path_for_models,dir_models,system_name):
-    if not os.path.isdir(path_for_models):
-        os.mkdir(path_for_models)
-    if not os.path.isdir(os.path.join(path_for_models,dir_models)):
-        os.mkdir(os.path.join(path_for_models,dir_models))
-    if not os.path.isdir(os.path.join(path_for_models,dir_models,system_name)):
-        os.mkdir(os.path.join(path_for_models,dir_models,system_name))
-    return os.path.join(path_for_models,dir_models,system_name)
+
 # To do change all the save and reading to pickle
 
 def automatic_modeling(system,max_separation=0.01,path_for_models=None,dir_models=None,model_All=False,do_mcmc=False,max_lap=10,
