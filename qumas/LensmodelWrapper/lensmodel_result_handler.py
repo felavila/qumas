@@ -262,7 +262,557 @@ class Result_Handler(
             plt.close()
         else:
             plt.show()
-        
+    def make_plot(
+        self,
+        model=None,
+        plane="both",
+        add_info=False,
+        add_critical=False,
+        add_caustic=False,
+        add_source=True,
+        save="",
+        remove_axis=False,
+        x_zoom_list=None,
+        y_zoom_list=None,
+        zoom_size=0.2,
+        zoom_positions=None,
+        add_legend=True,
+        legend_loc="best",
+        nlim=None,
+        figsize=None,
+        aspect_ratio="equal",
+        invert_xaxis=True,
+        label_fontsize=35,
+        tick_fontsize=30,
+        legend_fontsize=22,
+        annotation_fontsize=35,
+        info_fontsize=20,
+        title_fontsize=30,
+    ):
+        """
+        Plot the lens-plane and/or source-plane configuration.
+
+        Parameters
+        ----------
+        plane : {"lens", "source", "both"}
+            Select which plane is displayed.
+
+        nlim : float or dict, optional
+            Symmetric axis limits. It can be a scalar applied to every
+            panel or a dictionary such as:
+
+                nlim={"lens": 3.0, "source": 0.15}
+
+        aspect_ratio : str or float
+            Matplotlib aspect ratio. The default, "equal", preserves
+            angular scales in both planes.
+        """
+
+        model = model or self.current_best_n_model
+
+        if model not in self.models:
+            raise ModelNotFoundError(model, self.models)
+
+        plane = plane.lower()
+
+        if plane not in {"lens", "source", "both"}:
+            raise ValueError(
+                "plane must be 'lens', 'source', or 'both'."
+            )
+
+        model_dic = self.lensmodel_system[model]
+        final_step = model_dic["final_step"]
+        model_setup = model_dic["model_setup"]["model_setup"]
+
+        # --------------------------------------------------------------
+        # Image-plane coordinates
+        # --------------------------------------------------------------
+        image_data = final_step["images"]
+
+        ra_input = np.asarray(image_data["ra_imput"])
+        dec_input = np.asarray(image_data["dec_imput"])
+
+        ra_output = np.asarray(image_data["ra_output"])
+        dec_output = np.asarray(image_data["dec_output"])
+
+        # --------------------------------------------------------------
+        # Lens coordinates
+        # --------------------------------------------------------------
+        ra_lens_model = []
+        dec_lens_model = []
+
+        for lens_parameters in final_step["LENS PARMS"].values():
+            ra_lens_model.append(lens_parameters["p[1]"])
+            dec_lens_model.append(lens_parameters["p[2]"])
+
+        ra_lens_model = np.asarray(ra_lens_model)
+        dec_lens_model = np.asarray(dec_lens_model)
+
+        ra_lens_input = np.asarray(model_setup["lens_ra"])
+        dec_lens_input = np.asarray(model_setup["lens_dec"])
+
+        components = model_setup["component"]
+
+        # --------------------------------------------------------------
+        # Source coordinates
+        # --------------------------------------------------------------
+        source_parameters = final_step.get("SOURCE PARMS", {})
+
+        # --------------------------------------------------------------
+        # Critical curves and caustics
+        # --------------------------------------------------------------
+        critical_data = None
+        curve_segments = None
+
+        if add_critical or add_caustic:
+            critical_data = model_dic[
+                "critical_caustic"
+            ]["critical_caustic"]
+
+            critical_x = np.asarray(critical_data["x"])
+            critical_y = np.asarray(critical_data["y"])
+
+            # Locate the largest discontinuity between curve segments.
+            distance = np.hypot(
+                np.diff(critical_x),
+                np.diff(critical_y),
+            )
+
+            if len(distance) > 0 and np.any(np.isfinite(distance)):
+                split_index = int(np.nanargmax(distance)) + 1
+            else:
+                split_index = len(critical_x)
+
+            curve_segments = [
+                slice(0, split_index),
+                slice(split_index, None),
+            ]
+
+        # --------------------------------------------------------------
+        # Figure layout
+        # --------------------------------------------------------------
+        if plane == "both":
+            if figsize is None:
+                figsize = (20, 10)
+
+            fig, axes = plt.subplots(
+                1,
+                2,
+                figsize=figsize,
+                constrained_layout=True,
+            )
+
+            axes_by_plane = {
+                "lens": axes[0],
+                "source": axes[1],
+            }
+
+        else:
+            if figsize is None:
+                figsize = (10, 10)
+
+            fig, axis = plt.subplots(
+                figsize=figsize,
+                constrained_layout=True,
+            )
+
+            axes_by_plane = {plane: axis}
+
+        # --------------------------------------------------------------
+        # Helper functions
+        # --------------------------------------------------------------
+        def plot_segmented_curve(
+            axis,
+            x,
+            y,
+            label,
+            color,
+            linewidth=5,
+            alpha=0.7,
+            include_label=True,
+        ):
+            """Plot separated curve segments without duplicate legends."""
+
+            for segment_number, segment in enumerate(curve_segments):
+                x_segment = x[segment]
+                y_segment = y[segment]
+
+                if len(x_segment) == 0:
+                    continue
+
+                curve_label = (
+                    label
+                    if include_label and segment_number == 0
+                    else None
+                )
+
+                axis.plot(
+                    x_segment,
+                    y_segment,
+                    color=color,
+                    linewidth=linewidth,
+                    alpha=alpha,
+                    label=curve_label,
+                )
+
+        def draw_lens_plane(
+            axis,
+            annotate=True,
+            include_labels=True,
+        ):
+            """Draw image positions, lenses, and critical curves."""
+
+            axis.scatter(
+                ra_input,
+                dec_input,
+                label="Observed image positions"
+                if include_labels else None,
+                facecolors="none",
+                edgecolors="purple",
+                s=200,
+                linewidths=3,
+                zorder=100,
+            )
+
+            axis.scatter(
+                ra_output,
+                dec_output,
+                label="Model image positions"
+                if include_labels else None,
+                color="blue",
+                alpha=0.85,
+                s=200,
+                zorder=90,
+            )
+
+            axis.scatter(
+                ra_lens_model,
+                dec_lens_model,
+                label="Model lens position"
+                if include_labels else None,
+                color="black",
+                alpha=0.95,
+                linewidths=3,
+                s=200,
+                zorder=90,
+            )
+
+            axis.scatter(
+                ra_lens_input,
+                dec_lens_input,
+                label="Input lens position"
+                if include_labels else None,
+                facecolors="none",
+                edgecolors="red",
+                s=200,
+                linewidths=3,
+                zorder=90,
+            )
+
+            if annotate:
+                for component, ra_value, dec_value in zip(
+                    components,
+                    ra_input,
+                    dec_input,
+                ):
+                    axis.annotate(
+                        str(component),
+                        xy=(ra_value, dec_value),
+                        xytext=(-8, 8),
+                        textcoords="offset points",
+                        fontsize=annotation_fontsize,
+                        ha="right",
+                        va="bottom",
+                    )
+
+            if add_critical and critical_data is not None:
+                plot_segmented_curve(
+                    axis=axis,
+                    x=np.asarray(critical_data["x"]),
+                    y=np.asarray(critical_data["y"]),
+                    label="Critical curve",
+                    color="tab:grey",
+                    include_label=include_labels,
+                )
+
+        def draw_source_plane(
+            axis,
+            include_labels=True,
+        ):
+            """Draw source positions and caustics."""
+
+            if add_source:
+                for source_number, (
+                    source_name,
+                    source_values,
+                ) in enumerate(source_parameters.items()):
+
+                    if (
+                        "s[1]" not in source_values
+                        or "s[2]" not in source_values
+                    ):
+                        continue
+
+                    source_label = (
+                        "Source position"
+                        if len(source_parameters) == 1
+                        else f"Source position: {source_name}"
+                    )
+
+                    axis.scatter(
+                        source_values["s[1]"],
+                        source_values["s[2]"],
+                        label=source_label
+                        if include_labels else None,
+                        facecolors="#E69F00",
+                        edgecolors="black",
+                        s=300,
+                        linewidths=1.5,
+                        marker="*",
+                        zorder=100,
+                    )
+
+            if add_caustic and critical_data is not None:
+                plot_segmented_curve(
+                    axis=axis,
+                    x=np.asarray(critical_data["u"]),
+                    y=np.asarray(critical_data["v"]),
+                    label="Caustic",
+                    color="tab:red",
+                    include_label=include_labels,
+                )
+
+        def apply_axis_limits(axis, plane_name):
+            """Apply scalar or plane-dependent symmetric limits."""
+
+            if nlim is None:
+                return
+
+            if isinstance(nlim, dict):
+                local_limit = nlim.get(plane_name)
+            else:
+                local_limit = nlim
+
+            if local_limit is not None:
+                axis.set_xlim(-local_limit, local_limit)
+                axis.set_ylim(-local_limit, local_limit)
+
+        def format_axis(axis, plane_name, add_title=False):
+            """Apply common formatting to both planes."""
+
+            axis.set_aspect(
+                aspect_ratio,
+                adjustable="box",
+            )
+
+            if plane_name == "lens":
+                axis.set_xlabel(
+                    r"$\Delta\alpha\;[\mathrm{arcsec}]$",
+                    fontsize=label_fontsize,
+                )
+                axis.set_ylabel(
+                    r"$\Delta\delta\;[\mathrm{arcsec}]$",
+                    fontsize=label_fontsize,
+                )
+
+                if add_title:
+                    axis.set_title(
+                        "Lens plane",
+                        fontsize=title_fontsize,
+                    )
+
+            else:
+                axis.set_xlabel(
+                    r"$\Delta\beta_x\;[\mathrm{arcsec}]$",
+                    fontsize=label_fontsize,
+                )
+                axis.set_ylabel(
+                    r"$\Delta\beta_y\;[\mathrm{arcsec}]$",
+                    fontsize=label_fontsize,
+                )
+
+                if add_title:
+                    axis.set_title(
+                        "Source plane",
+                        fontsize=title_fontsize,
+                    )
+
+            axis.tick_params(
+                axis="both",
+                labelsize=tick_fontsize,
+                pad=10,
+            )
+
+            apply_axis_limits(axis, plane_name)
+
+            if invert_xaxis:
+                axis.invert_xaxis()
+
+            if add_legend:
+                handles, labels = axis.get_legend_handles_labels()
+
+                if handles:
+                    axis.legend(
+                        loc=legend_loc,
+                        fontsize=legend_fontsize,
+                        ncol=1,
+                    )
+
+            if remove_axis:
+                axis.set_axis_off()
+
+        # --------------------------------------------------------------
+        # Draw the requested planes
+        # --------------------------------------------------------------
+        if "lens" in axes_by_plane:
+            lens_axis = axes_by_plane["lens"]
+            draw_lens_plane(lens_axis)
+
+            if add_info:
+                stats = self.pandas_model_stats[
+                    self.pandas_model_stats["model_name"] == model
+                ]
+
+                if not stats.empty:
+                    mass_distribution = stats[
+                        "mass_distribution"
+                    ].iloc[0]
+
+                    maximum_difference = stats[
+                        "max(delta_images)"
+                    ].iloc[0]
+
+                    chi_squared = stats["chis2_tot"].iloc[0]
+
+                    info_text = (
+                        f"Mass distribution: {mass_distribution}\n"
+                        rf"$\max(\Delta_\mathrm{{images}})"
+                        rf"={maximum_difference:.3f}$"
+                        "\n"
+                        rf"$\chi^2_\mathrm{{total}}={chi_squared}$"
+                    )
+
+                    lens_axis.text(
+                        0.03,
+                        0.03,
+                        info_text,
+                        transform=lens_axis.transAxes,
+                        fontsize=info_fontsize,
+                        ha="left",
+                        va="bottom",
+                    )
+
+            format_axis(
+                lens_axis,
+                plane_name="lens",
+            )
+
+        if "source" in axes_by_plane:
+            source_axis = axes_by_plane["source"]
+            draw_source_plane(source_axis)
+
+            format_axis(
+                source_axis,
+                plane_name="source",
+            )
+
+        # --------------------------------------------------------------
+        # Optional zoomed insets
+        # --------------------------------------------------------------
+        if x_zoom_list is not None or y_zoom_list is not None:
+            if x_zoom_list is None or y_zoom_list is None:
+                raise ValueError(
+                    "Both x_zoom_list and y_zoom_list must be provided."
+                )
+
+            if len(x_zoom_list) != len(y_zoom_list):
+                raise ValueError(
+                    "x_zoom_list and y_zoom_list must have the same length."
+                )
+
+            # Use the lens plane when both panels are present.
+            zoom_plane = (
+                "lens"
+                if "lens" in axes_by_plane
+                else "source"
+            )
+
+            parent_axis = axes_by_plane[zoom_plane]
+
+            if zoom_positions is None:
+                zoom_positions = [
+                    (
+                        0.02 + index * (zoom_size + 0.02),
+                        0.02,
+                        zoom_size,
+                        zoom_size,
+                    )
+                    for index in range(len(x_zoom_list))
+                ]
+
+            if len(zoom_positions) != len(x_zoom_list):
+                raise ValueError(
+                    "zoom_positions must have one entry per zoom region."
+                )
+
+            for x_limits, y_limits, position in zip(
+                x_zoom_list,
+                y_zoom_list,
+                zoom_positions,
+            ):
+                inset_axis = parent_axis.inset_axes(position)
+
+                if zoom_plane == "lens":
+                    draw_lens_plane(
+                        inset_axis,
+                        annotate=False,
+                        include_labels=False,
+                    )
+                else:
+                    draw_source_plane(
+                        inset_axis,
+                        include_labels=False,
+                    )
+
+                inset_axis.set_xlim(*x_limits)
+                inset_axis.set_ylim(*y_limits)
+                inset_axis.set_aspect(
+                    aspect_ratio,
+                    adjustable="box",
+                )
+
+                if invert_xaxis:
+                    inset_axis.invert_xaxis()
+
+                inset_axis.tick_params(
+                    axis="both",
+                    labelsize=tick_fontsize,
+                )
+
+                parent_axis.indicate_inset_zoom(
+                    inset_axis,
+                    edgecolor="0.3",
+                )
+
+        # --------------------------------------------------------------
+        # Save or display
+        # --------------------------------------------------------------
+        if save:
+            save_path = (
+                save
+                if str(save).lower().endswith(".pdf")
+                else f"{save}.pdf"
+            )
+
+            fig.savefig(
+                save_path,
+                dpi=300,
+                bbox_inches="tight",
+            )
+            plt.close(fig)
+
+        else:
+            plt.show()
         # # Handle zoomed inset plots
         # if x_zoom_list and y_zoom_list:
         #     if len(x_zoom_list) != len(y_zoom_list):

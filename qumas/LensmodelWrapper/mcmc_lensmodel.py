@@ -92,22 +92,29 @@ def make_mcmc_lensmodel(system_class,model_to_mcmc,path,rewrite=False):
     with open(f'{path}/start_mcmc.dat', 'w') as file:
         file.writelines(start_mcmc)
     with open(f'{path}/domcmc.dat', 'w') as file:
-        mcmc = [    "#MCMC\n",
-                    "set omitcore = 0.05\n",
-                    f"data {path}/{name}.dat #filewhitdata\n",
-                    "set omega = 0.3\n",
-                    "set lambda = 0.7\n",
-                    "set hval = 0.7\n",
-                    "set hvale = 1000 # Uncertainty in H_0 in units of 100 km/s/Mpc\n",
-                    "set chimode = 0 #sourceplane\n",
-                    f"set zlens = {z_l} # lens redshift\n",
-                    f"fset zsrc = {z_s} # source redshift\n",
-                    "set checkparity = 0 # don't worry about parities\n",
-                    "set gridflag = 0 # don't need the tiling\n",
-                    "#set restart = 2\n",
-                    f"setlens {path}/start_mcmc.dat\n",
-                    "MCMCset 2 Nchain 10 maxsteps 100000\n",
-                    f"MCMCrun {path}/mcmc\n","quit\n"]
+        mcmc = [
+            "# MCMC\n",
+            "set omitcore = 0.05\n",
+            f"data {path}/{name}.dat\n",
+            "\n",
+            "set omega = 0.3\n",
+            "set lambda = 0.7\n",
+            "set hval = 0.7\n",
+            "set hvale = 1000\n",
+            f"set zlens = {z_l}\n",
+            f"set zsrc = {z_s}\n",
+            "\n",
+            "set chimode = 1      # image-plane chi-square\n",
+            "set srcmode = 1      # optimize source position for each model\n",
+            "set checkparity = 0  # use 1 if image parities are reliable\n",
+            "set gridflag = 1     # needed for image-plane lens-equation solving\n",
+            "set seed = -24\n",
+            "\n",
+            f"setlens {path}/start_mcmc.dat\n",
+            "MCMCset 2 Nchain 10 spread 3 maxsteps 100000\n",
+            f"MCMCrun {path}/mcmc\n",
+            "quit\n",
+        ]
         file.writelines(mcmc)
     run_lensmodel(path,"domcmc")
     result_pandas=make_pandas_from_mcmc(path)
@@ -119,9 +126,9 @@ def make_mcmc_lensmodel(system_class,model_to_mcmc,path,rewrite=False):
                     "set lambda = 0.7\n",
                     "set hval = 0.7\n",
                     "set hvale = 1000 # Uncertainty in H_0 in units of 100 km/s/Mpc\n",
-                    "set chimode = 0 #sourceplane\n",
+                    "set chimode = 1 #sourceplane\n",
                     f"set zlens = {z_l} # lens redshift\n",
-                    f"fset zsrc = {z_s} # source redshift\n",
+                    f"set zsrc = {z_s} # source redshift\n",
                     "set checkparity = 0 # don't worry about parities\n",
                     "set gridflag = 0 # don't need the tiling\n",
                     "#set restart = 2\n",
@@ -142,7 +149,7 @@ def make_mcmc_lensmodel(system_class,model_to_mcmc,path,rewrite=False):
     model.update({"mcmc":{"system_info":system_info,"mcmc_chain":result_pandas,"kappa_gamma_chain": pd.concat([pd.DataFrame(data) for data in data_list], ignore_index=True)}})
     system_class.lensmodel_system[model_to_mcmc] = model
     write_pickle(system_class.lensmodel_system,f"{path}/model_result.pickle")
-    [os.remove(os.path.join(path,i) )for i in os.listdir(path) if "model_result.pickle" not in i]
+    #[os.remove(os.path.join(path,i) )for i in os.listdir(path) if "model_result.pickle" not in i]
     print("MCMC ENDED")
     return system_class
 
