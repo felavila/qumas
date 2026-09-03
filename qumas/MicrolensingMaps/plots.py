@@ -9,7 +9,7 @@ from matplotlib.patches import Polygon, Rectangle, ConnectionPatch
 from qumas.MicrolensingMaps.micro_maps_tracks_func import _sample_profile_along_line_pixels,_sample_profile_along_line_bilinear_pixels
 
 
-def map_plot(mag_map_2d, cmap='RdYlBu', vmin=None, vmax=None,
+def map_plot(mag_map_2d, cmap='RdYlBu_r', vmin=None, vmax=None,
             cbar_side="right",
             remove_labels=True,
             cbar_label=r"$-2.5 \, \log(\mu/\langle \mu \rangle)$",
@@ -118,7 +118,7 @@ def compare_maps_plot(
     mag_map_left, mag_map_right,
     vmin=-1.5, vmax=0.5,
     label_color_bar=r"$-2.5 \, \log(\mu/\langle \mu \rangle)$",
-    cmap='RdYlBu',
+    cmap='RdYlBu_r',
     plot_sep=0.05,  # <--- NEW hyperparameter for horizontal spacing
     **kwargs
 ):

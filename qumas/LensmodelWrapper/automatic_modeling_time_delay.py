@@ -12,26 +12,29 @@ from .mcmc_lensmodel import make_mcmc_lensmodel
 
 # To do change all the save and reading to pickle
 
-def automatic_modeling(system,max_separation=0.01,path_for_models=None,dir_models=None,model_All=False,do_mcmc=False,max_lap=10,
-                    relative_flux_error=0.2,use_informed_flux=False,use_real_error_flux=False,do_model_of=None,time_delay=None,time_delay_error=None,center_mass_error = 0.003,astrometry_error = 0.003,**kwargs):
+def automatic_modeling(system,max_separation=0.01,path_for_models=None,dir_models=None,model_All=False,do_mcmc=False,max_lap=0,
+                    relative_flux_error=0.2,use_informed_flux=False,use_real_error_flux=False,do_model_of=None,time_delay=None,time_delay_error=None,
+                    center_mass_error = 0.003,astrometry_error = 0.003,**kwargs):
     #Check for existing results
     #path_model_result_csv = os.path.join(set_up_dir(system_name,path_for_models,dir_models),"final_result",f"models_{system_name}.csv")
     system_name = system.name.values[0]
     modeling_path = set_up_dir(path_for_models,dir_models,system_name)
+    print(modeling_path)
     path_save = os.path.join(modeling_path,"model_result.pickle")
     lensmodel_system = lensmodel_handler(modeling_path,system,time_delay=time_delay,time_delay_error=time_delay_error)
      
     can_end = False
-    #quick solution
-    #available_lens_models = lensmodel_system.mass_models.keys()
-    if len(lensmodel_system.images) == 2:
-        available_lens_models_to_model = ['SIS', 'SIE','SIS+shear']
-    if len(lensmodel_system.images) > 2:
-        available_lens_models_to_model = ['SIS+shear','SIE','SIE+shear',"POW",'POW+shear']#,"POWSE+shear"]
-    if system.total_lens.values[0]>1:
-        available_lens_models_to_model = np.array([[model if r==1 else model+f"-{r}G" for r in range(1,system.total_lens.values[0]+1)] for model in available_lens_models_to_model]).ravel()
+    available_lens_models_to_model = kwargs.get("lensmodels",[])
+    if len(available_lens_models_to_model) == 0:
+        if len(lensmodel_system.images) == 2:
+            available_lens_models_to_model = ['SIS', 'SIE','SIS+shear']
+        if len(lensmodel_system.images) > 2:
+            available_lens_models_to_model = ['SIS+shear','SIE','SIE+shear',"POW",'POW+shear']#,"POWSE+shear"]
+        if system.total_lens.values[0]>1:
+            available_lens_models_to_model = np.array([[model if r==1 else model+f"-{r}G" for r in range(1,system.total_lens.values[0]+1)] for model in available_lens_models_to_model]).ravel()
     if system.z_l.astype(float).values[0] > system.z_s.astype(float).values[0]:
             return print(f"Check redshift zl ({system.z_l.values[0]}) cant be bigger than zs ({system.z_s.values[0]})")
+    
     if os.path.exists(path_save):
         #print(path_save)
         dic_lens_system = read_pickle(path_save)
@@ -49,12 +52,12 @@ def automatic_modeling(system,max_separation=0.01,path_for_models=None,dir_model
     print("available_lens_models:",available_lens_models)
     for lap in range(10):
         if can_end and not model_All:
-                    break
+            break
         for _,mass_model in enumerate(available_lens_models):
             if can_end and not model_All:
                     break
             alredy_model = False
-            model_setup=lensmodel_system.writter_model_data(mass_distribution=mass_model,center_mass_error=center_mass_error,\
+            model_setup= lensmodel_system.writter_model_data(mass_distribution=mass_model,center_mass_error=center_mass_error,\
                                                             relative_flux_error=relative_flux_error,astrometry_error=astrometry_error,\
                                                                 use_informed_flux=use_informed_flux,use_real_error_flux=use_real_error_flux)
             for key, value in kwargs.items():

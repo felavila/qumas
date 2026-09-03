@@ -95,14 +95,10 @@ def run_lensmodel(modeling_path, run_name,**kwargs):
         # Always return to the original directory
         os.chdir(original_directory)
 
-        # Remove generated files, while preserving Lensmodel itself
         for filename in os.listdir(lensmodel_dir):
             file_path = os.path.join(lensmodel_dir, filename)
 
-            if (
-                os.path.isfile(file_path)
-                and "lensmodel" not in filename.lower()
-            ):
+            if (os.path.isfile(file_path) and "lensmodel" not in filename.lower()):
                 os.remove(file_path)
 
 

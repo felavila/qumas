@@ -8,7 +8,7 @@ dict_maps = {"alpha_0.1":  f"{main_path}/Mapas_magnification",
             "alpha_0.2":  f"{main_path}/Mapas_02"}
 
 
-def maps_to_stats(name,component,rs_lday,pix,mappix,num_bins=100,bins_limit=3,rs_times = [0.3,1,2],dict_maps=dict_maps):
+def maps_to_stats(name,component,rs_lday,pix,mappix,num_bins=100,bins_limit=3,rs_times = [0.3,1,2],dict_maps=dict_maps,use_direct=True):
     """_summary_
 
     Args:
@@ -27,7 +27,10 @@ def maps_to_stats(name,component,rs_lday,pix,mappix,num_bins=100,bins_limit=3,rs
     """
     mag_maps = {}
     for key,path in dict_maps.items():
-        map_1d_path = f'{path}/{name}{component}/magmap.dat'
+        if use_direct:
+            map_1d_path = f'{path}/magmap.dat'
+        else:
+            map_1d_path = f'{path}/{name}{component}/magmap.dat'
         map_1d = np.loadtxt(map_1d_path)
         map_2d = np.reshape(map_1d, (int(mappix), int(mappix)))
         n_factor_results = {}

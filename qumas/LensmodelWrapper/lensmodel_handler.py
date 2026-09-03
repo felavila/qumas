@@ -8,7 +8,7 @@ import subprocess
 from .utils import columns_to_float
 import pandas as pd
 from .mass_models import mass_models
-
+import copy
 # Get the path to the current file
 module_dir = Path(__file__).resolve().parent
 
@@ -33,7 +33,7 @@ class lensmodel_handler:
                   time_delay = None,time_delay_error= None): 
         self.model_setup_path = json_models
         self.modeling_path = modeling_path
-        self.system = system
+        self.system = copy.deepcopy(system)
         self.system_name = self.system.name.values[0]
         self.n_images = int(self.system.model_images.values[0]) #images can be modeled
         self.mass_distribution = "SIE"
@@ -82,6 +82,9 @@ class lensmodel_handler:
         error_lens_lens_centered = np.sqrt(lens[["dRA","dDEC"]].values**2+lens[["dRA","dDEC"]].values[0]**2)
         magnitudes = images[band_to_model].values
         #in coming iterations this should be change.
+        for n in ["photometric_system","Telescope","instrument"]:
+            if n not in self.system.columns:
+                self.system[n] = "Not informed"
         band_info = self.system.loc[images[band_to_model].index][["photometric_system","Telescope","instrument"]].values[0]
         # if not isinstance(band_info[0],str):
         #     band_info[0] = "Vega"
